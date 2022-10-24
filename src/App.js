@@ -1,12 +1,17 @@
-import qe from './qe.svg';
 import './App.css';
-import "react-datetime/css/react-datetime.css";
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Nav from './components/Nav';
 import Home from './Home';
 import Design from './Design';
 import Demo from './Demo';
 import Test from './Test';
+import CssBaseline from '@mui/material/CssBaseline';
 
 
 
@@ -304,8 +309,10 @@ function App() {
 
   const [available, setAvailable] = useState(defaultState.available);
 
+  const baseUrl = 'http://localhost:8000/';
+
   useEffect(() => {
-    let url = new URL('http://localhost:8000/api/info/available');
+    let url = new URL(baseUrl + 'api/info/available');
     fetch(url)
       .then(r => r.json())
       .then(j => {
@@ -313,29 +320,38 @@ function App() {
       })
   }, []);
 
+  const theme = createTheme({
+    palette: {
+      type: 'light',
+      primary: {
+        main: '#3f51b5',
+      },
+      secondary: {
+        main: '#f50057',
+      },
+    }
+  });
+
   return (
-    <Router>
-      <main className="block h-full">
-        <header className="App-header">
-          <div className="p-6 max-w-sm mx-auto flex space-x-4">
-            <div className="shrink-0">
-              <img className="h-12 w-12" src={qe} alt="qe" />
-            </div>
-            <div>
-              <div className=" text-zinc-300 text-4xl font-serif">Query Engine</div>
-            </div>
+
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <Nav available={available} />
+        <main className="block h-full">
+          <header className="App-header">
+          </header>
+          <div className='fixed w-full h-full'>
+            <Routes>
+              <Route index element={<Home />}></Route>
+              <Route exact path='/design' element={<Design available={available} baseUrl={baseUrl} />}></Route>
+              <Route exact path='/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
+              <Route exact path='/demo' element={<Demo available={available} />}></Route>
+            </Routes>
           </div>
-        </header>
-        <div className='fixed w-full h-full'>
-          <Routes>
-            <Route index element={<Home />}></Route>
-            <Route exact path='/design' element={<Design />}></Route>
-            <Route exact path='/test' element={<Test />}></Route>
-            <Route exact path='/demo' element={<Demo available={available} />}></Route>
-          </Routes>
-        </div>
-      </main >
-    </Router>
+        </main >
+      </Router>
+    </ThemeProvider>
   );
 }
 

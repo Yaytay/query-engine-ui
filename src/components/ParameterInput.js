@@ -3,6 +3,7 @@ import InputString from './InputString.js';
 import InputDate from './InputDate.js';
 import InputNumber from './InputNumber.js';
 import InputSelect from './InputSelect.js';
+import InputAsyncSelect from './InputAsyncSelect.js';
 import InputStringMulti from './InputStringMulti.js';
 
 
@@ -11,7 +12,6 @@ function ParameterInput(props) {
   var [value, setValue] = useState(props.value);
 
   function handleInputChange(e) {
-    console.log('ParameterInput: ' + e);
     setValue(e);
     props.onChange(e);
   }
@@ -34,6 +34,8 @@ function ParameterInput(props) {
           case 'String':
             if (props.arg.possibleValues.length > 0) {
               return (<InputSelect arg={props.arg} value={value} onChange={handleInputChange} />);
+            } else if(props.arg.possibleValuesUrl) {
+              return (<InputAsyncSelect arg={props.arg} value={value} onChange={handleInputChange} />);
             } else if (props.arg.multiValued) {
               return (<InputStringMulti arg={props.arg} value={value} onChange={handleInputChange} />);
             } else {

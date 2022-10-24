@@ -1,5 +1,3 @@
-import { propTypesSelected } from '@material-tailwind/react/types/components/select';
-import { getDefaultNormalizer } from '@testing-library/react';
 import React, {useState} from 'react';
 
 function DragBar(props) {

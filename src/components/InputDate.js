@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Datetime from 'react-datetime';
+// import Datetime from 'react-datetime';
 import 'moment';
 
 function InputDate(props) {
@@ -7,51 +7,39 @@ function InputDate(props) {
   var [value, setValue] = useState(props.value);
 
   function handleInputChange(e) {
-    var formattedTimestamp
-    switch (props.arg.type) {
-      case 'Date':
-        formattedTimestamp = e.format('YYYY-MM-DD');
-        break;
-      case 'DateTime':
-        formattedTimestamp = e.format();
-        break;
-      case 'Time':
-        formattedTimestamp = e.format('HH:mm:ss');
-        break;
-      default:
-    }
+    console.log(e.target.value);
   
-    console.log('InputDate: ' + formattedTimestamp);
-    setValue(formattedTimestamp);
-    props.onChange(formattedTimestamp);
+    console.log('InputDate: ' + e.target.value);
+    setValue(e.target.value);
+    props.onChange(e.target.value);
   }
 
-  var dateFormat;
-  var timeFormat;
+  var inputType;
 
   switch (props.arg.type) {
     case 'Date':
-      dateFormat = 'YYYY-MM-DD';
-      timeFormat = false;
+      inputType = "date";
       break;
     case 'DateTime':
-      dateFormat = 'YYYY-MM-DD';
-      timeFormat = 'HH:mm:ss';
+      inputType = "datetime-local";
       break;
     case 'Time':
-      dateFormat = false;
-      timeFormat = 'HH:mm:ss';
+      inputType = "time";
       break;
     default:
   }
 
   return (
+    <input className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+            id={props.arg.name} type={inputType} placeholder={props.arg.prompt} value={value} onChange={handleInputChange}/>
+    /*
     <Datetime inputProps={{ "placeholder": props.arg.prompt, "className": "appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" }}
       initialValue={value}
       dateFormat={dateFormat}
       timeFormat={timeFormat}
       closeOnSelect={true}    
       id={props.arg.name} placeholder={props.arg.promp} onChange={handleInputChange} />
+      */
   );
 }
 

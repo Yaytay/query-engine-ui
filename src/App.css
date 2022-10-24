@@ -12,18 +12,6 @@
   }
 }
 
-.App-header {
-  min-height: 9vh;
-  flex-direction: column;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
 @keyframes horizontal-shaking {
   0% { transform: translateX(0) }
   25% { transform: translateX(5px) }
@@ -31,3 +19,4 @@
   75% { transform: translateX(5px) }
   100% { transform: translateX(0) }
 }
+
