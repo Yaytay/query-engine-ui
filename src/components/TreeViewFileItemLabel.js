@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 
-import InlineEdit from './InlineEdit'
-
 import Box from '@mui/material/Box';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import EnhancedEncryptionIcon from '@mui/icons-material/EnhancedEncryption';
@@ -20,8 +18,8 @@ function TreeViewFileItemLabel(props) {
   const input = useRef(null);
 
   function renameClick(e) {
-    console.log(e)
     setDisabled(false)
+    input.current.focus()
   }
 
   function handleInputChange(e) {    
@@ -29,19 +27,26 @@ function TreeViewFileItemLabel(props) {
     setName(e.target.value)
   }
 
+  function siblingExists(node, newName) {
+    return node.parent && (node.parent.children.find(n => n.name === newName) === undefined ? false : true);
+  }
+
   function loseFocus(e) {
-    setDisabled(true);
-    props.onRename && props.onRename(props.node, name);
+    if (siblingExists(props.node, name)) {
+      console.log('has sibling')
+    } else {
+      setDisabled(true)
+      props.onRename && props.onRename(props.node, name)
+    }
   }
 
   function keyPress(e) {
-    if (e.keyCode == 13) {
+    if (e.keyCode === 13) {
       input.current.blur();
     }
   }
 
   useEffect(() => {
-    console.log(disabled)
     input.current.focus()
   }, [disabled])
 
@@ -65,14 +70,32 @@ function TreeViewFileItemLabel(props) {
         ? (
           <>
             <Tooltip title='New folder'>
-              <IconButton className="flex-right" sx={{ 'borderRadius': '20%' }}><CreateNewFolderIcon fontSize="small" /></IconButton>
+              <IconButton 
+                className="flex-right" 
+                sx={{ 'borderRadius': '20%' }}
+                onClick={e => { e.stopPropagation(); props.onNewFolder && props.onNewFolder(props.node) }}
+                >
+                <CreateNewFolderIcon fontSize="small" />
+              </IconButton>
             </Tooltip>
             <Tooltip title='New pipeline'>
-              <IconButton className="flex-right" sx={{ 'borderRadius': '20%' }}><PostAddIcon fontSize="small" /></IconButton>
+              <IconButton 
+                className="flex-right" 
+                sx={{ 'borderRadius': '20%' }}
+                onClick={e => { e.stopPropagation(); props.onNewPipeline && props.onNewPipeline(props.node) }}
+                >
+                <PostAddIcon fontSize="small" />
+              </IconButton>
             </Tooltip>
             {props.node.children.find(n => n.name === 'permissions.jexl') ? null : (
               <Tooltip title='New permissions file'>
-                <IconButton className="flex-right" sx={{ 'borderRadius': '20%' }}><EnhancedEncryptionIcon fontSize="small" /></IconButton>
+                <IconButton 
+                  className="flex-right" 
+                  sx={{ 'borderRadius': '20%' }}
+                  onClick={e => { e.stopPropagation(); props.onNewPermissions && props.onNewPermissions(props.node) }}
+                  >
+                  <EnhancedEncryptionIcon fontSize="small" />
+                </IconButton>
               </Tooltip>
             )
             }
@@ -94,7 +117,13 @@ function TreeViewFileItemLabel(props) {
           )
       }
       <Tooltip title='Delete'>
-        <IconButton className="flex-right" sx={{ 'borderRadius': '20%' }}><DeleteIcon fontSize="small" /></IconButton>
+        <IconButton 
+          className="flex-right" 
+          sx={{ 'borderRadius': '20%' }}
+          onClick={e => { e.stopPropagation(); props.onDelete && props.onDelete(props.node) }}
+          >
+          <DeleteIcon fontSize="small" />
+        </IconButton>
       </Tooltip>
     </Box>
   </Box>

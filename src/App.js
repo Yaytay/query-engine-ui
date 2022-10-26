@@ -320,6 +320,16 @@ function App() {
       })
   }, []);
 
+  const refresh = function() {
+    console.log('refresh');
+    let url = new URL(baseUrl + 'api/info/available');
+    fetch(url)
+      .then(r => r.json())
+      .then(j => {
+        setAvailable(j);
+      })
+  }
+
   const theme = createTheme({
     palette: {
       type: 'light',
@@ -344,7 +354,9 @@ function App() {
           <div className='fixed w-full h-full'>
             <Routes>
               <Route index element={<Home />}></Route>
-              <Route exact path='/design' element={<Design available={available} baseUrl={baseUrl} />}></Route>
+              <Route exact path='/design' element={
+                <Design available={available} baseUrl={baseUrl} onChange={refresh} />
+              }></Route>
               <Route exact path='/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
               <Route exact path='/demo' element={<Demo available={available} />}></Route>
             </Routes>
