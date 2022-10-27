@@ -11,7 +11,7 @@ function DragBar(props) {
 
   function dragMove(e) {
     if (dragging) {
-      props.onChange(e.pageX);
+      props.onChange && props.onChange(e.pageX);
     }
   }
 
@@ -21,7 +21,7 @@ function DragBar(props) {
   }
 
   return (
-    <div className="w-1 bg-gray-500 cursor-col-resize"
+    <div className="w-1 cursor-col-resize border-l-2"
       onPointerDown={dragStart} 
       onPointerMove={dragMove} 
       onPointerUp={dragStop} 

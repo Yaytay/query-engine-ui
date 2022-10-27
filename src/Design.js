@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
+import DragBar from './components/DragBar'
 import TreeViewFileItemLabel from './components/TreeViewFileItemLabel'
 
 import Article from '@mui/icons-material/Article';
 import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
 import Folder from '@mui/icons-material/Folder';
 import FolderOpen from '@mui/icons-material/FolderOpen';
 import Snackbar from '@mui/material/Snackbar';
@@ -23,6 +23,8 @@ function Design(props) {
 
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMessage, setSnackMessage] = useState();
+
+  const [fileDrawerWidth, setFileDrawerWidth] = useState(500);
 
   const setParents = useCallback(node => {
     node.children.forEach(n => {
@@ -95,8 +97,6 @@ function Design(props) {
       })
   }, [props.baseUrl, handleResponse, getAllDirs])
 
-  const drawerWidth = 500;
-
   const [tabPanel, setTabPanel] = useState(0);
   const [currentFile, setCurrentFile] = useState(null);
 
@@ -125,16 +125,24 @@ function Design(props) {
   }
 
   function fileSelected(e, nodeIds) {
-    console.log(nodeIds);
-    console.log(e);
     if (nodeMap[nodeIds]) {
       setCurrentFile(nodeMap[nodeIds]);
     }
   }
 
   function onRename(node, newName) {
+    const oldPath = node.path;
+    const newPath = node.path.substring(0, node.path.lastIndexOf("/") + 1) + newName;
+    console.log("Rename from " + oldPath + " to " + newPath)
     let url = new URL(props.baseUrl + 'api/design/rename/' + node.path + '?name=' + encodeURIComponent(newName));
-    handleResponse(fetch(url, { method: 'POST' }));
+    handleResponse(fetch(url, { method: 'POST' }))
+      .then(j => {
+        const idx = expanded.findIndex(p => p === oldPath);
+        if (idx >= 0) {
+          expanded[idx] = newPath;
+          setExpanded(expanded);
+        }
+      })
   }
 
   function childExists(node, newName) {
@@ -184,6 +192,12 @@ function Design(props) {
     setExpanded(nodeIds)
   }
 
+  function fileDrawerWidthChange(w) {
+    if (w > 400) {
+      setFileDrawerWidth(w)
+    }
+  }
+
   const snackClose = (event, reason) => {
     setSnackOpen(false);
   };
@@ -210,15 +224,14 @@ function Design(props) {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Drawer
+    <Box className="flex h-full">
+      <Box
         open={true}
         variant='persistent'
         sx={{
-          width: drawerWidth,
+          width: fileDrawerWidth,
           flexShrink: 0,
-          boxSizing: 'border-box',
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+          boxSizing: 'border-box'
         }}         >
         <Toolbar></Toolbar>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -242,12 +255,14 @@ function Design(props) {
             </TreeView>
           </Box>
         </TabPanel>
-      </Drawer>
+      </Box>
+      <DragBar className='h-full' onChange={fileDrawerWidthChange}/>
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${fileDrawerWidth}px)` } }}
       >
         <Toolbar></Toolbar>
+        <Box className="w-full h-full bg-red-50" />
         <Snackbar
           open={snackOpen}
           autoHideDuration={10000}
