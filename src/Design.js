@@ -7,6 +7,9 @@ import Article from '@mui/icons-material/Article';
 import Box from '@mui/material/Box';
 import Folder from '@mui/icons-material/Folder';
 import FolderOpen from '@mui/icons-material/FolderOpen';
+import IconButton from '@mui/material/IconButton';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import MenuIcon from '@mui/icons-material/Menu';
 import Snackbar from '@mui/material/Snackbar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -25,6 +28,7 @@ function Design(props) {
   const [snackMessage, setSnackMessage] = useState();
 
   const [fileDrawerWidth, setFileDrawerWidth] = useState(500);
+  const [displayFileDrawer, setDisplayFileDrawer] = useState(false);
 
   const setParents = useCallback(node => {
     node.children.forEach(n => {
@@ -198,6 +202,10 @@ function Design(props) {
     }
   }
 
+  function fileDrawerHide() {
+    setDisplayFileDrawer(!displayFileDrawer)
+  }
+
   const snackClose = (event, reason) => {
     setSnackOpen(false);
   };
@@ -231,13 +239,23 @@ function Design(props) {
         sx={{
           width: fileDrawerWidth,
           flexShrink: 0,
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          display: displayFileDrawer ? 'box' : 'none'
         }}         >
         <Toolbar></Toolbar>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabPanel} onChange={handleChange} >
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }} className="flex">
+          <Tabs value={tabPanel} onChange={handleChange} className="flex-1">
             <Tab label="Files" />
           </Tabs>
+          <Box className="flex-right">
+            <IconButton
+              className="flex-right"
+              sx={{ 'borderRadius': '20%' }}
+              onClick={fileDrawerHide}
+            >
+              <KeyboardDoubleArrowLeftIcon fontSize="small" />
+            </IconButton>
+          </Box>
         </Box>
         <TabPanel value={tabPanel} index={0}>
           <Box>
@@ -256,7 +274,20 @@ function Design(props) {
           </Box>
         </TabPanel>
       </Box>
-      <DragBar className='h-full' onChange={fileDrawerWidthChange}/>
+      <DragBar className='h-full' onChange={fileDrawerWidthChange} sx={{ display: displayFileDrawer ? 'box' : 'none'}} />
+      <Box className="flex h-full w-10 border-r-2 align-top" sx={{ display: displayFileDrawer ? 'none' : 'box'}}>
+        <Box>
+        <Toolbar></Toolbar>
+        <Box>
+          <IconButton
+            sx={{ 'borderRadius': '20%' }}
+            onClick={fileDrawerHide}
+          >
+            <MenuIcon fontSize="small" />
+          </IconButton>
+        </Box>
+        </Box>
+      </Box>
       <Box
         component="main"
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${fileDrawerWidth}px)` } }}
