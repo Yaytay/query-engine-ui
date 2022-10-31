@@ -18,8 +18,8 @@ function ParameterInput(props) {
 
   var labelClassName = 
     props.highlight 
-    ? "text-red-600 text-sm font-bold leading-tight tracking-normal"
-    : "text-gray-800 text-sm font-bold leading-tight tracking-normal"
+    ? "text-red-600 text-base font-bold leading-tight tracking-normal"
+    : "text-gray-800 text-base font-bold leading-tight tracking-normal"
     ;
 
   return (
@@ -28,7 +28,7 @@ function ParameterInput(props) {
         {props.arg.title ?? props.arg.name}
         {props.arg.optional || " *"}
       </label>
-      <div>{props.arg.description}</div>
+      <div className='text-sm'>{props.arg.description}</div>
       {(() => {
         switch (props.arg.type) {
           case 'String':

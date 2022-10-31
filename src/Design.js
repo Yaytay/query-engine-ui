@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 import DragBar from './components/DragBar'
 import TreeViewFileItemLabel from './components/TreeViewFileItemLabel'
@@ -9,32 +9,50 @@ import Folder from '@mui/icons-material/Folder';
 import FolderOpen from '@mui/icons-material/FolderOpen';
 import IconButton from '@mui/material/IconButton';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
-import MenuIcon from '@mui/icons-material/Menu';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Snackbar from '@mui/material/Snackbar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Toolbar from '@mui/material/Toolbar';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
+import { Typography } from '@mui/material';
 
+var onChange;
 
 function Design(props) {
 
-  const [files, setFiles] = useState({ children: [], path: '' });
-  const [expanded, setExpanded] = useState([]);
-  const [nodeMap, setNodeMap] = useState({});
+  const [files, setFiles] = useState({ children: [], path: '' })
+  const [expanded, setExpanded] = useState([])
+  const [nodeMap, setNodeMap] = useState({})
 
-  const [snackOpen, setSnackOpen] = useState(false);
-  const [snackMessage, setSnackMessage] = useState();
+  const [snackOpen, setSnackOpen] = useState(false)
+  const [snackMessage, setSnackMessage] = useState()
 
-  const [fileDrawerWidth, setFileDrawerWidth] = useState(500);
-  const [displayFileDrawer, setDisplayFileDrawer] = useState(false);
+  const [fileDrawerWidth, setFileDrawerWidth] = useState(500)
+  const [displayFileDrawer, setDisplayFileDrawer] = useState(true)
+
+  const [helpDrawerWidth, setHelpDrawerWidth] = useState(500)
+  const [displayHelpDrawer, setDisplayHelpDrawer] = useState(true)
+
+  const [openapi, setOpenapi] = useState()
+
+  const [fileContents, setFileContents] = useState(null)
+  const [fileIsPipeline, setFileIsPipeline] = useState(false)
+
+  const [helpText, setHelpText] = useState('')
+
+  const outerBox = useRef(null)
+
+  if (props.onChange !== undefined && onChange === undefined) {
+    onChange = props.onChange
+  }
 
   const setParents = useCallback(node => {
     node.children.forEach(n => {
       n.parent = node
       if (Array.isArray(n.children)) {
-        setParents(n);
+        setParents(n)
       }
     })
   }, [])
@@ -43,11 +61,11 @@ function Design(props) {
     var arr = []
     function addToDirs(node) {
       if (Array.isArray(node.children)) {
-        arr.push(node.path);
-        node.children.forEach(n => addToDirs(n));
+        arr.push(node.path)
+        node.children.forEach(n => addToDirs(n))
       }
     }
-    addToDirs(root);
+    addToDirs(root)
     return arr
   }, [])
 
@@ -55,8 +73,8 @@ function Design(props) {
     var nm = {}
     function addToNodeMap(node) {
       if (Array.isArray(node.children)) {
-        nm[node.path] = node;
-        node.children.forEach(n => addToNodeMap(n));
+        nm[node.path] = node
+        node.children.forEach(n => addToNodeMap(n))
       } else {
         nm[node.path] = node;
       }
@@ -81,12 +99,13 @@ function Design(props) {
         setFiles(j)
         setParents(j)
         setNodeMap(buildNodeMap(j))
-        if (props.onChange) {
-          props.onChange()
+        if (onChange) {
+          onChange()
         }
         return j
       })
       .catch(e => {
+        console.log(e)
         setSnackMessage(e.message)
         setSnackOpen(true)
         console.log(e)
@@ -99,14 +118,30 @@ function Design(props) {
       .then(j => {
         setExpanded(getAllDirs(j));
       })
+    let openApiUrl = new URL(props.baseUrl + 'openapi.json');
+    fetch(openApiUrl)
+      .then(r => {
+        if (!r.ok) {
+          return r.text().then(t => {
+            throw Error(t)
+          })
+        } else {
+          return r.json()
+        }
+      })
+      .then(j => {
+        console.log(j)
+        setOpenapi(j)
+      })
+      .catch(e => {
+        console.log(e)
+        setSnackMessage(e.message)
+        setSnackOpen(true)
+      })
+
   }, [props.baseUrl, handleResponse, getAllDirs])
 
-  const [tabPanel, setTabPanel] = useState(0);
   const [currentFile, setCurrentFile] = useState(null);
-
-  const handleChange = (event, newValue) => {
-    setTabPanel(newValue);
-  };
 
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -120,17 +155,49 @@ function Design(props) {
         {...other}
       >
         {value === index && (
-          <Box sx={{ p: 3 }}>
+          <div className="h-full p-0.5">
             {children}
-          </Box>
+          </div>
         )}
       </div>
     );
   }
 
   function fileSelected(e, nodeIds) {
-    if (nodeMap[nodeIds]) {
-      setCurrentFile(nodeMap[nodeIds]);
+    console.log(nodeIds)
+    var node = nodeMap[nodeIds]
+    console.log(node)
+    if (node && !Array.isArray(node.children)) {
+      setCurrentFile(node);
+      setHelpText('');
+      let nodeUrl = new URL(props.baseUrl + 'api/design/file/' + node.path);
+      console.log(nodeUrl)
+      fetch(nodeUrl)
+        .then(r => {
+          if (!r.ok) {
+            return r.text().then(t => {
+              throw Error(t)
+            })
+          } else {
+            return r.text()
+          }
+        })
+        .then(j => {
+          console.log(j)
+          setFileContents(j)
+          setFileIsPipeline(false)
+          if (node.name === 'permissions.jexl') {
+            setHelpText(permissionsHtml + (openapi ? openapi.components.schemas.Condition.description : ''))
+          }
+        })
+        .catch(e => {
+          console.log(e)
+          setSnackMessage(e.message)
+          setSnackOpen(true)
+        })
+    } else {
+      setFileContents(null)
+      setFileIsPipeline(false)
     }
   }
 
@@ -197,6 +264,7 @@ function Design(props) {
   }
 
   function fileDrawerWidthChange(w) {
+    console.log(w)
     if (w > 400) {
       setFileDrawerWidth(w)
     }
@@ -206,102 +274,145 @@ function Design(props) {
     setDisplayFileDrawer(!displayFileDrawer)
   }
 
+  function helpDrawerWidthChange(w) {
+    if (outerBox.current) {
+      w = outerBox.current.clientWidth - w
+      if (w > 300) {
+        setHelpDrawerWidth(w)
+      }
+
+    }
+  }
+
+  function helpDrawerHide() {
+    setDisplayHelpDrawer(!displayHelpDrawer)
+  }
+
   const snackClose = (event, reason) => {
     setSnackOpen(false);
   };
+
   const renderTree = (node) => {
+    const icon = Array.isArray(node.children) && node.children.length === 0 ? (<FolderOpen />) : null
+    const label = (
+      <TreeViewFileItemLabel
+        node={node}
+        onRename={onRename}
+        onNewFolder={onNewFolder}
+        onNewPipeline={onNewPipeline}
+        onNewPermissions={onNewPermissions}
+        onDelete={onDelete}
+      />
+    )
+    const children = Array.isArray(node.children) ? node.children.map((child) => renderTree(child)) : null
     return (
-      <TreeItem key={node.name}
-        nodeId={node.path}
-        icon={Array.isArray(node.children) && node.children.length === 0 ? (<FolderOpen />) : null}
-        label={
-          <TreeViewFileItemLabel
-            node={node}
-            onRename={onRename}
-            onNewFolder={onNewFolder}
-            onNewPipeline={onNewPipeline}
-            onNewPermissions={onNewPermissions}
-            onDelete={onDelete}
-          />
-        } >
-        {Array.isArray(node.children)
-          ? node.children.map((child) => renderTree(child))
-          : null}
-      </TreeItem>
+      <TreeItem key={node.name} nodeId={node.path} icon={icon} label={label} children={children} />
     )
   };
 
   return (
-    <Box className="flex h-full">
-      <Box
-        open={true}
-        variant='persistent'
-        sx={{
-          width: fileDrawerWidth,
-          flexShrink: 0,
-          boxSizing: 'border-box',
-          display: displayFileDrawer ? 'box' : 'none'
-        }}         >
+    <div className="h-full flex" ref={outerBox}>
+      {displayFileDrawer && (
+        <>
+          <div style={{ width: fileDrawerWidth }} className="h-full box-border " >
+            <Toolbar></Toolbar>
+            <div style={{ borderColor: 'divider' }} className="flex border-b">
+              <div className="flex-1 p-3">
+                FILES
+              </div>
+              <div className="flex-none">
+                <IconButton sx={{ 'borderRadius': '20%' }} onClick={fileDrawerHide} >
+                  <KeyboardDoubleArrowLeftIcon fontSize="small" />
+                </IconButton>
+              </div>
+            </div>
+            <div className="h-full">
+              <TreeView
+                aria-label="file system navigator"
+                multiSelect={false}
+                defaultCollapseIcon={<FolderOpen />}
+                defaultExpandIcon={<Folder />}
+                defaultEndIcon={<Article />}
+                defaultExpanded={expanded}
+                onNodeSelect={fileSelected}
+                onNodeToggle={nodeToggled}
+                sx={{ height: '100%', flexGrow: 1, maxWidth: '100%', overflowY: 'auto' }}
+              >
+                {renderTree(files)}
+              </TreeView>
+            </div>
+          </div>
+          <DragBar className='h-full' onChange={fileDrawerWidthChange} sx={{ display: displayFileDrawer ? 'box' : 'none' }} />
+        </>
+      )}
+      {displayFileDrawer || (
+        <div className="h-full w-10 border-r-2 align-top">
+          <div>
+            <Toolbar></Toolbar>
+            <IconButton sx={{ 'borderRadius': '20%' }} onClick={fileDrawerHide}>
+              <KeyboardDoubleArrowRightIcon fontSize="small" />
+            </IconButton>
+          </div>
+        </div>
+      )}
+
+      <div className="h-full flex-1">
         <Toolbar></Toolbar>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }} className="flex">
-          <Tabs value={tabPanel} onChange={handleChange} className="flex-1">
-            <Tab label="Files" />
-          </Tabs>
-          <Box className="flex-right">
-            <IconButton
-              className="flex-right"
-              sx={{ 'borderRadius': '20%' }}
-              onClick={fileDrawerHide}
-            >
+        <div style={{ borderColor: 'divider' }} className="flex border-b p-3">
+          {currentFile == null ? 'No file selected' : currentFile.path}
+        </div>
+        {(fileIsPipeline) ?
+          (<Box className="bg-red-50" />)
+          :
+          (<textarea className="w-full h-full font-mono p-3" value={fileContents ?? ''} disabled={fileContents === null} />)
+        }
+        <Snackbar open={snackOpen} autoHideDuration={10000} message={snackMessage} onClose={snackClose} />
+      </div>
+
+      {displayHelpDrawer || (
+        <div className="h-full w-10 border-l-2 align-top">
+          <div>
+            <Toolbar></Toolbar>
+            <IconButton sx={{ 'borderRadius': '20%' }} onClick={helpDrawerHide}>
               <KeyboardDoubleArrowLeftIcon fontSize="small" />
             </IconButton>
-          </Box>
-        </Box>
-        <TabPanel value={tabPanel} index={0}>
-          <Box>
-            <TreeView
-              aria-label="file system navigator"
-              defaultCollapseIcon={<FolderOpen />}
-              defaultExpandIcon={<Folder />}
-              defaultEndIcon={<Article />}
-              defaultExpanded={expanded}
-              onNodeSelect={fileSelected}
-              onNodeToggle={nodeToggled}
-              sx={{ height: '100%', flexGrow: 1, maxWidth: '100%', overflowY: 'auto' }}
-            >
-              {renderTree(files)}
-            </TreeView>
-          </Box>
-        </TabPanel>
-      </Box>
-      <DragBar className='h-full' onChange={fileDrawerWidthChange} sx={{ display: displayFileDrawer ? 'box' : 'none'}} />
-      <Box className="flex h-full w-10 border-r-2 align-top" sx={{ display: displayFileDrawer ? 'none' : 'box'}}>
-        <Box>
-        <Toolbar></Toolbar>
-        <Box>
-          <IconButton
-            sx={{ 'borderRadius': '20%' }}
-            onClick={fileDrawerHide}
-          >
-            <MenuIcon fontSize="small" />
-          </IconButton>
-        </Box>
-        </Box>
-      </Box>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${fileDrawerWidth}px)` } }}
-      >
-        <Toolbar></Toolbar>
-        <Box className="w-full h-full bg-red-50" />
-        <Snackbar
-          open={snackOpen}
-          autoHideDuration={10000}
-          message={snackMessage}
-          onClose={snackClose}
-        />
-      </Box>
-    </Box>);
+          </div>
+        </div>
+      )}
+      {displayHelpDrawer && (
+        <>
+          <DragBar className='h-full' onChange={helpDrawerWidthChange} />
+          <div style={{ width: helpDrawerWidth }} className="h-full box-border " >
+            <Toolbar></Toolbar>
+            <div style={{ borderColor: 'divider' }} className="flex border-b">
+              <div className="flex-none">
+                <IconButton sx={{ 'borderRadius': '20%' }} onClick={helpDrawerHide} >
+                  <KeyboardDoubleArrowRightIcon fontSize="small" />
+                </IconButton>
+              </div>
+              <div className="flex-1 p-3">
+                HELP
+              </div>
+            </div>
+            <div class="h-full w-full prose overflow-y-scroll p-3" style={{maxWidth: '100%'}} dangerouslySetInnerHTML={{ __html: helpText }} />
+          </div>
+        </>
+      )}
+    </div>);
 }
+
+const permissionsHtml = `
+<H2>Permissions Files</H2>
+<P>
+You are editing a permissions file.
+At runtime the expression in this file will be evaluated and the operation will only be permitted to access the directory if the expression evaluates to true.
+</P>
+<P>
+Permissions files are evaluated at every level of the directory hierarchy.
+</P>
+<P>
+The expression in the permission file is treated as a standard Query Engine condition expression.
+</P>
+`
 
 export default Design;
