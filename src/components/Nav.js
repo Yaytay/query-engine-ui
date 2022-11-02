@@ -130,7 +130,7 @@ function Nav(props) {
         <Parameters onRequestClose={closeModal} onRequestSubmit={submitModal} pipeline={pipeline} values={args} >
         </Parameters>
       </Modal>
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} >
+      <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <Link to="/">

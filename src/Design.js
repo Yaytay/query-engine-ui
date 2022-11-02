@@ -11,12 +11,8 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Snackbar from '@mui/material/Snackbar';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Toolbar from '@mui/material/Toolbar';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
-import { Typography } from '@mui/material';
 
 var onChange;
 
@@ -29,10 +25,10 @@ function Design(props) {
   const [snackOpen, setSnackOpen] = useState(false)
   const [snackMessage, setSnackMessage] = useState()
 
-  const [fileDrawerWidth, setFileDrawerWidth] = useState(500)
+  const [fileDrawerWidth, setFileDrawerWidth] = useState(360)
   const [displayFileDrawer, setDisplayFileDrawer] = useState(true)
 
-  const [helpDrawerWidth, setHelpDrawerWidth] = useState(500)
+  const [helpDrawerWidth, setHelpDrawerWidth] = useState(360)
   const [displayHelpDrawer, setDisplayHelpDrawer] = useState(true)
 
   const [openapi, setOpenapi] = useState()
@@ -142,26 +138,6 @@ function Design(props) {
   }, [props.baseUrl, handleResponse, getAllDirs])
 
   const [currentFile, setCurrentFile] = useState(null);
-
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <div className="h-full p-0.5">
-            {children}
-          </div>
-        )}
-      </div>
-    );
-  }
 
   function fileSelected(e, nodeIds) {
     console.log(nodeIds)
@@ -311,13 +287,12 @@ function Design(props) {
   };
 
   return (
-    <div className="h-full flex" ref={outerBox}>
+    <div className="flex-auto flex flex-row overflow-hidden" ref={outerBox}>
       {displayFileDrawer && (
         <>
-          <div style={{ width: fileDrawerWidth }} className="h-full box-border " >
-            <Toolbar></Toolbar>
+          <div style={{ width: fileDrawerWidth }} className="box-border " >
             <div style={{ borderColor: 'divider' }} className="flex border-b">
-              <div className="flex-1 p-3">
+              <div className="flex-auto p-3">
                 FILES
               </div>
               <div className="flex-none">
@@ -326,7 +301,7 @@ function Design(props) {
                 </IconButton>
               </div>
             </div>
-            <div className="h-full">
+            <div className="grow flex flex-col">
               <TreeView
                 aria-label="file system navigator"
                 multiSelect={false}
@@ -342,13 +317,12 @@ function Design(props) {
               </TreeView>
             </div>
           </div>
-          <DragBar className='h-full' onChange={fileDrawerWidthChange} sx={{ display: displayFileDrawer ? 'box' : 'none' }} />
+          <DragBar className='grow' onChange={fileDrawerWidthChange} />
         </>
       )}
-      {displayFileDrawer || (
-        <div className="h-full w-10 border-r-2 align-top">
+      {true || displayFileDrawer || (
+        <div className="grow w-10 border-r-2 align-top">
           <div>
-            <Toolbar></Toolbar>
             <IconButton sx={{ 'borderRadius': '20%' }} onClick={fileDrawerHide}>
               <KeyboardDoubleArrowRightIcon fontSize="small" />
             </IconButton>
@@ -356,23 +330,21 @@ function Design(props) {
         </div>
       )}
 
-      <div className="h-full flex-1">
-        <Toolbar></Toolbar>
+      <div className="grow flex flex-col">
         <div style={{ borderColor: 'divider' }} className="flex border-b p-3">
           {currentFile == null ? 'No file selected' : currentFile.path}
         </div>
         {(fileIsPipeline) ?
           (<Box className="bg-red-50" />)
           :
-          (<textarea className="w-full h-full font-mono p-3" value={fileContents ?? ''} disabled={fileContents === null} />)
+          (<textarea className="grow font-mono p-3" value={fileContents ?? ''} disabled={fileContents === null} />)
         }
         <Snackbar open={snackOpen} autoHideDuration={10000} message={snackMessage} onClose={snackClose} />
       </div>
 
       {displayHelpDrawer || (
-        <div className="h-full w-10 border-l-2 align-top">
+        <div className="grow-0 w-10 border-l-2 align-top">
           <div>
-            <Toolbar></Toolbar>
             <IconButton sx={{ 'borderRadius': '20%' }} onClick={helpDrawerHide}>
               <KeyboardDoubleArrowLeftIcon fontSize="small" />
             </IconButton>
@@ -381,20 +353,21 @@ function Design(props) {
       )}
       {displayHelpDrawer && (
         <>
-          <DragBar className='h-full' onChange={helpDrawerWidthChange} />
-          <div style={{ width: helpDrawerWidth }} className="h-full box-border " >
-            <Toolbar></Toolbar>
-            <div style={{ borderColor: 'divider' }} className="flex border-b">
+          <DragBar className='' onChange={helpDrawerWidthChange} />
+          <div style={{ width: helpDrawerWidth }} className="flex flex-col overflow-hidden" >
+            <div style={{ borderColor: 'divider' }} className="flex-none border-b flex">
               <div className="flex-none">
                 <IconButton sx={{ 'borderRadius': '20%' }} onClick={helpDrawerHide} >
                   <KeyboardDoubleArrowRightIcon fontSize="small" />
                 </IconButton>
               </div>
-              <div className="flex-1 p-3">
+              <div className="flex-auto p-3">
                 HELP
               </div>
             </div>
-            <div class="h-full w-full prose overflow-y-scroll p-3" style={{maxWidth: '100%'}} dangerouslySetInnerHTML={{ __html: helpText }} />
+            <div className="flex-auto w-full overflow-y-auto p-3 prose"
+              dangerouslySetInnerHTML={{ __html: helpText }} >
+            </div>
           </div>
         </>
       )}

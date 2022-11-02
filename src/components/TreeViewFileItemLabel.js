@@ -115,7 +115,7 @@ function TreeViewFileItemLabel(props) {
 
   return (
     <Box className="flex items-center align-middle">
-      <Box className='flex-1'>
+      <Box className='flex-auto'>
         <input className="bg-transparent appearance-none w-full py-2 text-gray-700 leading-tight focus:outline-none border-b-2 disabled:border-transparent"
           id={props.id}
           type="text"

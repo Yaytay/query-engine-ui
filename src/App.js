@@ -343,25 +343,20 @@ function App() {
   });
 
   return (
-
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Nav available={available} />
-        <main className="block h-full">
-          <header className="App-header">
-          </header>
-          <div className='fixed w-full h-full'>
-            <Routes>
-              <Route index element={<Home />}></Route>
-              <Route exact path='/design' element={
-                <Design available={available} baseUrl={baseUrl} onChange={refresh} />
-              }></Route>
-              <Route exact path='/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
-              <Route exact path='/demo' element={<Demo available={available} />}></Route>
-            </Routes>
-          </div>
-        </main >
+        <div className="flex-none">
+          <Nav available={available} />
+        </div>        
+        <Routes>
+          <Route index element={<Home />}></Route>
+          <Route exact path='/design' element={
+            <Design available={available} baseUrl={baseUrl} onChange={refresh} />
+          }></Route>
+          <Route exact path='/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
+          <Route exact path='/demo' element={<Demo available={available} />}></Route>
+        </Routes>
       </Router>
     </ThemeProvider>
   );

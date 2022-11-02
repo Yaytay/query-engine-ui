@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import DragBar from './components/DragBar'
 import Parameters from './components/Parameters.js';
 
 import Article from '@mui/icons-material/Article';
@@ -7,6 +8,9 @@ import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Folder from '@mui/icons-material/Folder';
 import FolderOpen from '@mui/icons-material/FolderOpen';
+import IconButton from '@mui/material/IconButton';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,34 +21,19 @@ import DOMPurify from 'dompurify';
 
 function Test(props) {
 
-  const drawerWidth = 400;
-
   const emptyTable = (
     <table className='min-w-full' >
       <thead className='border'>
         <tr>
-          <th className='border'>&nbsp;</th>
-          <th className='border'>&nbsp;</th>
-          <th className='border'>&nbsp;</th>
-          <th className='border'>&nbsp;</th>
-          <th className='border'>&nbsp;</th>
+          <th className='border'>&nbsp;</th><th className='border'>&nbsp;</th><th className='border'>&nbsp;</th><th className='border'>&nbsp;</th><th className='border'>&nbsp;</th>
         </tr>
-
       </thead>
       <tbody>
         <tr>
-          <td className='border'>&nbsp;</td>
-          <td className='border'>&nbsp;</td>
-          <td className='border'>&nbsp;</td>
-          <td className='border'>&nbsp;</td>
-          <td className='border'>&nbsp;</td>
+          <td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td>
         </tr>
         <tr>
-          <td className='border'>&nbsp;</td>
-          <td className='border'>&nbsp;</td>
-          <td className='border'>&nbsp;</td>
-          <td className='border'>&nbsp;</td>
-          <td className='border'>&nbsp;</td>
+        <td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td>
         </tr>
       </tbody>
     </table>
@@ -57,6 +46,10 @@ function Test(props) {
   const [args, setArgs] = useState(null);
   const [data, setData] = useState(emptyTable);
   const [rawHtml, setRawHtml] = useState(null);
+
+  const [drawerWidth, setDrawerWidth] = useState(360)
+  const [displayDrawer, setDisplayDrawer] = useState(true)
+
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -176,53 +169,69 @@ function Test(props) {
     )
   };
 
+  function drawerWidthChange(w) {
+    if (w > 360) {
+      setDrawerWidth(w)
+    }
+  }
+
+  function drawerHide() {
+    setDisplayDrawer(!displayDrawer)
+  }
+
+
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Drawer
-        open={true}
-        variant='persistent'
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          boxSizing: 'border-box',
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-        }}         >
-        <Toolbar></Toolbar>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabPanel} onChange={handleChange} >
-            <Tab label="Files" />
-            <Tab label="Properties" />
-          </Tabs>
-        </Box>
-        <TabPanel value={tabPanel} index={0}>
-          <Box>
-            <TreeView
-              aria-label="file system navigator"
-              defaultCollapseIcon={<FolderOpen />}
-              defaultExpandIcon={<Folder />}
-              defaultEndIcon={<Article />}
-              defaultExpanded={expanded}
-              onNodeSelect={fileSelected}
-              sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-            >
-              {props.available.children.map((node) => renderTree(node))}
-            </TreeView>
-          </Box>
-        </TabPanel>
-        <TabPanel value={tabPanel} index={1}>
-          <Parameters onRequestSubmit={submit} closeable={false} pipeline={currentFile} values={args} >
-          </Parameters>
-        </TabPanel>
-      </Drawer>
+    <div className="h-full flex">
+      {displayDrawer && (
+        <>
+          <div style={{ width: drawerWidth }} className="h-full box-border " >
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs value={tabPanel} onChange={handleChange} >
+                <Tab label="Files" />
+                <Tab label="Properties" disabled={!currentFile} />
+              </Tabs>
+            </Box>
+            <TabPanel value={tabPanel} index={0}>
+              <Box>
+                <TreeView
+                  aria-label="file system navigator"
+                  defaultCollapseIcon={<FolderOpen />}
+                  defaultExpandIcon={<Folder />}
+                  defaultEndIcon={<Article />}
+                  defaultExpanded={expanded}
+                  onNodeSelect={fileSelected}
+                  sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                >
+                  {props.available.children.map((node) => renderTree(node))}
+                </TreeView>
+              </Box>
+            </TabPanel>
+            <TabPanel value={tabPanel} index={1}>
+              <Parameters onRequestSubmit={submit} closeable={false} pipeline={currentFile} values={args} >
+              </Parameters>
+            </TabPanel>
+          </div>
+          <DragBar className='h-full' onChange={drawerWidthChange} />
+        </>
+      )}
+      {displayDrawer || (
+        <div className="h-full w-10 border-r-2 align-top">
+          <div>
+            <IconButton sx={{ 'borderRadius': '20%' }} onClick={drawerHide}>
+              <KeyboardDoubleArrowRightIcon fontSize="small" />
+            </IconButton>
+          </div>
+        </div>
+      )}
+
       <Box
         component="main"
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
-        <Toolbar></Toolbar>
         <pre className="whitespace-pre-wrap">{data}</pre>
         <div className="rawHtmlData" dangerouslySetInnerHTML={{ __html: rawHtml }}></div>
       </Box>
-    </Box>);
+    </div>);
 }
 
 export default Test;
