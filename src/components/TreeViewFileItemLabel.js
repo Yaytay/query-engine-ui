@@ -90,7 +90,7 @@ function TreeViewFileItemLabel(props) {
         <PostAddIcon fontSize="small" className="mr-2" /> New pipeline
       </MenuItem>
     )
-    if (props.node.children.find(n => n.name === 'permissions.jexl') === null) {
+    if (!props.node.children.find(n => n.name === 'permissions.jexl')) {
       menuItems.push(
         <MenuItem key="newpermissions" onClick={e => { e.stopPropagation(); props.onNewFolder && props.onNewPermissions(props.node) }}>
           <EnhancedEncryptionIcon fontSize="small" className="mr-2" /> New permissions

@@ -148,7 +148,7 @@ function Design(props) {
       setHelpText('');
       let nodeUrl = new URL(props.baseUrl + 'api/design/file/' + node.path);
       console.log(nodeUrl)
-      fetch(nodeUrl)
+      fetch(nodeUrl, { headers: { 'Accept': 'application/json, */*;q=0.8' }})
         .then(r => {
           if (!r.ok) {
             return r.text().then(t => {
@@ -308,7 +308,7 @@ function Design(props) {
                 defaultCollapseIcon={<FolderOpen />}
                 defaultExpandIcon={<Folder />}
                 defaultEndIcon={<Article />}
-                defaultExpanded={expanded}
+                expanded={expanded}
                 onNodeSelect={fileSelected}
                 onNodeToggle={nodeToggled}
                 sx={{ height: '100%', flexGrow: 1, maxWidth: '100%', overflowY: 'auto' }}
