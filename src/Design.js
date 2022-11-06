@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 
 import DragBar from './components/DragBar'
+import PipelineEditor from './components/PipelineEditor'
 import TreeViewFileItemLabel from './components/TreeViewFileItemLabel'
 
 import Article from '@mui/icons-material/Article';
-import Box from '@mui/material/Box';
 import Folder from '@mui/icons-material/Folder';
 import FolderOpen from '@mui/icons-material/FolderOpen';
 import IconButton from '@mui/material/IconButton';
@@ -148,7 +148,7 @@ function Design(props) {
       setHelpText('');
       let nodeUrl = new URL(props.baseUrl + 'api/design/file/' + node.path);
       console.log(nodeUrl)
-      fetch(nodeUrl, { headers: { 'Accept': 'application/json, */*;q=0.8' }})
+      fetch(nodeUrl, { headers: { 'Accept': 'application/json, */*;q=0.8' } })
         .then(r => {
           if (!r.ok) {
             return r.text().then(t => {
@@ -160,10 +160,15 @@ function Design(props) {
         })
         .then(j => {
           console.log(j)
-          setFileContents(j)
-          setFileIsPipeline(false)
           if (node.name === 'permissions.jexl') {
             setHelpText(permissionsHtml + (openapi ? openapi.components.schemas.Condition.description : ''))
+            setFileContents(j)
+            setFileIsPipeline(false)
+          } else {
+            var p = JSON.parse(j)
+            console.log(p)
+            setFileContents(p)
+            setFileIsPipeline(true)
           }
         })
         .catch(e => {
@@ -330,12 +335,16 @@ function Design(props) {
         </div>
       )}
 
-      <div className="grow flex flex-col">
+      <div className="grow flex flex-col overflow-hidden">
         <div style={{ borderColor: 'divider' }} className="flex border-b p-3">
           {currentFile == null ? 'No file selected' : currentFile.path}
         </div>
         {(fileIsPipeline) ?
-          (<Box className="bg-red-50" />)
+          (<PipelineEditor openapi={openapi}
+            onHelpChange={h => setHelpText(h)}
+            pipeline={fileContents}
+            onChange={p => { setFileContents(p); console.log(fileContents) }}
+          />)
           :
           (<textarea className="grow font-mono p-3" value={fileContents ?? ''} disabled={fileContents === null} />)
         }

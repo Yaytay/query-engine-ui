@@ -110,7 +110,7 @@ function Nav(props) {
 
   Modal.setAppElement('#root');
 
-  const pages = ['Design', 'Test', 'Demo', 'Settngs'];
+  const pages = ['Design', 'Test', 'Demo', 'Settngs', 'Help'];
 
   const customStyles = {
     content: {
@@ -178,6 +178,11 @@ function Nav(props) {
                 <NestedMenuItem parentMenuOpen={navOpen} label={'Data'}>
                   <QueryFolderLevel items={props.available.children} parentMenuOpen={navOpen} />
                 </NestedMenuItem>
+                <Link to="/Test">
+                  <MenuItem key='Help' onClick={handleCloseNavMenu}>
+                    <Typography textAlign="center">Help</Typography>
+                  </MenuItem>
+                </Link>
               </Menu>
             </Box>
             <QeIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -216,6 +221,11 @@ function Nav(props) {
                 <Menu anchorEl={anchorElData} open={dataOpen} onClose={handleCloseDataMenu}>
                   <QueryFolderLevel items={props.available.children} parentMenuOpen={dataOpen} />
                 </Menu>
+                <Link to="/Test">
+                  <Button key='Help' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
+                    Help
+                  </Button>
+                </Link>
             </Box>
 
           </Toolbar>

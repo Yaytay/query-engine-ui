@@ -11,25 +11,35 @@ function InlineEdit(props) {
     props.onChange && props.onChange(e.target.value);
   }
 
-  if (!props.disabled) {
-    console.log(input)
-    input.current.focus()
-  }
-
   // const classes = "bg-transparent appearance-none w-full py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline";
-  const classes = "bg-transparent appearance-none w-full py-2 text-gray-700 leading-tight";
+  const classes = "grow bg-transparent appearance-none px-1 text-gray-700 leading-tight font-mono overflow-wrap resize";
 
-  return (
-    <input className={classes}
-      id={props.id} 
-      type="text" 
-      placeholder={props.prompt} 
-      value={value} 
-      onChange={handleInputChange} 
-      disabled={props.disabled ?? true}
-      ref={input}
-      />
-  )
+  if (props.type === 'textarea') {
+    return (
+      <textarea className={classes}
+        id={props.id} 
+        placeholder={props.prompt} 
+        value={props.value} 
+        onChange={handleInputChange} 
+        onFocus={props.onFocus ?? null}
+        disabled={props.disabled ?? true}
+        ref={input}
+        />
+    )
+  } else {
+    return (
+      <input className={classes}
+        id={props.id} 
+        type={props.type ?? "text"} 
+        placeholder={props.prompt} 
+        value={props.value} 
+        onChange={handleInputChange} 
+        onFocus={props.onFocus ?? null}
+        disabled={props.disabled ?? true}
+        ref={input}
+        />
+    )  
+  }
 }
 
 export default InlineEdit;
