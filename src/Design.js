@@ -343,7 +343,7 @@ function Design(props) {
           (<PipelineEditor openapi={openapi}
             onHelpChange={h => setHelpText(h)}
             pipeline={fileContents}
-            onChange={p => { setFileContents(p); console.log(fileContents) }}
+            onChange={p => { p.v = (p.v ?? 0) + 1; setFileContents(p); console.log(p) }}
           />)
           :
           (<textarea className="grow font-mono p-3" value={fileContents ?? ''} disabled={fileContents === null} />)

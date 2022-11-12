@@ -1,71 +1,50 @@
 import React from 'react';
-import PipelineArgumentEditor from './PipelineArgumentEditor.js';
-import PipelineEditorField from './PipelineEditorField.js';
+import OASObjectEditor from './OASObjectEditor.js';
 
 function PipelineEditor({ pipeline, openapi, onHelpChange, onChange }) {
 
+  const fieldOrders = {
+    Pipeline: ['title', 'description', 'condition', 'arguments', 'sourceEndpoints', 'dynamicEndpoints', 'source', 'processors', 'destinations']
+    , Argument: ['name', 'type', 'title', 'prompt', 'description', 'optional', 'multiValued', 'ignored', 'dependsUpon', 'defaultValue', 'minimumValue', 'maximumValue', 'possibleValues', 'possibleValuesUrl', 'permittedValuesRegex']
+    , ArgumentValue: ['value', 'label']
+    , Condition: ['expression']
+    , Destination: ['mediaType', 'name', 'type']
+    , Processor: ['type']
+    , Source: ['type']
+  }
+
+  const fieldTypes = {
+    Source: {
+      SQL: 'SourceSQL'
+      , HTML: 'SourceHTML'
+    }
+    , Processor: {
+      LIMIT: 'ProcessorLimit'
+      , GROUP_CONCAT: 'ProcessorGroupConcat'
+      , DYNAMIC_FIELD: 'ProcessorDynamicField'
+      , SCRIPT: 'ProcessorScript'
+    }
+    , Destination: {
+      JSON: 'DestinationJson'
+      , HTML: 'DestinationHtml'
+      , XLSX: 'DestinationXlsx'
+      , Delimited: 'DestinationDelimited'
+    }
+  }
+
   const help = onHelpChange ?? function () { };
-
-  function onFieldChange(field, value) {
-    var newPipeline = { ...pipeline }
-    newPipeline[field] = value
-    onChange && onChange(newPipeline)
-  }
-
-  function onArgumentChange(index, value) {
-    var newPipeline = { ...pipeline }
-    newPipeline.arguments[index] = value
-    onChange && onChange(newPipeline)
-  }
 
   return (
     <form className="font-mono overflow-y-auto">
-      <PipelineEditorField
-        name={'title'}
-        parentSchema={openapi.components.schemas.Pipeline}
-        parent={pipeline}
+      <OASObjectEditor
+        object={pipeline}
+        openapi={openapi}
+        fieldOrders={fieldOrders}
         onHelpChange={help}
-        onChange={onFieldChange}
-        visible={true}
+        field='pipeline'
+        type='Pipeline'
+        onChange={(_,p) => {onChange && onChange(p)}}
       />
-      <PipelineEditorField
-        name={'description'}
-        parentSchema={openapi.components.schemas.Pipeline}
-        parent={pipeline}
-        onHelpChange={help}
-        onChange={onFieldChange}
-        visible={true}
-      />
-      <PipelineEditorField
-        name={'condition'}
-        parentSchema={openapi.components.schemas.Pipeline}
-        parent={pipeline}
-        onHelpChange={help}
-        onChange={onFieldChange}
-        visible={true}
-      />
-
-      <div className="">
-        <label className="px-1 text-blue-500">arguments:</label>
-        {
-          pipeline.arguments && pipeline.arguments.map((a, i) => {
-            return (
-              <div className="flex">
-                <div className="">
-                  &nbsp;&nbsp;-
-                </div>
-                <PipelineArgumentEditor
-                  argument={a}
-                  openapi={openapi}
-                  onHelpChange={help}
-                  onChange={newArg => onArgumentChange(i, newArg)}
-                />
-              </div>
-            )
-          }
-          )
-        }
-      </div>
     </form >
   );
 
