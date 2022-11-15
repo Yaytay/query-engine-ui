@@ -13,6 +13,7 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import Snackbar from '@mui/material/Snackbar';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
+import OASFieldEditor from './components/OASFieldEditor';
 
 var onChange;
 
@@ -32,6 +33,7 @@ function Design(props) {
   const [displayHelpDrawer, setDisplayHelpDrawer] = useState(true)
 
   const [openapi, setOpenapi] = useState()
+  const [schema, setSchema] = useState()
 
   const [fileContents, setFileContents] = useState(null)
   const [fileIsPipeline, setFileIsPipeline] = useState(false)
@@ -128,6 +130,7 @@ function Design(props) {
       .then(j => {
         console.log(j)
         setOpenapi(j)
+        setSchema(buildSchema(j))
       })
       .catch(e => {
         console.log(e)
@@ -138,6 +141,101 @@ function Design(props) {
   }, [props.baseUrl, handleResponse, getAllDirs])
 
   const [currentFile, setCurrentFile] = useState(null);
+
+  const fieldOrders = {
+    Pipeline: ['title', 'description', 'condition', 'arguments', 'sourceEndpoints', 'dynamicEndpoints', 'source', 'processors', 'destinations']
+    , Argument: ['name', 'type', 'title', 'prompt', 'description', 'optional', 'multiValued', 'ignored', 'dependsUpon', 'defaultValue', 'minimumValue', 'maximumValue', 'possibleValues', 'possibleValuesUrl', 'permittedValuesRegex']
+    , ArgumentValue: ['value', 'label']
+    , Condition: ['expression']
+    , Destination: ['type','name','mediaType']
+    , Processor: ['type']
+    , Source: ['type']
+  }
+
+  function buildSchema(openapi) {
+    function typeFromRef(arg) {
+      var lastPos = arg.lastIndexOf('/')
+      if (lastPos > 0) {
+        return arg.substring(lastPos + 1);
+      } else {
+        return arg;
+      }
+    }
+
+    function collectProperties(schema) {
+      var props = {}
+      if (schema.properties) {
+        props = {...schema.properties}
+      }
+      if (schema.allOf) {
+        schema.allOf.forEach(ao => {
+          if (ao.$ref) {
+            var parentProps = collectProperties(openapi.components.schemas[typeFromRef(ao.$ref)])
+            Object.keys(parentProps).forEach(pp => {
+              if (props[pp]) {
+                Object.assign(props[pp], parentProps[pp])
+              } else {
+                props[pp] = {...parentProps[pp]}
+              }
+            })
+          } else if (ao.properties) {
+            Object.keys(ao.properties).forEach(pp => {
+              if (props[pp]) {
+                Object.assign(props[pp], ao.properties[pp])
+              } else {
+                props[pp] = {...ao.properties[pp]}
+              }
+            })
+          }
+        })
+      }
+      if (schema.required) {
+        schema.required.forEach(req => {
+          props[req].required = true
+        })
+      }
+      return props
+    }
+
+    var result = {}
+    Object.keys(openapi.components.schemas).forEach(k => {
+      const schema = openapi.components.schemas[k]
+      var simpleSchema = { description: schema.description ?? '', name: k }
+
+      if (schema.discriminator) {
+        simpleSchema['discriminator'] = { propertyName: schema.discriminator.propertyName, mapping: {}}
+        Object.keys(schema.discriminator.mapping).forEach(dk => {
+          simpleSchema.discriminator.mapping[dk] = typeFromRef(schema.discriminator.mapping[dk])
+        })
+      }
+
+      simpleSchema.collectedProperties = collectProperties(schema)
+
+      simpleSchema.sortedProperties = []
+      if (fieldOrders[k]) {
+        fieldOrders[k].forEach(f => {
+          if (simpleSchema.collectedProperties[f]) {
+            simpleSchema.sortedProperties.push(f)
+          }
+        })
+      }
+      Object.keys(simpleSchema.collectedProperties).forEach(f => {
+        if (simpleSchema.collectedProperties[f].required && !simpleSchema.sortedProperties.includes(f)) {
+          simpleSchema.sortedProperties.push(f)
+        }
+      })
+      Object.keys(simpleSchema.collectedProperties).forEach(f => {
+        if (!simpleSchema.collectedProperties[f].required && !simpleSchema.sortedProperties.includes(f)) {
+          simpleSchema.sortedProperties.push(f)
+        }
+      })
+
+      result[k] = simpleSchema
+    })
+
+    console.log(result)
+    return result
+  }
 
   function fileSelected(e, nodeIds) {
     console.log(nodeIds)
@@ -164,8 +262,11 @@ function Design(props) {
             setHelpText(permissionsHtml + (openapi ? openapi.components.schemas.Condition.description : ''))
             setFileContents(j)
             setFileIsPipeline(false)
-          } else {
+          } else {            
             var p = JSON.parse(j)
+            if (!p) {
+              p = {}
+            }
             console.log(p)
             setFileContents(p)
             setFileIsPipeline(true)
@@ -340,7 +441,8 @@ function Design(props) {
           {currentFile == null ? 'No file selected' : currentFile.path}
         </div>
         {(fileIsPipeline) ?
-          (<PipelineEditor openapi={openapi}
+          (<PipelineEditor 
+            schema={schema}
             onHelpChange={h => setHelpText(h)}
             pipeline={fileContents}
             onChange={p => { p.v = (p.v ?? 0) + 1; setFileContents(p); console.log(p) }}

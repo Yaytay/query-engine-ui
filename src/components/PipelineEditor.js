@@ -1,36 +1,7 @@
 import React from 'react';
 import OASObjectEditor from './OASObjectEditor.js';
 
-function PipelineEditor({ pipeline, openapi, onHelpChange, onChange }) {
-
-  const fieldOrders = {
-    Pipeline: ['title', 'description', 'condition', 'arguments', 'sourceEndpoints', 'dynamicEndpoints', 'source', 'processors', 'destinations']
-    , Argument: ['name', 'type', 'title', 'prompt', 'description', 'optional', 'multiValued', 'ignored', 'dependsUpon', 'defaultValue', 'minimumValue', 'maximumValue', 'possibleValues', 'possibleValuesUrl', 'permittedValuesRegex']
-    , ArgumentValue: ['value', 'label']
-    , Condition: ['expression']
-    , Destination: ['mediaType', 'name', 'type']
-    , Processor: ['type']
-    , Source: ['type']
-  }
-
-  const fieldTypes = {
-    Source: {
-      SQL: 'SourceSQL'
-      , HTML: 'SourceHTML'
-    }
-    , Processor: {
-      LIMIT: 'ProcessorLimit'
-      , GROUP_CONCAT: 'ProcessorGroupConcat'
-      , DYNAMIC_FIELD: 'ProcessorDynamicField'
-      , SCRIPT: 'ProcessorScript'
-    }
-    , Destination: {
-      JSON: 'DestinationJson'
-      , HTML: 'DestinationHtml'
-      , XLSX: 'DestinationXlsx'
-      , Delimited: 'DestinationDelimited'
-    }
-  }
+function PipelineEditor({ pipeline, schema, onHelpChange, onChange }) {
 
   const help = onHelpChange ?? function () { };
 
@@ -38,11 +9,11 @@ function PipelineEditor({ pipeline, openapi, onHelpChange, onChange }) {
     <form className="font-mono overflow-y-auto">
       <OASObjectEditor
         object={pipeline}
-        openapi={openapi}
-        fieldOrders={fieldOrders}
+        schema={schema}
         onHelpChange={help}
         field='pipeline'
         type='Pipeline'
+        defaultVisible='true'
         onChange={(_,p) => {onChange && onChange(p)}}
       />
     </form >

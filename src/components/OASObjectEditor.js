@@ -1,7 +1,10 @@
 
+import React, { useState } from 'react';
 import OASFieldEditor from './OASFieldEditor.js';
 
-function OASObjectEditor({object, openapi, fieldOrders, field, onHelpChange, onChange, type }) {
+function OASObjectEditor({object, schema, fieldOrders, field, onHelpChange, onChange, type, index, defaultVisible, onMoveUp, onMoveDown, onRemove}) {
+
+  const [visible, setVisible] = useState(defaultVisible)
 
   function handleInputChange(changedField, value) {
     var rep={...object}
@@ -9,26 +12,36 @@ function OASObjectEditor({object, openapi, fieldOrders, field, onHelpChange, onC
     onChange(field, rep)
   }
 
-  if (!fieldOrders[type]) {
-    return (<div>The type {type} has not been configured yet</div>)
-  } else {
-    return (
-      <div className="grow">
-        { fieldOrders[type].map(f => { 
-          return (<OASFieldEditor
-            id={f}
-            object={object}
-            openapi={openapi}
-            fieldOrders={fieldOrders}
-            onHelpChange={onHelpChange}
-            onChange={handleInputChange}
-            parentType={type}
-            field={f}
-          />)
-        }) }
-      </div>
-    )
+  if (schema[type].discriminator) {
+    const d = schema[type].discriminator;
+    if (object[d.propertyName] && d.mapping[object[d.propertyName]]) {
+      type = d.mapping[object[d.propertyName]]
+    }
   }
+
+  return (
+    <div className="grow">
+      { schema[type].sortedProperties.map((f,i) => { 
+        return (<OASFieldEditor
+          id={f}
+          key={f}
+          object={object}
+          schema={schema}
+          fieldOrders={fieldOrders}
+          onHelpChange={onHelpChange}
+          onChange={handleInputChange}
+          parentType={type}
+          visible={visible}
+          field={f}
+          index={index}
+          onDrop={i == 0 ? () => setVisible(!visible) : null}
+          onMoveUp={i == 0 && onMoveUp ? onMoveUp : null}
+          onMoveDown={i == 0 && onMoveDown ? onMoveDown : null}
+          onRemove={i == 0 && onRemove ? onRemove : null}
+          />)
+      }) }
+    </div>
+  )
 }
 
 
