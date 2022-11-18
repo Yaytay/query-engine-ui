@@ -10,13 +10,16 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import Tooltip from '@mui/material/Tooltip';
 
-function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onChange, onHelpChange, parentType, drop, onDrop, index, onMoveUp, onMoveDown, onRemove }) {
+function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, onChange, onHelpChange, parentType, onDrop, index, onMoveUp, onMoveDown, onRemove }) {
 
+  const colours = [' bg-white', ' bg-slate-50', ' bg-slate-100', ' bg-slate-200', ' bg-slate-300']
   const parentSchema = schema[parentType]
   const fieldSchema = parentSchema.collectedProperties[field]
   const help = onHelpChange ?? function () { }
 
   var input = useRef(null);
+
+  const bgcol = (bg < colours.length) ? colours[bg] : colours[0]
 
   function typeFromRef(arg) {
     var lastPos = arg.lastIndexOf('/')
@@ -125,7 +128,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
   if (!fieldSchema) {
     // No schema
     return (
-      <div className={"flex" + hidden}>
+      <div className={"flex" + hidden + bgcol}>
         <label className="px-1 text-blue-500">{field}:</label>
         <div className="grow">Unknown field {field}</div>
       </div>
@@ -133,12 +136,13 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
   } else if (fieldSchema.type === 'boolean') {
     // Boolean field
     return (
-      <div className={"flex align-top" + hidden}>
+      <div className={"flex align-top" + hidden + bgcol}>
         <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
         <select
           id={id}
           placeholder={field.prompt}
           value={object[field] ? 1 : 0}
+          className={bgcol}
           onChange={e => { handleChange((e.target.value > 0) ? true : false) }}
           onFocus={onFocus}
           ref={input}
@@ -154,9 +158,9 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
   } else if (fieldSchema.type === 'integer') {
     // Integer field
     return (
-      <div className={"flex" + hidden}>
+      <div className={"flex" + hidden + bgcol}>
         <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
-        <input className={classes}
+        <input className={classes + bgcol}
           id={id}
           type='text'
           placeholder={field.prompt}
@@ -172,9 +176,9 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
   } else if (fieldSchema.maxLength) {
     // Short text field
     return (
-      <div className={"flex align-top" + hidden}>
+      <div className={"flex align-top" + hidden + bgcol}>
         <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
-        <input className={classes}
+        <input className={classes + bgcol}
           id={id}
           type='text'
           value={object[field]}
@@ -190,10 +194,11 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
   } else if (fieldSchema.enum) {
     // Enum/select field
     return (
-      <div className={"flex" + hidden}>
+      <div className={"flex" + hidden + bgcol}>
         <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
         <select
           id={id}
+          className={bgcol}
           placeholder={fieldSchema.prompt}
           value={object[field]}
           onChange={e => handleChange(e.target.value)}
@@ -214,7 +219,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
   } else if (fieldSchema.items && fieldSchema.items['$ref']) {
     // Array field
     return (
-      <div className={hidden}>
+      <div className={hidden + bgcol}>
         <div className='flex'>
           <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
           <div className='grow' />
@@ -241,6 +246,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
                 field={field}
                 fieldOrders={fieldOrders}
                 onHelpChange={help}
+                bg={bg}
                 type={typeFromRef(fieldSchema.items['$ref'])}
                 index={i}
                 onChange={(f, v) => {
@@ -274,7 +280,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
   } else if (fieldSchema['$ref']) {
     // Single object field
     return (
-      <div className={"flex flex-col" + hidden}>
+      <div className={"flex flex-col" + hidden + bgcol}>
         <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
         <div className="flex">
           <div className="">
@@ -286,6 +292,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
                 object={object[field]}
                 schema={schema}
                 field={field}
+                bg={bg}
                 fieldOrders={fieldOrders}
                 onHelpChange={help}
                 type={typeFromRef(fieldSchema['$ref'])}
@@ -302,7 +309,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
   } else if (fieldSchema.additionalProperties) {
     // Map field
     return (
-      <div className={hidden}>
+      <div className={hidden + bgcol}>
         <div className='flex'>
           <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
           <div className='grow' />
@@ -366,6 +373,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
                       object={object[field][v]}
                       schema={schema}
                       field={field}
+                      bg={bg}
                       fieldOrders={fieldOrders}
                       onHelpChange={help}
                       type={typeFromRef(fieldSchema.additionalProperties['$ref'])}
@@ -384,10 +392,10 @@ function OASFieldEditor({ id, schema, field, fieldOrders, object, visible, onCha
   } else {
     // Long text field
     return (
-      <div className={"flex" + hidden}>
+      <div className={"flex" + hidden + bgcol}>
         <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
-        <Textarea className={classes + ' h-6'}
-          id={id}
+        <Textarea className={classes + ' h-6' + bgcol}
+          id={id}          
           placeholder={field.prompt}
           value={object[field]}
           onChange={e => handleChange(e.target.value)}

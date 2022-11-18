@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import OASFieldEditor from './OASFieldEditor.js';
 
-function OASObjectEditor({object, schema, fieldOrders, field, onHelpChange, onChange, type, index, defaultVisible, onMoveUp, onMoveDown, onRemove}) {
+function OASObjectEditor({object, schema, fieldOrders, field, bg, onHelpChange, onChange, type, index, defaultVisible, onMoveUp, onMoveDown, onRemove}) {
 
   const [visible, setVisible] = useState(defaultVisible)
 
@@ -25,6 +25,7 @@ function OASObjectEditor({object, schema, fieldOrders, field, onHelpChange, onCh
         return (<OASFieldEditor
           id={f}
           key={f}
+          bg={bg + (i % 2)}
           object={object}
           schema={schema}
           fieldOrders={fieldOrders}

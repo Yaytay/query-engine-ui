@@ -13,6 +13,7 @@ function PipelineEditor({ pipeline, schema, onHelpChange, onChange }) {
         onHelpChange={help}
         field='pipeline'
         type='Pipeline'
+        bg={0}
         defaultVisible='true'
         onChange={(_,p) => {onChange && onChange(p)}}
       />
