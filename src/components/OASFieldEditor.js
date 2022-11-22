@@ -51,8 +51,8 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
       ref = fieldSchema.items['$ref']
     } else if (fieldSchema['$ref']) {
       ref = fieldSchema['$ref']
-    } else if (fieldSchema.additionalProperties && fieldSchema.additionalProperties ['$ref']) {
-      ref = fieldSchema.additionalProperties ['$ref']
+    } else if (fieldSchema.additionalProperties && fieldSchema.additionalProperties['$ref']) {
+      ref = fieldSchema.additionalProperties['$ref']
     }
     console.log(fieldSchema)
     if (ref) {
@@ -120,7 +120,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
   var hidden = ' hidden';
   if (visible
     || (fieldSchema && fieldSchema.required)
-    || (object && object[field] && object[field] != (fieldSchema.default))
+    || (object && object[field] && object[field] !== (fieldSchema.default))
   ) {
     hidden = ''
   }
@@ -302,6 +302,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
               />
             </div>
           </div>
+          {minusControl}{upControl}{downControl}{dropControl}
         </div>
       </div>
 

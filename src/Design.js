@@ -5,15 +5,17 @@ import PipelineEditor from './components/PipelineEditor'
 import TreeViewFileItemLabel from './components/TreeViewFileItemLabel'
 
 import Article from '@mui/icons-material/Article';
+import FactCheckIcon from '@mui/icons-material/FactCheck';
 import Folder from '@mui/icons-material/Folder';
 import FolderOpen from '@mui/icons-material/FolderOpen';
 import IconButton from '@mui/material/IconButton';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import SaveIcon from '@mui/icons-material/Save';
 import Snackbar from '@mui/material/Snackbar';
+import Tooltip from '@mui/material/Tooltip';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
-import OASFieldEditor from './components/OASFieldEditor';
 
 var onChange;
 
@@ -147,7 +149,7 @@ function Design(props) {
     , Argument: ['name', 'type', 'title', 'prompt', 'description', 'optional', 'multiValued', 'ignored', 'dependsUpon', 'defaultValue', 'minimumValue', 'maximumValue', 'possibleValues', 'possibleValuesUrl', 'permittedValuesRegex']
     , ArgumentValue: ['value', 'label']
     , Condition: ['expression']
-    , Destination: ['type','name','mediaType']
+    , Destination: ['type', 'name', 'mediaType']
     , Processor: ['type']
     , Source: ['type']
   }
@@ -165,7 +167,7 @@ function Design(props) {
     function collectProperties(schema) {
       var props = {}
       if (schema.properties) {
-        props = {...schema.properties}
+        props = { ...schema.properties }
       }
       if (schema.allOf) {
         schema.allOf.forEach(ao => {
@@ -175,7 +177,7 @@ function Design(props) {
               if (props[pp]) {
                 Object.assign(props[pp], parentProps[pp])
               } else {
-                props[pp] = {...parentProps[pp]}
+                props[pp] = { ...parentProps[pp] }
               }
             })
           } else if (ao.properties) {
@@ -183,7 +185,7 @@ function Design(props) {
               if (props[pp]) {
                 Object.assign(props[pp], ao.properties[pp])
               } else {
-                props[pp] = {...ao.properties[pp]}
+                props[pp] = { ...ao.properties[pp] }
               }
             })
           }
@@ -203,7 +205,7 @@ function Design(props) {
       var simpleSchema = { description: schema.description ?? '', name: k }
 
       if (schema.discriminator) {
-        simpleSchema['discriminator'] = { propertyName: schema.discriminator.propertyName, mapping: {}}
+        simpleSchema['discriminator'] = { propertyName: schema.discriminator.propertyName, mapping: {} }
         Object.keys(schema.discriminator.mapping).forEach(dk => {
           simpleSchema.discriminator.mapping[dk] = typeFromRef(schema.discriminator.mapping[dk])
         })
@@ -237,6 +239,51 @@ function Design(props) {
     return result
   }
 
+  function validateFile() {
+    const url = new URL(props.baseUrl + 'api/design/validate');
+    console.log(fileContents)
+    fetch(url, { method: 'POST', body: JSON.stringify(fileContents), headers: { 'Content-Type': 'application/json' } })
+      .then(r => {
+        if (!r.ok) {
+          return r.text().then(t => {
+            throw Error(t)
+          })
+        } else {
+          return r.text()
+        }
+      })
+      .then(t => {
+        console.log(t)
+        setSnackMessage(t)
+        setSnackOpen(true)
+      })
+      .catch(e => {
+        console.log(e)
+        setSnackMessage(e.message)
+        setSnackOpen(true)
+      })
+  }
+
+  function saveFile() {
+    const url = new URL(props.baseUrl + 'api/design/file/' + currentFile.path);
+    console.log(fileContents)
+    fetch(url, { method: 'PUT', body: JSON.stringify(fileContents), headers: { 'Content-Type': 'application/json' } })
+      .then(r => {
+        if (!r.ok) {
+          return r.text().then(t => {
+            throw Error(t)
+          })
+        } else {
+          return r.text()
+        }
+      })
+      .catch(e => {
+        console.log(e)
+        setSnackMessage(e.message)
+        setSnackOpen(true)
+      })
+  }
+
   function fileSelected(e, nodeIds) {
     console.log(nodeIds)
     var node = nodeMap[nodeIds]
@@ -262,7 +309,7 @@ function Design(props) {
             setHelpText(permissionsHtml + (openapi ? openapi.components.schemas.Condition.description : ''))
             setFileContents(j)
             setFileIsPipeline(false)
-          } else {            
+          } else {
             var p = JSON.parse(j)
             if (!p) {
               p = {}
@@ -438,10 +485,24 @@ function Design(props) {
 
       <div className="grow flex flex-col overflow-hidden">
         <div style={{ borderColor: 'divider' }} className="flex border-b p-3">
-          {currentFile == null ? 'No file selected' : currentFile.path}
+          <div className="grow">
+            {currentFile == null ? 'No file selected' : currentFile.path}
+          </div>
+          <div>
+            <Tooltip title="Validate">
+              <IconButton sx={{ 'borderRadius': '20%' }} onClick={validateFile}>
+                <FactCheckIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Save">
+              <IconButton sx={{ 'borderRadius': '20%' }} onClick={saveFile}>
+                <SaveIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
         </div>
         {(fileIsPipeline) ?
-          (<PipelineEditor 
+          (<PipelineEditor
             schema={schema}
             onHelpChange={h => setHelpText(h)}
             pipeline={fileContents}

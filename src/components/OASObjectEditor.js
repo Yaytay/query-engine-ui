@@ -14,7 +14,7 @@ function OASObjectEditor({object, schema, fieldOrders, field, bg, onHelpChange, 
 
   if (schema[type].discriminator) {
     const d = schema[type].discriminator;
-    if (object[d.propertyName] && d.mapping[object[d.propertyName]]) {
+    if (object && object[d.propertyName] && d.mapping[object[d.propertyName]]) {
       type = d.mapping[object[d.propertyName]]
     }
   }
@@ -35,10 +35,10 @@ function OASObjectEditor({object, schema, fieldOrders, field, bg, onHelpChange, 
           visible={visible}
           field={f}
           index={index}
-          onDrop={i == 0 ? () => setVisible(!visible) : null}
-          onMoveUp={i == 0 && onMoveUp ? onMoveUp : null}
-          onMoveDown={i == 0 && onMoveDown ? onMoveDown : null}
-          onRemove={i == 0 && onRemove ? onRemove : null}
+          onDrop={i === 0 ? () => setVisible(!visible) : null}
+          onMoveUp={i === 0 && onMoveUp ? onMoveUp : null}
+          onMoveDown={i === 0 && onMoveDown ? onMoveDown : null}
+          onRemove={i === 0 && onRemove ? onRemove : null}
           />)
       }) }
     </div>
