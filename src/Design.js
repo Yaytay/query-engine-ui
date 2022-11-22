@@ -155,6 +155,7 @@ function Design(props) {
   }
 
   function buildSchema(openapi) {
+    console.log(openapi)
     function typeFromRef(arg) {
       var lastPos = arg.lastIndexOf('/')
       if (lastPos > 0) {
@@ -169,6 +170,11 @@ function Design(props) {
       if (schema.properties) {
         props = { ...schema.properties }
       }
+      Object.keys(props).forEach(pp => {
+        if (props[pp].type === 'array' && props[pp].minItems > 0) {
+          props[pp].required = true
+        }
+      })
       if (schema.allOf) {
         schema.allOf.forEach(ao => {
           if (ao.$ref) {
@@ -196,6 +202,7 @@ function Design(props) {
           props[req].required = true
         })
       }
+      console.log(props)
       return props
     }
 
