@@ -220,6 +220,8 @@ function Design(props) {
 
       simpleSchema.collectedProperties = collectProperties(schema)
 
+      simpleSchema.hasRequired = schema.required && schema.required.length > 0
+
       simpleSchema.sortedProperties = []
       if (fieldOrders[k]) {
         fieldOrders[k].forEach(f => {
@@ -242,7 +244,7 @@ function Design(props) {
       result[k] = simpleSchema
     })
 
-    console.log(result)
+    console.log('Built schema:', result)
     return result
   }
 
@@ -281,6 +283,9 @@ function Design(props) {
             throw Error(t)
           })
         } else {
+          if (onChange) {
+            onChange()
+          }
           return r.text()
         }
       })

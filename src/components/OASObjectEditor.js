@@ -32,10 +32,10 @@ function OASObjectEditor({object, schema, fieldOrders, field, bg, onHelpChange, 
           onHelpChange={onHelpChange}
           onChange={handleInputChange}
           parentType={type}
-          visible={visible}
+          visible={visible || !schema[type].hasRequired}
           field={f}
           index={index}
-          onDrop={i === 0 ? () => setVisible(!visible) : null}
+          onDrop={i === 0 && schema[type].hasRequired ? () => setVisible(!visible) : null}
           onMoveUp={i === 0 && onMoveUp ? onMoveUp : null}
           onMoveDown={i === 0 && onMoveDown ? onMoveDown : null}
           onRemove={i === 0 && onRemove ? onRemove : null}

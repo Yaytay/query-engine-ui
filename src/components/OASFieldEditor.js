@@ -36,7 +36,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
   }
 
   if (!object) {
-    console.log("Null object of type " + JSON.stringify(fieldSchema) + ' from ' + parentType)
+    // console.log("Null object of type " + JSON.stringify(fieldSchema) + ' from ' + parentType)
     object = {}
   }
 
@@ -125,6 +125,8 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
     hidden = ''
   }
 
+  var value = object[field] === undefined ? fieldSchema.default : object[field]
+
   if (!fieldSchema) {
     // No schema
     return (
@@ -141,7 +143,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
         <select
           id={id}
           placeholder={field.prompt}
-          value={object[field] ? 1 : 0}
+          value={value ? 1 : 0}
           className={bgcol}
           onChange={e => { handleChange((e.target.value > 0) ? true : false) }}
           onFocus={onFocus}
@@ -150,6 +152,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
         >
           <option value="1" key={field +  1}>true</option>
           <option value="0" key={field +  0}>false</option>
+          <option value="" key={field + 'null'}></option>
         </select>
         <div className="grow" />
         {minusControl}{upControl}{downControl}{dropControl}
@@ -164,7 +167,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
           id={id}
           type='text'
           placeholder={field.prompt}
-          value={object[field]}
+          value={value}
           onChange={e => handleChange(e.target.value)}
           onFocus={onFocus}
           ref={input}
@@ -181,7 +184,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
         <input className={classes + bgcol}
           id={id}
           type='text'
-          value={object[field]}
+          value={value}
           onChange={e => handleChange(e.target.value)}
           onFocus={onFocus}
           ref={input}
@@ -200,7 +203,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
           id={id}
           className={bgcol}
           placeholder={fieldSchema.prompt}
-          value={object[field]}
+          value={value}
           onChange={e => handleChange(e.target.value)}
           onFocus={onFocus}
           ref={input}
@@ -398,7 +401,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
         <Textarea className={classes + ' h-6' + bgcol}
           id={id}          
           placeholder={field.prompt}
-          value={object[field]}
+          value={value}
           onChange={e => handleChange(e.target.value)}
           onFocus={onFocus}
           ref={input}
