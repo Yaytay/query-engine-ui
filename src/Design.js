@@ -140,7 +140,9 @@ function Design(props) {
         setSnackOpen(true)
       })
 
-  }, [props.baseUrl, handleResponse, getAllDirs])
+  }, 
+  // eslint-disable-next-line   
+  [props.baseUrl, handleResponse, getAllDirs])
 
   const [currentFile, setCurrentFile] = useState(null);
 
