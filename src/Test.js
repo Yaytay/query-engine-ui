@@ -5,15 +5,12 @@ import Parameters from './components/Parameters.js';
 
 import Article from '@mui/icons-material/Article';
 import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
 import Folder from '@mui/icons-material/Folder';
 import FolderOpen from '@mui/icons-material/FolderOpen';
 import IconButton from '@mui/material/IconButton';
-import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Toolbar from '@mui/material/Toolbar';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 
@@ -39,7 +36,7 @@ function Test(props) {
     </table>
   )
 
-  const [mobileOpen, setMobileOpen] = useState(false);
+  // const [mobileOpen, setMobileOpen] = useState(false);
 
   const [tabPanel, setTabPanel] = useState(0);
   const [currentFile, setCurrentFile] = useState(null);
@@ -49,11 +46,6 @@ function Test(props) {
 
   const [drawerWidth, setDrawerWidth] = useState(360)
   const [displayDrawer, setDisplayDrawer] = useState(true)
-
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
 
   const handleChange = (event, newValue) => {
     setTabPanel(newValue);

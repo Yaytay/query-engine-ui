@@ -15,10 +15,7 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import SvgIcon from '@mui/material/SvgIcon';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 
 import {NestedMenuItem} from 'mui-nested-menu';
 
@@ -108,9 +105,11 @@ function Nav(props) {
   [modalIsOpen, setIsOpen] = useState(false);
   [args, setArgs] = useState({});
 
-  Modal.setAppElement('#root');
+  if (process.env.NODE_ENV !== 'test') {
+    Modal.setAppElement('#root');
+  }
 
-  const pages = ['Design', 'Test', 'Demo', 'Settngs', 'Help'];
+  // const pages = ['Design', 'Test', 'Demo', 'Settngs', 'Help'];
 
   const customStyles = {
     content: {
