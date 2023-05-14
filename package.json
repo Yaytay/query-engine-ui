@@ -2,7 +2,7 @@
   "name": "qe2",
   "version": "0.1.0",
   "private": true,
-  "homepage" : "/ui",
+  "homepage": "/ui",
   "dependencies": {
     "@date-io/moment": "^2.16.0",
     "@emotion/react": "^11.10.4",
