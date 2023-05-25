@@ -57,7 +57,9 @@ function Test(props) {
     }
     var result = [];
     Object.keys(args).forEach(k => {
-      result.push(k + '=' + encodeURIComponent(args[k]));
+      if (args[k] !== '') {
+        result.push(k + '=' + encodeURIComponent(args[k]));
+      }
     });
     return result.join('&');
   }

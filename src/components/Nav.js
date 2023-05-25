@@ -103,7 +103,7 @@ function Nav(props) {
   const handleCloseDataMenu = () => setAnchorElData(null);
 
   [modalIsOpen, setIsOpen] = useState(false);
-  [args, setArgs] = useState({});
+  [args, setArgs] = useState({});  
 
   if (process.env.NODE_ENV !== 'test') {
     Modal.setAppElement('#root');
@@ -164,11 +164,13 @@ function Nav(props) {
                   display: { xs: 'block', md: 'none' },
                 }}
               >
-                <Link to="/Design">
-                  <MenuItem key='Design' onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">Design</Typography>
-                  </MenuItem>
-                </Link>
+                { props.designMode && 
+                  <Link to="/Design" >
+                    <MenuItem key='Design' onClick={handleCloseNavMenu}>
+                      <Typography textAlign="center">Design</Typography>
+                    </MenuItem>
+                  </Link>
+                }
                 <Link to="/Test">
                   <MenuItem key='Test' onClick={handleCloseNavMenu}>
                     <Typography textAlign="center">Test</Typography>
@@ -204,11 +206,13 @@ function Nav(props) {
               Query Engine
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                <Link to="/Design">
-                  <Button key='Design' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
-                    Design
-                  </Button>
-                </Link>
+                { props.designMode && 
+                  <Link to="/Design">
+                    <Button key='Design' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
+                      Design
+                    </Button>
+                  </Link>
+                }
                 <Link to="/Test">
                   <Button key='Test' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
                     Test
