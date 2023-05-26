@@ -179,7 +179,7 @@ function Nav(props) {
                 <NestedMenuItem parentMenuOpen={navOpen} label={'Data'}>
                   <QueryFolderLevel items={props.available.children} parentMenuOpen={navOpen} />
                 </NestedMenuItem>
-                <Link to="/Test">
+                <Link to="/Help">
                   <MenuItem key='Help' onClick={handleCloseNavMenu}>
                     <Typography textAlign="center">Help</Typography>
                   </MenuItem>
@@ -224,7 +224,7 @@ function Nav(props) {
                 <Menu anchorEl={anchorElData} open={dataOpen} onClose={handleCloseDataMenu}>
                   <QueryFolderLevel items={props.available.children} parentMenuOpen={dataOpen} />
                 </Menu>
-                <Link to="/Test">
+                <Link to="/Help">
                   <Button key='Help' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
                     Help
                   </Button>

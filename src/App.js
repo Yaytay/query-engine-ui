@@ -11,6 +11,7 @@ import Home from './Home';
 import Design from './Design';
 import Demo from './Demo';
 import Test from './Test';
+import Help from './Help';
 import CssBaseline from '@mui/material/CssBaseline';
 
 
@@ -18,14 +19,14 @@ import CssBaseline from '@mui/material/CssBaseline';
 function App() {
 
   var defaultState = {
-    "available":
-    {
-    }
+    "available": {}
+    , "docs": {}
     , "designMode": false
   };
 
   const [available, setAvailable] = useState(defaultState.available);
   const [designMode, setDesignMode] = useState(defaultState.designMode);
+  const [docs, setDocs] = useState(defaultState.docs);
 
   const baseUrl = 'http://localhost:8000/';
 
@@ -36,12 +37,17 @@ function App() {
       .then(j => {
         setAvailable(j);
       })
-    let dm = new URL(baseUrl + 'api/design/enabled');
-    fetch(dm)
-        .then(r => {
-          setDesignMode(r.ok)
-          console.log(r)
-        })
+    let dmurl = new URL(baseUrl + 'api/design/enabled');
+    fetch(dmurl)
+      .then(r => {
+        setDesignMode(r.ok)
+      })
+    let docurl = new URL(baseUrl + 'api/docs');
+    fetch(docurl)
+      .then(r => r.json())
+      .then(j => {
+        setDocs(j);
+      })
     }, []);
 
   const refresh = function() {
@@ -80,6 +86,7 @@ function App() {
           }></Route>
           <Route exact path='/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
           <Route exact path='/demo' element={<Demo available={available} />}></Route>
+          <Route exact path='/help' element={<Help docs={docs} baseUrl={baseUrl} window={window} />}></Route>
         </Routes>
       </Router>
     </ThemeProvider>
