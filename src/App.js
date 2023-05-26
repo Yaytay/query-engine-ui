@@ -15,12 +15,11 @@ import Help from './Help';
 import CssBaseline from '@mui/material/CssBaseline';
 
 
-
 function App() {
 
   var defaultState = {
-    "available": {}
-    , "docs": {}
+    "available": { children: [] }
+    , "docs": { children: [] }
     , "designMode": false
   };
 

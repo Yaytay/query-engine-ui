@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 import DragBar from './components/DragBar'
-import Parameters from './components/Parameters.js';
 
 import Article from '@mui/icons-material/Article';
 import Box from '@mui/material/Box';
@@ -14,55 +13,14 @@ import Tab from '@mui/material/Tab';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 
-import DOMPurify from 'dompurify';
+import ReactMarkdown from 'react-markdown'
 
 function Help(props) {
 
-  const emptyTable = (
-    <table className='min-w-full' >
-      <thead className='border'>
-        <tr>
-          <th className='border'>&nbsp;</th><th className='border'>&nbsp;</th><th className='border'>&nbsp;</th><th className='border'>&nbsp;</th><th className='border'>&nbsp;</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td>
-        </tr>
-        <tr>
-        <td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td><td className='border'>&nbsp;</td>
-        </tr>
-      </tbody>
-    </table>
-  )
-
-  // const [mobileOpen, setMobileOpen] = useState(false);
-
-  const [tabPanel, setTabPanel] = useState(0);
-  const [currentFile, setCurrentFile] = useState(null);
-  const [args, setArgs] = useState(null);
-  const [data, setData] = useState(emptyTable);
-  const [rawHtml, setRawHtml] = useState(null);
-
-  const [drawerWidth, setDrawerWidth] = useState(360)
+  const [doc, setDoc] = useState(null);
+ 
+  const [drawerWidth, setDrawerWidth] = useState(250)
   const [displayDrawer, setDisplayDrawer] = useState(true)
-
-  const handleChange = (event, newValue) => {
-    setTabPanel(newValue);
-  };
-
-  function ArgsToArgs(args) {
-    if (args == null) {
-      return null;
-    }
-    var result = [];
-    Object.keys(args).forEach(k => {
-      if (args[k] !== '') {
-        result.push(k + '=' + encodeURIComponent(args[k]));
-      }
-    });
-    return result.join('&');
-  }
 
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -95,63 +53,16 @@ function Help(props) {
       nodeMap[node.path] = node;
     }
   }
-  console.log(props.docs);
   AddToNodeMap(props.docs);
 
   function fileSelected(e, nodeIds) {
     console.log(nodeIds);
-    if (nodeMap[nodeIds]) {
-      setCurrentFile(nodeMap[nodeIds]);
-      const ta = {}
-      if (nodeMap[nodeIds].arguments) {
-        nodeMap[nodeIds].arguments.forEach(arg => {
-          ta[arg.name] = arg.defaultValue ?? '';
-        });
-        ta['_fmt'] = nodeMap[nodeIds].destinations[0].name;
-      }
-      setArgs(ta);
-      setTabPanel(1);
-    }
-  }
-
-  function findDestination(fmt) {
-    for (var i in currentFile.destinations) {
-      if (currentFile.destinations[i].name === fmt) {
-        return currentFile.destinations[i];
-      }
-    }
-  }
-
-  function submit(e) {
-    var query = ArgsToArgs(args);
-    var url = props.baseUrl + 'query/' + currentFile.path + (query == null ? '' : ('?' + query))
-    console.log(url)
-
-    var dest = findDestination(args._fmt);
-    if (dest && (dest.type === 'XLSX')) {
-      props.window.open(url, "_blank");
-    } else {
-      fetch(url)
-        .then(r => {
-          if (r.ok) {
-            const type = r.headers.get('Content-Type');
-            r.text().then(t => {
-              if ("text/html" === type) {
-                setRawHtml('<div>' + DOMPurify.sanitize(t) + '</div>');
-                setData(null);
-              } else {
-                setRawHtml(null);
-                setData(t);
-              }
-            })
-          } else {
-            r.text().then(t => {
-              setData(t);
-            })
-          }
-        })
-    }
-
+    let url = new URL(props.baseUrl + 'api/docs/' + nodeIds);
+    fetch(url)
+      .then(r => r.text())
+      .then(b => {
+        setDoc(b)
+      })
   }
 
   const renderTree = (node) => {
@@ -165,7 +76,7 @@ function Help(props) {
   };
 
   function drawerWidthChange(w) {
-    if (w > 360) {
+    if (w > 200) {
       setDrawerWidth(w)
     }
   }
@@ -181,12 +92,11 @@ function Help(props) {
         <>
           <div style={{ width: drawerWidth }} className="h-full box-border " >
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs value={tabPanel} onChange={handleChange} >
+              <Tabs value={0} >
                 <Tab label="Files" />
-                <Tab label="Properties" disabled={!currentFile} />
               </Tabs>
             </Box>
-            <TabPanel value={tabPanel} index={0}>
+            <TabPanel value={0} index={0}>
               <Box>
                 <TreeView
                   aria-label="file system navigator"
@@ -200,10 +110,6 @@ function Help(props) {
                   {props.docs.children.map((node) => renderTree(node))}
                 </TreeView>
               </Box>
-            </TabPanel>
-            <TabPanel value={tabPanel} index={1}>
-              <Parameters onRequestSubmit={submit} closeable={false} pipeline={currentFile} values={args} >
-              </Parameters>
             </TabPanel>
           </div>
           <DragBar className='h-full' onChange={drawerWidthChange} />
@@ -223,8 +129,7 @@ function Help(props) {
         component="main"
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
-        <pre className="whitespace-pre-wrap">{data}</pre>
-        <div className="rawHtmlData" dangerouslySetInnerHTML={{ __html: rawHtml }}></div>
+        <ReactMarkdown children={doc} className="prose max-w-full" />
       </Box>
     </div>);
 }
