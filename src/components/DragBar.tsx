@@ -1,22 +1,25 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 
-function DragBar(props) {
+interface DragBarPropsType {
+  onChange: (x : number) => void
+}
+function DragBar(props : DragBarPropsType) {
 
   var [dragging, setDragging] = useState(false);
 
-  function dragStart(e) {
-    e.target.setPointerCapture(e.pointerId);
+  function dragStart(e : React.PointerEvent<HTMLDivElement>) {
+    e.currentTarget.setPointerCapture(e.pointerId);
     setDragging(true);
   }
 
-  function dragMove(e) {
+  function dragMove(e : React.PointerEvent<HTMLDivElement>) {
     if (dragging) {
       props.onChange && props.onChange(e.pageX);
     }
   }
 
-  function dragStop(e) {
-    e.target.releasePointerCapture(e.pointerId);
+  function dragStop(e : React.PointerEvent<HTMLDivElement>) {
+    e.currentTarget.releasePointerCapture(e.pointerId);
     setDragging(false);
   }
 

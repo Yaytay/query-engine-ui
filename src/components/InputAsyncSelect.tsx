@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import AsyncSelect from 'react-select/async'
 import { mapPossibleValues, getOption } from './SelectHelpers';
+import { InputStdProps } from './InputStdProps';
 
-function InputSelect(props) {
+function InputSelect(props : InputStdProps) {
 
   const [value, setValue] = useState();
   const [defaultValue, setDefaultValue] = useState();
@@ -11,13 +12,13 @@ function InputSelect(props) {
     setValue(defaultValue);
   }, [defaultValue]);
 
-  function handleInputChange(e) {
+  function handleInputChange(e : (React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>)) {    
     console.log('InputSelect: ' + JSON.stringify(e));
-    setValue(e);
+    // setValue(e);
     if (Array.isArray(e)) {
       props.onChange(e.map(v => v.value));
     } else {
-      props.onChange(e.value);
+      props.onChange(e.currentTarget.value);
     }
   }
 

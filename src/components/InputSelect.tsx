@@ -1,19 +1,20 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Select from 'react-select'
+import { InputStdProps } from './InputStdProps';
 import { mapPossibleValues, getOption } from './SelectHelpers';
 
-function InputSelect(props) {
+function InputSelect(props : InputStdProps) {
 
   const possibleValues = mapPossibleValues(props.arg.possibleValues);
 
   var value = useState(getOption(possibleValues, props.arg.multiValued, props.value))
 
-  function handleInputChange(e) {
-    console.log('InputSelect: ' + JSON.stringify(e));
+  function handleInputChange(e : React.ChangeEvent<HTMLSelectElement>) {    
+      console.log('InputSelect: ' + JSON.stringify(e));
     if (Array.isArray(e)) {
       props.onChange(e.map(v => v.value));
     } else {
-      props.onChange(e.value);
+      props.onChange(e.currentTarget.value);
     }
   }
 

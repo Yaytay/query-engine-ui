@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { InputStdProps } from './InputStdProps';
 import Creatable  from 'react-select/creatable';
 
-function InputStringMulti(props) {
+interface ValueType {
+  value: string
+  , label: string
+}
 
-  function makeValue(v) {
+function InputStringMulti(props : InputStdProps) : ValueType {
+
+  function makeValue(v : any) {
     if (v.value) {
       return {"value": v.value, "label": v.value};
     } else {
@@ -11,7 +17,7 @@ function InputStringMulti(props) {
     }
   }
 
-  var defaultValue = [];
+  var defaultValue : (ValueType[] | ValueType | null) = [];
   if (props.value) {
     if (Array.isArray(props.value)) {
       props.value.forEach(element => {
@@ -22,13 +28,13 @@ function InputStringMulti(props) {
     }
   }
   if (!props.arg.multiValued) {
-    defaultValue = (defaultValue === []) ? null : defaultValue[0];
+    defaultValue = Array.isArray(defaultValue) ? defaultValue[0] : null;
   }
 
   var [value, setValue] = useState(defaultValue);
   var [inputValue, setInputValue] = useState('');
 
-  function handleChange(e) {    
+  function handleChange(e : any) {    
     console.log('InputStringMulti: ' + JSON.stringify(e));
     setValue(e);
     setInputValue('');
@@ -39,11 +45,11 @@ function InputStringMulti(props) {
     }
   }
 
-  function handleInputChange(inputValue) {
+  function handleInputChange(inputValue : any) {
     setInputValue(inputValue);
   };
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event : any) {
     if (!inputValue) return;
     switch (event.key) {
       case 'Enter':

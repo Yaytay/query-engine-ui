@@ -1,5 +1,9 @@
 
-function LeftRightChevrons(props) {
+
+interface LeftRightChevronsProps {
+  left : boolean
+};
+function LeftRightChevrons(props : LeftRightChevronsProps) {
 
   if (props.left) {
     return (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import DragBar from './components/DragBar'
 
@@ -15,14 +15,21 @@ import TreeView from '@mui/lab/TreeView';
 
 import ReactMarkdown from 'react-markdown'
 
-function Help(props) {
+interface HelpProps {
+  children: any
+  , value: any
+  , index: any
+  , docs: any
+}
+
+function Help(props : HelpProps) {
 
   const [doc, setDoc] = useState(null);
  
   const [drawerWidth, setDrawerWidth] = useState(250)
   const [displayDrawer, setDisplayDrawer] = useState(true)
 
-  function TabPanel(props) {
+  function TabPanel(props : HelpProps) {
     const { children, value, index, ...other } = props;
 
     return (

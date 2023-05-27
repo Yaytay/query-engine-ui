@@ -1,11 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 
-function InlineEdit(props) {
+interface InlineEditProps {
+  value : any
+  , id : string
+  , type : string
+  , prompt : string
+  , onFocus : React.ReactEventHandler
+  , disabled : boolean
+  , onChange: (x : any) => void
+} 
+function InlineEdit(props : InlineEditProps) {
 
-  var [value, setValue] = useState(props.value);
+  var [_, setValue] = useState(props.value);
   var input = useRef(null);
 
-  function handleInputChange(e) {    
+  function handleInputChange(e : (React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>)) {    
     console.log('InputString: ' + e.target.value);
     setValue(e.target.value);
     props.onChange && props.onChange(e.target.value);

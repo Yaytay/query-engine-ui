@@ -4,7 +4,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Nav from './components/Nav';
 import Home from './Home';
@@ -13,13 +13,14 @@ import Demo from './Demo';
 import Test from './Test';
 import Help from './Help';
 import CssBaseline from '@mui/material/CssBaseline';
+import { Types } from './components/QueryEngineTypes';
 
 
 function App() {
 
   var defaultState = {
-    "available": { children: [] }
-    , "docs": { children: [] }
+    "available":( {name: '', path: '', children: [] } as Types.QueryFileDir)
+    , "docs": ( {name: '', path: '', children: [] } as Types.DocFileDir)
     , "designMode": false
   };
 
@@ -61,7 +62,6 @@ function App() {
 
   const theme = createTheme({
     palette: {
-      type: 'light',
       primary: {
         main: '#3f51b5',
       },
@@ -80,12 +80,12 @@ function App() {
         </div>        
         <Routes>
           <Route index element={<Home designMode={designMode} />}></Route>
-          <Route exact path='/design' element={
+          <Route path='/design' element={
             <Design available={available} baseUrl={baseUrl} onChange={refresh} />
           }></Route>
-          <Route exact path='/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
-          <Route exact path='/demo' element={<Demo available={available} />}></Route>
-          <Route exact path='/help' element={<Help docs={docs} baseUrl={baseUrl} window={window} />}></Route>
+          <Route path='/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
+          <Route path='/demo' element={<Demo available={available} />}></Route>
+          <Route path='/help' element={<Help docs={docs} baseUrl={baseUrl} window={window} />}></Route>
         </Routes>
       </Router>
     </ThemeProvider>

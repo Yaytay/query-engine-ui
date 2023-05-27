@@ -1,5 +1,5 @@
 import './Nav.css';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Parameters from './Parameters';
 import Modal from 'react-modal';
@@ -16,13 +16,14 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
+import { Types } from './QueryEngineTypes';
 
 import {NestedMenuItem} from 'mui-nested-menu';
 
-var [modalIsOpen, setIsOpen] = [false, null];
-var [anchorElNav, setAnchorElNav] = [null, null];
-var [anchorElData, setAnchorElData] = [null, null];
-var pipeline = { "name": "None" };
+var [modalIsOpen, setIsOpen] = [false, (_fmt : boolean) => {}];
+var [anchorElNav, setAnchorElNav] = [null, (_ : any) => {}];
+var [anchorElData, setAnchorElData] = [null, (_ : any) => {}];
+var pipeline = ( { "name": "None" } as Types.QueryFile );
 var [args, setArgs] = [{}, null];
 
 function displayParameters(event, item) {
@@ -83,7 +84,12 @@ function QueryFolderLevel(props) {
   );
 }
 
-function Nav(props) {
+interface NavProps {
+  designMode: boolean
+  , available: Types.QueryFileDir
+}
+
+function Nav(props : NavProps) {
 
   [anchorElNav, setAnchorElNav] = useState(null);
   const navOpen = Boolean(anchorElNav);

@@ -1,6 +1,9 @@
-import React from 'react';
 
-function Demo(props) {
+interface DemoProps {
+
+}
+
+function Demo(_ : DemoProps) {
 
   return (
     <div/>
