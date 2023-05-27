@@ -56,7 +56,6 @@ function TreeViewFileItemLabel(props) {
     if (name === props.node.name) {
       setDisabled(true)
     } else if (siblingExists(props.node, name)) {
-      console.log('has sibling')
       input.current.focus()
     } else {
       setDisabled(true)

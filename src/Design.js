@@ -95,7 +95,6 @@ function Design(props) {
         }
       })
       .then(j => {
-        console.log(j)
         setFiles(j)
         setParents(j)
         setNodeMap(buildNodeMap(j))
@@ -108,7 +107,6 @@ function Design(props) {
         console.log(e)
         setSnackMessage(e.message)
         setSnackOpen(true)
-        console.log(e)
       })
   }, [setFiles, setParents, setNodeMap, buildNodeMap])
 
@@ -130,7 +128,6 @@ function Design(props) {
         }
       })
       .then(j => {
-        console.log(j)
         setOpenapi(j)
         setSchema(buildSchema(j))
       })
@@ -157,7 +154,6 @@ function Design(props) {
   }
 
   function buildSchema(openapi) {
-    console.log(openapi)
     function typeFromRef(arg) {
       var lastPos = arg.lastIndexOf('/')
       if (lastPos > 0) {
@@ -264,7 +260,6 @@ function Design(props) {
         }
       })
       .then(t => {
-        console.log(t)
         setSnackMessage(t)
         setSnackOpen(true)
       })
@@ -277,7 +272,6 @@ function Design(props) {
 
   function saveFile() {
     const url = new URL(props.baseUrl + 'api/design/file/' + currentFile.path);
-    console.log(fileContents)
     fetch(url, { method: 'PUT', body: JSON.stringify(fileContents), headers: { 'Content-Type': 'application/json' } })
       .then(r => {
         if (!r.ok) {
@@ -299,14 +293,11 @@ function Design(props) {
   }
 
   function fileSelected(e, nodeIds) {
-    console.log(nodeIds)
     var node = nodeMap[nodeIds]
-    console.log(node)
     if (node && !Array.isArray(node.children)) {
       setCurrentFile(node);
       setHelpText('');
       let nodeUrl = new URL(props.baseUrl + 'api/design/file/' + node.path);
-      console.log(nodeUrl)
       fetch(nodeUrl, { headers: { 'Accept': 'application/json, */*;q=0.8' } })
         .then(r => {
           if (!r.ok) {
@@ -318,7 +309,6 @@ function Design(props) {
           }
         })
         .then(j => {
-          console.log(j)
           if (node.name === 'permissions.jexl') {
             setHelpText(permissionsHtml + (openapi ? openapi.components.schemas.Condition.description : ''))
             setFileContents(j)
@@ -328,7 +318,6 @@ function Design(props) {
             if (!p) {
               p = {}
             }
-            console.log(p)
             setFileContents(p)
             setFileIsPipeline(true)
           }
@@ -520,7 +509,7 @@ function Design(props) {
             schema={schema}
             onHelpChange={h => setHelpText(h)}
             pipeline={fileContents}
-            onChange={p => { p.v = (p.v ?? 0) + 1; setFileContents(p); console.log(p) }}
+            onChange={p => { p.v = (p.v ?? 0) + 1; setFileContents(p) }}
           />)
           :
           (<textarea className="grow font-mono p-3" value={fileContents ?? ''} disabled={fileContents === null} />)

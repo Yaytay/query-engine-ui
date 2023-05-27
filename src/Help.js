@@ -55,9 +55,8 @@ function Help(props) {
   }
   AddToNodeMap(props.docs);
 
-  function fileSelected(e, nodeIds) {
-    console.log(nodeIds);
-    let url = new URL(props.baseUrl + 'api/docs/' + nodeIds);
+  function fileSelected(e, node) {
+    let url = new URL(props.baseUrl + 'api/docs/' + node);
     fetch(url)
       .then(r => r.text())
       .then(b => {

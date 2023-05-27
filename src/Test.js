@@ -97,16 +97,16 @@ function Test(props) {
   }
   AddToNodeMap(props.available);
 
-  function fileSelected(e, nodeIds) {
-    console.log(nodeIds);
-    if (nodeMap[nodeIds]) {
-      setCurrentFile(nodeMap[nodeIds]);
+  function fileSelected(e, nodeId) {
+    console.log(nodeId);
+    if (nodeMap[nodeId]) {
+      setCurrentFile(nodeMap[nodeId]);
       const ta = {}
-      if (nodeMap[nodeIds].arguments) {
-        nodeMap[nodeIds].arguments.forEach(arg => {
+      if (nodeMap[nodeId].arguments) {
+        nodeMap[nodeId].arguments.forEach(arg => {
           ta[arg.name] = arg.defaultValue ?? '';
         });
-        ta['_fmt'] = nodeMap[nodeIds].destinations[0].name;
+        ta['_fmt'] = nodeMap[nodeId].destinations[0].name;
       }
       setArgs(ta);
       setTabPanel(1);
