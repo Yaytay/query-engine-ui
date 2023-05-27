@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import Box from '@mui/material/Box';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';

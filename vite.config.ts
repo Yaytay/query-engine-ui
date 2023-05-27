@@ -6,7 +6,7 @@ import svgr from "vite-plugin-svgr"
 export default defineConfig({
   plugins: [svgr(),react()],
   esbuild: {
-    loader: "jsx"  
+    loader: "tsx"  
   },
   server: {
     open: true,
