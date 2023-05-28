@@ -14,12 +14,12 @@ import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 
 import ReactMarkdown from 'react-markdown'
+import { components } from "./Query-Engine-Schema";
+
 
 interface HelpProps {
-  children: any
-  , value: any
-  , index: any
-  , docs: any
+  docs: components["schemas"]["Node"]
+  , baseUrl: string
 }
 
 function Help(props : HelpProps) {
@@ -29,7 +29,13 @@ function Help(props : HelpProps) {
   const [drawerWidth, setDrawerWidth] = useState(250)
   const [displayDrawer, setDisplayDrawer] = useState(true)
 
-  function TabPanel(props : HelpProps) {
+  interface TabPanelProps {
+    children: ReactElement
+    , value: number
+    , index: number
+  }
+
+  function TabPanel(props : TabPanelProps) {
     const { children, value, index, ...other } = props;
 
     return (

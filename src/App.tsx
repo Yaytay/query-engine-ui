@@ -13,14 +13,14 @@ import Demo from './Demo';
 import Test from './Test';
 import Help from './Help';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Types } from './components/QueryEngineTypes';
+import { components } from "./Query-Engine-Schema";
 
 
 function App() {
 
   var defaultState = {
-    "available":( {name: '', path: '', children: [] } as Types.QueryFileDir)
-    , "docs": ( {name: '', path: '', children: [] } as Types.DocFileDir)
+    "available":( {name: '', path: '', children: [] } as components["schemas"]["Node"])
+    , "docs": ( {name: '', path: '', children: [] } as components["schemas"]["Node"])
     , "designMode": false
   };
 
@@ -84,8 +84,8 @@ function App() {
             <Design available={available} baseUrl={baseUrl} onChange={refresh} />
           }></Route>
           <Route path='/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
-          <Route path='/demo' element={<Demo available={available} />}></Route>
-          <Route path='/help' element={<Help docs={docs} baseUrl={baseUrl} window={window} />}></Route>
+          <Route path='/demo' element={<Demo />}></Route>
+          <Route path='/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
         </Routes>
       </Router>
     </ThemeProvider>

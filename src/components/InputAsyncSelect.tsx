@@ -23,15 +23,17 @@ function InputSelect(props : InputStdProps) {
   }
 
   function loadOptions() {
-    return fetch(props.arg.possibleValuesUrl)
-      .then(r => r.json())
-      .then(j => {
-        console.log(j);
-        var pv = mapPossibleValues(j);
-        var o = getOption(pv, props.arg.multiValued, props.value);
-        setDefaultValue(o);
-        return pv;
-      })
+    if (props.arg.possibleValuesUrl) {
+      return fetch(props.arg.possibleValuesUrl)
+        .then(r => r.json())
+        .then(j => {
+          console.log(j);
+          var pv = mapPossibleValues(j);
+          var o = getOption(pv, props.arg.multiValued, props.value);
+          setDefaultValue(o);
+          return pv;
+        })
+    }
   }
 
   return (

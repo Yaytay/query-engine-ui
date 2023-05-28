@@ -7,9 +7,9 @@ interface ValueType {
   , label: string
 }
 
-function InputStringMulti(props : InputStdProps) : ValueType {
+function InputStringMulti(props : InputStdProps) {
 
-  function makeValue(v : any) {
+  function makeValue(v : any) : ValueType {
     if (v.value) {
       return {"value": v.value, "label": v.value};
     } else {
@@ -17,14 +17,19 @@ function InputStringMulti(props : InputStdProps) : ValueType {
     }
   }
 
+  function appendValue(current : ValueType[] | ValueType | null, newValue : any) : ValueType[] {
+    let newArray = current === null ? []  : Array.isArray(current) ? current : [current];
+    return newArray.concat(makeValue(newValue))
+  }
+
   var defaultValue : (ValueType[] | ValueType | null) = [];
   if (props.value) {
     if (Array.isArray(props.value)) {
       props.value.forEach(element => {
-        defaultValue = [...defaultValue, makeValue(element)];
+        defaultValue = appendValue(defaultValue, element)
       });
     } else {
-      defaultValue = [...defaultValue, makeValue(props.value)];
+      defaultValue = appendValue(defaultValue, props.value)
     }
   }
   if (!props.arg.multiValued) {
@@ -51,10 +56,12 @@ function InputStringMulti(props : InputStdProps) : ValueType {
 
   function handleKeyDown(event : any) {
     if (!inputValue) return;
+    let result = value === null ? []  : Array.isArray(value) ? value : [value];
+    result = result.concat(makeValue(inputValue))
     switch (event.key) {
       case 'Enter':
       case 'Tab':
-        handleChange([...value, {"value": inputValue, "label": inputValue}]);
+        handleChange(appendValue(value, inputValue));
         event.preventDefault();
         break;
       default:

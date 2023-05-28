@@ -1,8 +1,8 @@
-import { Types } from './QueryEngineTypes';
+import { components } from "../Query-Engine-Schema";
 
 export interface InputStdProps {
   value : any
-  , arg : Types.ArgumentDefn
+  , arg : components["schemas"]["Argument"]
   , id : string
   , type : string
   , prompt : string

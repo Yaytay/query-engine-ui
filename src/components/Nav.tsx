@@ -16,24 +16,27 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import { Types } from './QueryEngineTypes';
+import { components } from "../Query-Engine-Schema";
 
 import {NestedMenuItem} from 'mui-nested-menu';
 
-var [modalIsOpen, setIsOpen] = [false, (_fmt : boolean) => {}];
-var [anchorElNav, setAnchorElNav] = [null, (_ : any) => {}];
-var [anchorElData, setAnchorElData] = [null, (_ : any) => {}];
-var pipeline = ( { "name": "None" } as Types.QueryFile );
-var [args, setArgs] = [{}, null];
+var [anchorElNav, setAnchorElNav] = [null, (_ : any) => {}]
+var [anchorElData, setAnchorElData] = [null, (_ : any) => {}]
 
-function displayParameters(event, item) {
+var [modalIsOpen, setIsOpen] = [null as boolean | null, (_ : any) => {}]
+var [args, setArgs] = [null, (_ : any) => {}]
+
+var pipeline : components["schemas"]["PipelineFile"]
+
+
+function displayParameters(item : components["schemas"]["PipelineFile"]) {
   setAnchorElNav(null);
   setAnchorElData(null);
   console.log(item);
   pipeline = item;
 
-  var ta = {
-    '_fmt': pipeline.destinations[0].name
+  var ta : any = {
+    '_fmt': (Array.isArray(pipeline.destinations) ? pipeline.destinations[0].name : null)
   }
   if (pipeline.arguments) {
     pipeline.arguments.forEach(arg => {
@@ -49,55 +52,71 @@ function closeModal() {
   setIsOpen(false);
 }
 
-function submitModal(values) {
+function submitModal(values : any) {
   console.log(values);
   setIsOpen(false);
 }
 
-function QueryMenuItem(props) {
+interface QueryMenuItemProps {
+  item: components["schemas"]["PipelineFile"]
+} 
+
+function QueryMenuItem(props : QueryMenuItemProps) {
   return (
-    <MenuItem onClick={e => displayParameters(e, props.item)}>
+    <MenuItem onClick={_ => displayParameters(props.item)}>
       {props.item.title ?? props.item.name}
     </MenuItem>
   );
 }
 
-function QueryFolderLevel(props) {
+interface QueryFolderLevelProps {
+  items: components["schemas"]["PipelineNode"][] | undefined
+  , parentMenuOpen: boolean
+}
+
+function QueryFolderLevel(props : QueryFolderLevelProps) {
   var children = props.items;
 
-  return (
-    <>
-      {children.map((value, index) => {
-        if (value.children) {
-          return (
-            <NestedMenuItem key={value.path} parentMenuOpen={props.parentMenuOpen} label={value.name}>
-              <QueryFolderLevel items={value.children} parentMenuOpen={props.parentMenuOpen}></QueryFolderLevel>
-            </NestedMenuItem>
-          );
-        } else {
-          return (
-            <QueryMenuItem key={value.path} item={value} />
-          );
-        }
-      })}
-    </>
-  );
+  if (children) {
+    return (
+      <>
+        {children.map((value, _) => {
+          if (value.children) {
+            return (
+              <NestedMenuItem key={value.path} parentMenuOpen={props.parentMenuOpen} label={value.name}>
+                <QueryFolderLevel items={value.children} parentMenuOpen={props.parentMenuOpen}></QueryFolderLevel>
+              </NestedMenuItem>
+            );
+          } else {
+            return (
+              <QueryMenuItem key={value.path} item={value} />
+            );
+          }
+        })}
+      </>
+    );
+  } else {
+    return (<div/>)
+  }
 }
 
 interface NavProps {
   designMode: boolean
-  , available: Types.QueryFileDir
+  , available: components["schemas"]["PipelineDir"]
 }
 
 function Nav(props : NavProps) {
 
+  [modalIsOpen, setIsOpen] = useState(false);
+  [args, setArgs] = useState({} as any);  
+  
   [anchorElNav, setAnchorElNav] = useState(null);
   const navOpen = Boolean(anchorElNav);
 
   [anchorElData, setAnchorElData] = useState(null);
   const dataOpen = Boolean(anchorElData);
 
-  const handleOpenNavMenu = (event) => {
+  const handleOpenNavMenu = (event : React.MouseEvent<HTMLButtonElement>) => {
     setAnchorElNav(event.currentTarget);
   };
 
@@ -105,11 +124,8 @@ function Nav(props : NavProps) {
     setAnchorElNav(null);
   };
 
-  const handleOpenDataMenu = (e) => setAnchorElData(e.currentTarget);
+  const handleOpenDataMenu = (e : React.MouseEvent<HTMLElement>) => setAnchorElData(e.currentTarget);
   const handleCloseDataMenu = () => setAnchorElData(null);
-
-  [modalIsOpen, setIsOpen] = useState(false);
-  [args, setArgs] = useState({});  
 
   if (process.env.NODE_ENV !== 'test') {
     Modal.setAppElement('#root');
