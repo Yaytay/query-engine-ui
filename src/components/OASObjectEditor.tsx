@@ -1,8 +1,23 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import OASFieldEditor from './OASFieldEditor';
 
-function OASObjectEditor({object, schema, fieldOrders, field, bg, onHelpChange, onChange, type, index, defaultVisible, onMoveUp, onMoveDown, onRemove}) {
+interface OASObjectEditorProps {
+  object
+  , schema
+  , fieldOrders
+  , field
+  , bg
+  , onHelpChange
+  , onChange
+  , type
+  , index
+  , defaultVisible
+  , onMoveUp
+  , onMoveDown
+  , onRemove
+}
+function OASObjectEditor({object, schema, fieldOrders, field, bg, onHelpChange, onChange, type, index, defaultVisible, onMoveUp, onMoveDown, onRemove} : OASObjectEditorProps) {
 
   const [visible, setVisible] = useState(defaultVisible)
 

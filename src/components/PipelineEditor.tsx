@@ -1,7 +1,15 @@
-import React from 'react';
 import OASObjectEditor from './OASObjectEditor';
 
-function PipelineEditor({ pipeline, schema, onHelpChange, onChange }) {
+import { components } from "../Query-Engine-Schema";
+
+interface PipelineEditorProps {
+  pipeline : components["schemas"]["PipelineFile"]
+  , schema : any
+  , onHelpChange : () => {}
+  , onChange : (p: any) => {}
+}
+
+function PipelineEditor({ pipeline, schema, onHelpChange, onChange } : PipelineEditorProps) {
 
   const help = onHelpChange ?? function () { };
 

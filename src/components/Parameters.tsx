@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Select from 'react-select';
 import ParameterInput from './ParameterInput';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-function Parameters(props) {
+import { components } from "../Query-Engine-Schema";
+
+interface ParametersProps {
+  closeable : boolean
+  , onRequestSubmit: (values : any[]) => void
+  , onRequestClose: () => void  
+  , pipeline: components["schemas"]["PipelineFile"]
+  , values: any
+}
+
+function Parameters(props : ParametersProps) {
+
+  var [values, setValues] = useState(props.values);
+  var [highlight, setHighlight] = useState({});
+  var [rootStyle, setRootStyle] = useState({});
 
   const closeable = props.closeable ?? true;
 
@@ -14,12 +28,14 @@ function Parameters(props) {
 
   function submit() {
     var allGood = true;
-    highlight = {};
-    for (var i = 0; i < props.pipeline.arguments.length; ++i) {
-      var arg = props.pipeline.arguments[i];
-      if (!values[arg.name] && !arg.optional) {
-        highlight[arg.name] = true;
-        allGood = false;
+    let h = {} as any;
+    if (props.pipeline.arguments) {
+      for (var i = 0; i < props.pipeline.arguments.length; ++i) {
+        var arg = props.pipeline.arguments[i];
+        if (!values[arg.name] && !arg.optional) {
+          h[arg.name] = true;
+          allGood = false;
+        }
       }
     }
 
@@ -27,7 +43,7 @@ function Parameters(props) {
       setHighlight({});
       props.onRequestSubmit(values);
     } else {
-      setHighlight(highlight);
+      setHighlight(h);
       setRootStyle({ animationName: 'horizontal-shaking', animationIterationCount: '3', animationDuration: '0.05s' });
       setTimeout(() => {
         setRootStyle({});
@@ -35,21 +51,17 @@ function Parameters(props) {
     }
   }
 
-  const destOptions = props.pipeline.destinations == null ? [] : props.pipeline.destinations.map((value, index) => {
+  const destOptions = props.pipeline.destinations == null ? [] : props.pipeline.destinations.map((value) => {
     return { value: value.name, label: value.name };
   });
 
-  function getOption(value) {
+  function getOption(value : any) {
     for (var i in destOptions) {
       if (destOptions[i].value === value) {
         return destOptions[i];
       }
     }
   }
-
-  var [values, setValues] = useState(props.values);
-  var [highlight, setHighlight] = useState({});
-  var [rootStyle, setRootStyle] = useState({});
 
   return (
     <>
@@ -61,17 +73,17 @@ function Parameters(props) {
         <hr className="mb-5"></hr>
 
         <div className="columns-3xs">
-          {props.pipeline.arguments.map((value, index) => {
+          {props.pipeline.arguments && props.pipeline.arguments.map((value) => {
             const arg = value;
             return (
               <div key={value.name}>
-                <ParameterInput arg={arg} highlight={highlight[arg.name]} value={values[arg.name]} onChange={v => { values[arg.name] = v; setValues(values); }} />
+                <ParameterInput arg={arg} highlight={highlight.hasOwnProperty(arg.name)} value={values[arg.name]} onChange={v => { values[arg.name] = v; setValues(values); }} />
               </div>
             )
           })}
         </div>
 
-        {props.pipeline.destinations.length > 1 &&
+        {props.pipeline.destinations && props.pipeline.destinations.length > 1 &&
           <>
             <hr className="mt-2 mb-5"></hr>
             <div className="mb-5">
@@ -81,7 +93,9 @@ function Parameters(props) {
                 menuPortalTarget={document.body}
                 defaultValue={getOption(values['_fmt'])}
                 onChange={e => {
-                  values['_fmt'] = e.value;
+                  if (e) {
+                    values['_fmt'] = e.value;
+                  }
                   setValues(values);
                 }} />
             </div>

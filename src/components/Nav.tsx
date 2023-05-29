@@ -148,8 +148,7 @@ function Nav(props : NavProps) {
   return (
     <>
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles}>
-        <Parameters onRequestClose={closeModal} onRequestSubmit={submitModal} pipeline={pipeline} values={args} >
-        </Parameters>
+        <Parameters onRequestClose={closeModal} onRequestSubmit={submitModal} pipeline={pipeline} values={args} closeable={true} />
       </Modal>
       <AppBar position="static">
         <Container maxWidth="xl">

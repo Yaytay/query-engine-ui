@@ -19,8 +19,8 @@ import { components } from "./Query-Engine-Schema";
 function App() {
 
   var defaultState = {
-    "available":( {name: '', path: '', children: [] } as components["schemas"]["Node"])
-    , "docs": ( {name: '', path: '', children: [] } as components["schemas"]["Node"])
+    "available":( {name: '', path: '', children: [] } as components["schemas"]["PipelineDir"])
+    , "docs": ( {name: '', path: '', children: [] } as components["schemas"]["DocDir"])
     , "designMode": false
   };
 

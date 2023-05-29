@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import Textarea from 'react-expanding-textarea'
 import OASObjectEditor from './OASObjectEditor';
 import IconButton from '@mui/material/IconButton';
@@ -10,7 +10,27 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import Tooltip from '@mui/material/Tooltip';
 
-function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, onChange, onHelpChange, parentType, onDrop, index, onMoveUp, onMoveDown, onRemove }) {
+import { components } from "../Query-Engine-Schema";
+
+interface OASFieldEditorProps {
+  id : string
+  , object : any
+  , schema : any
+  , fieldOrders : any
+  , field : any
+  , bg : any
+  , onHelpChange : any
+  , onChange : any
+  , type : any
+  , index : number
+  , visible : boolean
+  , parentType : any
+  , onDrop : any
+  , onMoveUp : any
+  , onMoveDown : any
+  , onRemove : any
+}
+function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, onChange, onHelpChange, parentType, onDrop, index, onMoveUp, onMoveDown, onRemove } : OASFieldEditorProps) {
 
   const colours = [' bg-white', ' bg-slate-50', ' bg-slate-100', ' bg-slate-200', ' bg-slate-300']
   const parentSchema = schema[parentType]

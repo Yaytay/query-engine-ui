@@ -16,21 +16,20 @@ import TreeView from '@mui/lab/TreeView';
 import ReactMarkdown from 'react-markdown'
 import { components } from "./Query-Engine-Schema";
 
-
 interface HelpProps {
-  docs: components["schemas"]["Node"]
+  docs: components["schemas"]["DocDir"]
   , baseUrl: string
 }
 
 function Help(props : HelpProps) {
 
-  const [doc, setDoc] = useState(null);
+  const [doc, setDoc] = useState('');
  
   const [drawerWidth, setDrawerWidth] = useState(250)
   const [displayDrawer, setDisplayDrawer] = useState(true)
 
   interface TabPanelProps {
-    children: ReactElement
+    children: any
     , value: number
     , index: number
   }
@@ -55,10 +54,10 @@ function Help(props : HelpProps) {
     );
   }
 
-  const nodeMap = {}
-  const expanded = []
+  const nodeMap = {} as any
+  const expanded = [] as string[]
 
-  function AddToNodeMap(node) {
+  function AddToNodeMap(node : components["schemas"]["DocNode"]) {
     if (Array.isArray(node.children)) {
       node.children.forEach(n => AddToNodeMap(n));
       expanded.push(node.path);
@@ -68,8 +67,8 @@ function Help(props : HelpProps) {
   }
   AddToNodeMap(props.docs);
 
-  function fileSelected(e, node) {
-    let url = new URL(props.baseUrl + 'api/docs/' + node);
+  function fileSelected(_ : any, path : string) {
+    let url = new URL(props.baseUrl + 'api/docs/' + path);
     fetch(url)
       .then(r => r.text())
       .then(b => {
@@ -77,17 +76,25 @@ function Help(props : HelpProps) {
       })
   }
 
-  const renderTree = (node) => {
-    return (
-      <TreeItem key={node.name} nodeId={node.path} label={node.title ?? node.name} >
-        {Array.isArray(node.children)
-          ? node.children.map((child) => renderTree(child))
-          : null}
-      </TreeItem>
-    )
+  const isDocFile = (n : components["schemas"]["DocNode"]) : n is components["schemas"]["DocFile"] => {
+    return ! Array.isArray(n.children);
+  }
+
+  const renderTree = (node : components["schemas"]["DocNode"]) => {
+    if (isDocFile(node)) {
+      return (
+        <TreeItem key={node.name} nodeId={node.path} label={node.title ?? node.name} />
+      )
+    } else {
+      return (
+        <TreeItem key={node.name} nodeId={node.path} label={node.name} >
+          { node.children && node.children.map((child) => renderTree(child)) }
+        </TreeItem>
+      )
+    }
   };
 
-  function drawerWidthChange(w) {
+  function drawerWidthChange(w : number) {
     if (w > 200) {
       setDrawerWidth(w)
     }
@@ -119,12 +126,12 @@ function Help(props : HelpProps) {
                   onNodeSelect={fileSelected}
                   sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                 >
-                  {props.docs.children.map((node) => renderTree(node))}
+                  {props.docs.children && props.docs.children.map((node) => renderTree(node))}
                 </TreeView>
               </Box>
             </TabPanel>
           </div>
-          <DragBar className='h-full' onChange={drawerWidthChange} />
+          <DragBar onChange={drawerWidthChange} />
         </>
       )}
       {displayDrawer || (

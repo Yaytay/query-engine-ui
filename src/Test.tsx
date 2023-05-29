@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import DragBar from './components/DragBar'
 import Parameters from './components/Parameters';
@@ -15,8 +15,15 @@ import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 
 import DOMPurify from 'dompurify';
+import { components } from "./Query-Engine-Schema";
 
-function Test(props) {
+interface TestProps {
+  available: components["schemas"]["PipelineDir"]
+  , baseUrl: string
+  , window: Window
+}
+
+function Test(props : TestProps) {
 
   const emptyTable = (
     <table className='min-w-full' >
@@ -39,23 +46,23 @@ function Test(props) {
   // const [mobileOpen, setMobileOpen] = useState(false);
 
   const [tabPanel, setTabPanel] = useState(0);
-  const [currentFile, setCurrentFile] = useState(null);
-  const [args, setArgs] = useState(null);
-  const [data, setData] = useState(emptyTable);
-  const [rawHtml, setRawHtml] = useState(null);
+  const [currentFile, setCurrentFile] = useState(null as components["schemas"]["PipelineFile"] | null);
+  const [args, setArgs] = useState(null as any);
+  const [data, setData] = useState(emptyTable as any);
+  const [rawHtml, setRawHtml] = useState(null as string | null);
 
   const [drawerWidth, setDrawerWidth] = useState(360)
   const [displayDrawer, setDisplayDrawer] = useState(true)
 
-  const handleChange = (event, newValue) => {
-    setTabPanel(newValue);
+  const handleChange = (_ : any, newTabIndex : number) => {
+    setTabPanel(newTabIndex);
   };
 
-  function ArgsToArgs(args) {
+  function ArgsToArgs(args : any) {
     if (args == null) {
       return null;
     }
-    var result = [];
+    var result = [] as any[];
     Object.keys(args).forEach(k => {
       if (args[k] !== '') {
         result.push(k + '=' + encodeURIComponent(args[k]));
@@ -64,9 +71,14 @@ function Test(props) {
     return result.join('&');
   }
 
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
 
+  interface TabPanelProps {
+    children: any
+    , value: number
+    , index: number    
+  }
+
+  function TabPanel({ children, value, index, ...other } : TabPanelProps) {
     return (
       <div
         role="tabpanel"
@@ -84,10 +96,10 @@ function Test(props) {
     );
   }
 
-  const nodeMap = {}
-  const expanded = []
+  const nodeMap = {} as any
+  const expanded = [] as string[]
 
-  function AddToNodeMap(node) {
+  function AddToNodeMap(node : components["schemas"]["PipelineNode"]) {
     if (Array.isArray(node.children)) {
       node.children.forEach(n => AddToNodeMap(n));
       expanded.push(node.path);
@@ -97,35 +109,44 @@ function Test(props) {
   }
   AddToNodeMap(props.available);
 
-  function fileSelected(e, nodeId) {
-    console.log(nodeId);
-    if (nodeMap[nodeId]) {
-      setCurrentFile(nodeMap[nodeId]);
-      const ta = {}
-      if (nodeMap[nodeId].arguments) {
-        nodeMap[nodeId].arguments.forEach(arg => {
+  function fileSelected(_ : any, path : string) {
+    console.log(path);
+    if (nodeMap[path]) {
+      setCurrentFile(nodeMap[path]);
+      const ta = {} as any
+      if (nodeMap[path].arguments) {
+        nodeMap[path].arguments.forEach((arg : any) => {
           ta[arg.name] = arg.defaultValue ?? '';
         });
-        ta['_fmt'] = nodeMap[nodeId].destinations[0].name;
+        ta['_fmt'] = nodeMap[path].destinations[0].name;
       }
       setArgs(ta);
       setTabPanel(1);
     }
   }
 
-  function findDestination(fmt) {
-    for (var i in currentFile.destinations) {
-      if (currentFile.destinations[i].name === fmt) {
-        return currentFile.destinations[i];
+  function findDestination(fmt : string) : components["schemas"]["Format"] | null{
+    if (currentFile && currentFile.destinations) {
+      for (var i of currentFile.destinations) {
+        if (i.name === fmt) {
+          return i;
+        }
       }
-    }
+    } 
+    return null;
   }
 
-  function submit(e) {
+  function submit() {
+    if (!currentFile) {
+      return 
+    }
     var query = ArgsToArgs(args);
     var url = props.baseUrl + 'query/' + currentFile.path + (query == null ? '' : ('?' + query))
     console.log(url)
 
+    if (!args) {
+      return
+    }
     var dest = findDestination(args._fmt);
     if (dest && (dest.type === 'XLSX')) {
       props.window.open(url, "_blank");
@@ -153,17 +174,23 @@ function Test(props) {
 
   }
 
-  const renderTree = (node) => {
-    return (
-      <TreeItem key={node.name} nodeId={node.path} label={node.title ?? node.name} >
-        {Array.isArray(node.children)
-          ? node.children.map((child) => renderTree(child))
-          : null}
-      </TreeItem>
-    )
+  const isPipelineFile = (n : components["schemas"]["PipelineNode"]) : n is components["schemas"]["PipelineFile"] => {
+    return ! Array.isArray(n.children);
+  }
+
+  const renderTree = (node : components["schemas"]["PipelineNode"]) => {
+    if (isPipelineFile(node)) {
+      return (<TreeItem key={node.name} nodeId={node.path} label={node.title ?? node.name}/>)
+    } else {
+      return (
+        <TreeItem key={node.name} nodeId={node.path} label={node.name} >
+          {node.children && node.children.map((child) => renderTree(child))}
+        </TreeItem>
+      )
+    }
   };
 
-  function drawerWidthChange(w) {
+  function drawerWidthChange(w : number) {
     if (w > 360) {
       setDrawerWidth(w)
     }
@@ -201,11 +228,10 @@ function Test(props) {
               </Box>
             </TabPanel>
             <TabPanel value={tabPanel} index={1}>
-              <Parameters onRequestSubmit={submit} closeable={false} pipeline={currentFile} values={args} >
-              </Parameters>
+              { currentFile && (<Parameters onRequestSubmit={submit} closeable={false} pipeline={currentFile} values={args} onRequestClose={() => {}} />) }
             </TabPanel>
           </div>
-          <DragBar className='h-full' onChange={drawerWidthChange} />
+          <DragBar onChange={drawerWidthChange} />
         </>
       )}
       {displayDrawer || (
@@ -223,7 +249,7 @@ function Test(props) {
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
         <pre className="whitespace-pre-wrap">{data}</pre>
-        <div className="rawHtmlData" dangerouslySetInnerHTML={{ __html: rawHtml }}></div>
+        {rawHtml && (<div className="rawHtmlData" dangerouslySetInnerHTML={{ __html: rawHtml }}></div>)}
       </Box>
     </div>);
 }

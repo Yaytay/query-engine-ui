@@ -1,7 +1,10 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
-function Home(props) {
+interface HomeProps {
+    designMode :  boolean
+}
+
+function Home(props : HomeProps) {
     return (
         <div className="grid h-screen place-content-center">
             <div>

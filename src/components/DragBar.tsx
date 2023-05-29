@@ -1,9 +1,9 @@
 import {useState} from 'react';
 
-interface DragBarPropsType {
+interface DragBarProps {
   onChange: (x : number) => void
 }
-function DragBar(props : DragBarPropsType) {
+function DragBar(props : DragBarProps) {
 
   var [dragging, setDragging] = useState(false);
 
@@ -24,7 +24,7 @@ function DragBar(props : DragBarPropsType) {
   }
 
   return (
-    <div className="w-1 cursor-col-resize border-l-2"
+    <div className="w-1 cursor-col-resize border-l-2 h-full"
       onPointerDown={dragStart} 
       onPointerMove={dragMove} 
       onPointerUp={dragStop} 
