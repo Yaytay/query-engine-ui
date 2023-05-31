@@ -1,11 +1,17 @@
 
 import PipelineEditorField from './PipelineEditorField';
 
-function PipelineArgumentEditor({argument, openapi, onHelpChange, onChange}) {
+interface PipelineArgumentEditorProps {
+  argument : any
+  , openapi : any
+  , onChange : (field : string, newValue : any) => void
+  , onHelpChange : (help : string) => void
+}
+function PipelineArgumentEditor({argument, openapi, onHelpChange, onChange} : PipelineArgumentEditorProps) {
 
   const help = onHelpChange ?? function(){};
 
-  function onFieldChange(field, value) {
+  function onFieldChange(field : string, value : any) {
     var newArg = {...argument}
     newArg[field] = value
     onChange && onChange(newArg)

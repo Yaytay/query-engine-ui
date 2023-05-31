@@ -24,7 +24,7 @@ function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange
     return (<div />)
   }
 
-  function handleInputChange(e : React.ChangeEvent<HTMLInputElement>) {
+  function handleInputChange(e : React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) {
     onChange(name, e.currentTarget.value);
   }
 
@@ -83,13 +83,12 @@ function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange
         id={id}
         placeholder={field.prompt}
         value={parent[name]}
-        onChange={onChange}
+        onChange={handleInputChange}
         onFocus={onFocus ?? null}
         ref={input}
-        pattern={field.pattern}
       >
         {
-          field.enum.map(v => {
+          field.enum.map((v : string) => {
             return (<option id={v} value={v}>{v}</option>)
           })
         }
