@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import * as React from 'react';
 
 import DragBar from './components/DragBar'
 import PipelineEditor from './components/PipelineEditor'
@@ -17,16 +18,23 @@ import Tooltip from '@mui/material/Tooltip';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 
-var onChange;
+import { components } from "./Query-Engine-Schema";
+import { SchemaMapType, buildSchema } from "./SchemaType";
 
-function Design(props) {
+var onChange : any;
 
-  const [files, setFiles] = useState({ children: [], path: '' })
-  const [expanded, setExpanded] = useState([])
-  const [nodeMap, setNodeMap] = useState({})
+interface DesignProps {
+  onChange :  any
+  , baseUrl : string
+}
+function Design(props : DesignProps) {
+
+  const [files, setFiles] = useState(null as components["schemas"]["DesignNode"] | null)
+  const [expanded, setExpanded] = useState([] as string[])
+  const [nodeMap, setNodeMap] = useState(null as Map<string, components["schemas"]["DesignNode"]> | null)
 
   const [snackOpen, setSnackOpen] = useState(false)
-  const [snackMessage, setSnackMessage] = useState()
+  const [snackMessage, setSnackMessage] = useState(null as string | null)
 
   const [fileDrawerWidth, setFileDrawerWidth] = useState(360)
   const [displayFileDrawer, setDisplayFileDrawer] = useState(true)
@@ -34,58 +42,67 @@ function Design(props) {
   const [helpDrawerWidth, setHelpDrawerWidth] = useState(360)
   const [displayHelpDrawer, setDisplayHelpDrawer] = useState(true)
 
-  const [openapi, setOpenapi] = useState()
-  const [schema, setSchema] = useState()
+  const [schema, setSchema] = useState(null as SchemaMapType | null)
+  const [openapi, setOpenApi] = useState({} as any)
 
-  const [fileContents, setFileContents] = useState(null)
-  const [fileIsPipeline, setFileIsPipeline] = useState(false)
+  const [fileContents, setFileContents] = useState(null as components["schemas"]["Pipeline"] | null)
+  const [fileContentsString, setFileContentsString] = useState(null as string | null)
 
   const [helpText, setHelpText] = useState('')
 
-  const outerBox = useRef(null)
+  const outerBox = React.useRef<HTMLDivElement>(null)
 
   if (props.onChange !== undefined && onChange === undefined) {
     onChange = props.onChange
   }
 
-  const setParents = useCallback(node => {
-    node.children.forEach(n => {
+  const isDirectory = (n : components["schemas"]["DesignNode"]) : n is components["schemas"]["DesignDir"] => {
+    return Array.isArray(n.children);
+  }
+
+  const isFile = (n : components["schemas"]["DesignNode"]) : n is components["schemas"]["DesignFile"] => {
+    return ! Array.isArray(n.children);
+  }
+
+  function setParents(node : any) {
+    node.children.forEach((n : any) => {
       n.parent = node
       if (Array.isArray(n.children)) {
         setParents(n)
       }
     })
-  }, [])
+  }
 
-  const getAllDirs = useCallback(root => {
-    var arr = []
-    function addToDirs(node) {
-      if (Array.isArray(node.children)) {
+  const getAllDirs = useCallback((root : components["schemas"]["DesignDir"]) => {
+    var arr : string[] = []
+
+    function addToDirs(node : components["schemas"]["DesignNode"]) {
+      if (isDirectory(node)) {
         arr.push(node.path)
-        node.children.forEach(n => addToDirs(n))
+        node.children.forEach((n) => addToDirs(n))
       }
     }
     addToDirs(root)
     return arr
   }, [])
 
-  const buildNodeMap = useCallback(root => {
-    var nm = {}
-    function addToNodeMap(node) {
+  const buildNodeMap = useCallback((root : components["schemas"]["DesignDir"]) => {
+    var nm = new Map<string, components["schemas"]["DesignNode"]>();
+    function addToNodeMap(node : components["schemas"]["DesignNode"] ) {
       if (Array.isArray(node.children)) {
-        nm[node.path] = node
+        nm.set(node.path, node)
         node.children.forEach(n => addToNodeMap(n))
       } else {
-        nm[node.path] = node;
+        nm.set(node.path, node);
       }
     }
     addToNodeMap(root);
     return nm;
   }, [])
 
-  const handleResponse = useCallback(p => {
+  const handleResponse = useCallback((p : Promise<Response>) => {
     return p
-      .then(r => {
+      .then((r : Response) => {
         if (!r.ok) {
           return r.text().then(t => {
             throw Error(t)
@@ -94,7 +111,7 @@ function Design(props) {
           return r.json()
         }
       })
-      .then(j => {
+      .then((j : any) => {
         setFiles(j)
         setParents(j)
         setNodeMap(buildNodeMap(j))
@@ -128,7 +145,7 @@ function Design(props) {
         }
       })
       .then(j => {
-        setOpenapi(j)
+        setOpenApi(j)
         setSchema(buildSchema(j))
       })
       .catch(e => {
@@ -141,110 +158,7 @@ function Design(props) {
   // eslint-disable-next-line   
   [props.baseUrl, handleResponse, getAllDirs])
 
-  const [currentFile, setCurrentFile] = useState(null);
-
-  const fieldOrders = {
-    Pipeline: ['title', 'description', 'condition', 'arguments', 'sourceEndpoints', 'dynamicEndpoints', 'source', 'processors', 'destinations']
-    , Argument: ['name', 'type', 'title', 'prompt', 'description', 'optional', 'multiValued', 'ignored', 'dependsUpon', 'defaultValue', 'minimumValue', 'maximumValue', 'possibleValues', 'possibleValuesUrl', 'permittedValuesRegex']
-    , ArgumentValue: ['value', 'label']
-    , Condition: ['expression']
-    , Destination: ['type', 'name', 'mediaType']
-    , Processor: ['type']
-    , Source: ['type']
-  }
-
-  function buildSchema(openapi) {
-    function typeFromRef(arg) {
-      var lastPos = arg.lastIndexOf('/')
-      if (lastPos > 0) {
-        return arg.substring(lastPos + 1);
-      } else {
-        return arg;
-      }
-    }
-
-    function collectProperties(schema) {
-      var props = {}
-      if (schema.properties) {
-        props = { ...schema.properties }
-      }
-      Object.keys(props).forEach(pp => {
-        if (props[pp].type === 'array' && props[pp].minItems > 0) {
-          props[pp].required = true
-        }
-      })
-      if (schema.allOf) {
-        schema.allOf.forEach(ao => {
-          if (ao.$ref) {
-            var parentProps = collectProperties(openapi.components.schemas[typeFromRef(ao.$ref)])
-            Object.keys(parentProps).forEach(pp => {
-              if (props[pp]) {
-                Object.assign(props[pp], parentProps[pp])
-              } else {
-                props[pp] = { ...parentProps[pp] }
-              }
-            })
-          } else if (ao.properties) {
-            Object.keys(ao.properties).forEach(pp => {
-              if (props[pp]) {
-                Object.assign(props[pp], ao.properties[pp])
-              } else {
-                props[pp] = { ...ao.properties[pp] }
-              }
-            })
-          }
-        })
-      }
-      if (schema.required) {
-        schema.required.forEach(req => {
-          props[req].required = true
-        })
-      }
-      console.log(props)
-      return props
-    }
-
-    var result = {}
-    Object.keys(openapi.components.schemas).forEach(k => {
-      const schema = openapi.components.schemas[k]
-      var simpleSchema = { description: schema.description ?? '', name: k }
-
-      if (schema.discriminator) {
-        simpleSchema['discriminator'] = { propertyName: schema.discriminator.propertyName, mapping: {} }
-        Object.keys(schema.discriminator.mapping).forEach(dk => {
-          simpleSchema.discriminator.mapping[dk] = typeFromRef(schema.discriminator.mapping[dk])
-        })
-      }
-
-      simpleSchema.collectedProperties = collectProperties(schema)
-
-      simpleSchema.hasRequired = schema.required && schema.required.length > 0
-
-      simpleSchema.sortedProperties = []
-      if (fieldOrders[k]) {
-        fieldOrders[k].forEach(f => {
-          if (simpleSchema.collectedProperties[f]) {
-            simpleSchema.sortedProperties.push(f)
-          }
-        })
-      }
-      Object.keys(simpleSchema.collectedProperties).forEach(f => {
-        if (simpleSchema.collectedProperties[f].required && !simpleSchema.sortedProperties.includes(f)) {
-          simpleSchema.sortedProperties.push(f)
-        }
-      })
-      Object.keys(simpleSchema.collectedProperties).forEach(f => {
-        if (!simpleSchema.collectedProperties[f].required && !simpleSchema.sortedProperties.includes(f)) {
-          simpleSchema.sortedProperties.push(f)
-        }
-      })
-
-      result[k] = simpleSchema
-    })
-
-    console.log('Built schema:', result)
-    return result
-  }
+  const [currentFile, setCurrentFile] = useState(null as  components["schemas"]["DesignFile"] | null);
 
   function validateFile() {
     const url = new URL(props.baseUrl + 'api/design/validate');
@@ -271,6 +185,9 @@ function Design(props) {
   }
 
   function saveFile() {
+    if (!currentFile) {
+      return
+    }    
     const url = new URL(props.baseUrl + 'api/design/file/' + currentFile.path);
     fetch(url, { method: 'PUT', body: JSON.stringify(fileContents), headers: { 'Content-Type': 'application/json' } })
       .then(r => {
@@ -292,9 +209,9 @@ function Design(props) {
       })
   }
 
-  function fileSelected(e, nodeIds) {
-    var node = nodeMap[nodeIds]
-    if (node && !Array.isArray(node.children)) {
+  function fileSelected(_ : any, nodeId : string) {
+    var node = nodeMap && nodeMap.get(nodeId)
+    if (node && isFile(node)) {
       setCurrentFile(node);
       setHelpText('');
       let nodeUrl = new URL(props.baseUrl + 'api/design/file/' + node.path);
@@ -309,17 +226,17 @@ function Design(props) {
           }
         })
         .then(j => {
-          if (node.name === 'permissions.jexl') {
+          if (node && node.name === 'permissions.jexl') {
             setHelpText(permissionsHtml + (openapi ? openapi.components.schemas.Condition.description : ''))
-            setFileContents(j)
-            setFileIsPipeline(false)
+            setFileContents(null)
+            setFileContentsString(j)
           } else {
             var p = JSON.parse(j)
             if (!p) {
               p = {}
             }
             setFileContents(p)
-            setFileIsPipeline(true)
+            setFileContentsString(null)
           }
         })
         .catch(e => {
@@ -329,17 +246,17 @@ function Design(props) {
         })
     } else {
       setFileContents(null)
-      setFileIsPipeline(false)
+      setFileContentsString('')
     }
   }
 
-  function onRename(node, newName) {
+  function onRename(node : components["schemas"]["DesignNode"], newName : string) {
     const oldPath = node.path;
     const newPath = node.path.substring(0, node.path.lastIndexOf("/") + 1) + newName;
     console.log("Rename from " + oldPath + " to " + newPath)
     let url = new URL(props.baseUrl + 'api/design/rename/' + node.path + '?name=' + encodeURIComponent(newName));
     handleResponse(fetch(url, { method: 'POST' }))
-      .then(j => {
+      .then((_ : any) => {
         const idx = expanded.findIndex(p => p === oldPath);
         if (idx >= 0) {
           expanded[idx] = newPath;
@@ -348,54 +265,54 @@ function Design(props) {
       })
   }
 
-  function childExists(node, newName) {
+  function childExists(node : components["schemas"]["DesignDir"], newName : string) {
     return node.children.find(n => n.name === newName) === undefined ? false : true;
   }
 
-  function onNewFolder(node) {
+  function onNewFolder(node : components["schemas"]["DesignDir"]) {
     var name;
     for (var i = 1; (name = 'NewFolder' + i) && childExists(node, name) && i < 10; ++i) {
     }
     const parentPath = node.path === '' ? '' : node.path + '/'
     const url = new URL(props.baseUrl + 'api/design/file/' + parentPath + name);
-    if (expanded.find(n => n.path === node.path) === undefined) {
+    if (expanded.find(n => n === node.path) === undefined) {
       expanded.push(node.path);
     }
     handleResponse(fetch(url, { method: 'PUT', headers: { 'Content-Type': 'inode/directory' } }));
   }
 
-  function onNewPipeline(node) {
+  function onNewPipeline(node : components["schemas"]["DesignDir"]) {
     var name;
     for (var i = 1; (name = 'NewPipeline' + i + '.yaml') && childExists(node, name) && i < 10; ++i) {
     }
     const parentPath = node.path === '' ? '' : node.path + '/'
     const url = new URL(props.baseUrl + 'api/design/file/' + parentPath + name);
-    if (expanded.find(n => n.path === node.path) === undefined) {
+    if (expanded.find(n => n === node.path) === undefined) {
       expanded.push(node.path);
     }
     handleResponse(fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/yaml' } }));
   }
 
-  function onNewPermissions(node) {
+  function onNewPermissions(node : components["schemas"]["DesignDir"]) {
     var name = 'permissions.jexl';
     const parentPath = node.path === '' ? '' : node.path + '/'
     const url = new URL(props.baseUrl + 'api/design/file/' + parentPath + name);
-    if (expanded.find(n => n.path === node.path) === undefined) {
+    if (expanded.find(n => n === node.path) === undefined) {
       expanded.push(node.path);
     }
     handleResponse(fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/jexl' }, body: '' }));
   }
 
-  function onDelete(node) {
+  function onDelete(node: components["schemas"]["DesignNode"]) {
     const url = new URL(props.baseUrl + 'api/design/file/' + node.path);
     handleResponse(fetch(url, { method: 'DELETE' }));
   }
 
-  function nodeToggled(e, nodeIds) {
+  function nodeToggled(_ : any, nodeIds : string[]) {
     setExpanded(nodeIds)
   }
 
-  function fileDrawerWidthChange(w) {
+  function fileDrawerWidthChange(w : number) {
     console.log(w)
     if (w > 400) {
       setFileDrawerWidth(w)
@@ -406,7 +323,7 @@ function Design(props) {
     setDisplayFileDrawer(!displayFileDrawer)
   }
 
-  function helpDrawerWidthChange(w) {
+  function helpDrawerWidthChange(w : number) {
     if (outerBox.current) {
       w = outerBox.current.clientWidth - w
       if (w > 300) {
@@ -420,14 +337,15 @@ function Design(props) {
     setDisplayHelpDrawer(!displayHelpDrawer)
   }
 
-  const snackClose = (event, reason) => {
+  const snackClose = () => {
     setSnackOpen(false);
   };
 
-  const renderTree = (node) => {
+  const renderTree = (node : components["schemas"]["DesignNode"]) => {
     const icon = Array.isArray(node.children) && node.children.length === 0 ? (<FolderOpen />) : null
     const label = (
       <TreeViewFileItemLabel
+        id={'lbl_' + node.path}
         node={node}
         onRename={onRename}
         onNewFolder={onNewFolder}
@@ -469,11 +387,11 @@ function Design(props) {
                 onNodeToggle={nodeToggled}
                 sx={{ height: '100%', flexGrow: 1, maxWidth: '100%', overflowY: 'auto' }}
               >
-                {renderTree(files)}
+                {files && renderTree(files)}
               </TreeView>
             </div>
           </div>
-          <DragBar className='grow' onChange={fileDrawerWidthChange} />
+          <DragBar onChange={fileDrawerWidthChange} />
         </>
       )}
       {true || displayFileDrawer || (
@@ -504,15 +422,15 @@ function Design(props) {
             </Tooltip>
           </div>
         </div>
-        {(fileIsPipeline) ?
+        {(fileContents && schema) ?
           (<PipelineEditor
             schema={schema}
-            onHelpChange={h => setHelpText(h)}
+            onHelpChange={ (help : string) => { setHelpText(help) } }
             pipeline={fileContents}
-            onChange={p => { p.v = (p.v ?? 0) + 1; setFileContents(p) }}
+            onChange={ (p :  components["schemas"]["Pipeline"] )  => { setFileContents(p) } }
           />)
           :
-          (<textarea className="grow font-mono p-3" value={fileContents ?? ''} disabled={fileContents === null} />)
+          (<textarea className="grow font-mono p-3" value={fileContentsString ?? ''} disabled={fileContentsString === null} />)
         }
         <Snackbar open={snackOpen} autoHideDuration={10000} message={snackMessage} onClose={snackClose} />
       </div>
@@ -528,7 +446,7 @@ function Design(props) {
       )}
       {displayHelpDrawer && (
         <>
-          <DragBar className='' onChange={helpDrawerWidthChange} />
+          <DragBar onChange={helpDrawerWidthChange} />
           <div style={{ width: helpDrawerWidth }} className="flex flex-col overflow-hidden" >
             <div style={{ borderColor: 'divider' }} className="flex-none border-b flex">
               <div className="flex-none">

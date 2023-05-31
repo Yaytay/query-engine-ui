@@ -1,17 +1,18 @@
 import OASObjectEditor from './OASObjectEditor';
 
+import { SchemaMapType } from "../SchemaType";
 import { components } from "../Query-Engine-Schema";
 
 interface PipelineEditorProps {
-  pipeline : components["schemas"]["PipelineFile"]
-  , schema : any
-  , onHelpChange : () => {}
-  , onChange : (p: any) => {}
+  pipeline : components["schemas"]["Pipeline"]
+  , schema : SchemaMapType
+  , onHelpChange : (help : string) => void
+  , onChange : (p :  components["schemas"]["Pipeline"]) => void
 }
 
 function PipelineEditor({ pipeline, schema, onHelpChange, onChange } : PipelineEditorProps) {
 
-  const help = onHelpChange ?? function () { };
+  const help = onHelpChange ?? function (_ : string) { };
 
   return (
     <form className="font-mono overflow-y-auto">
@@ -22,8 +23,9 @@ function PipelineEditor({ pipeline, schema, onHelpChange, onChange } : PipelineE
         field='pipeline'
         type='Pipeline'
         bg={0}
-        defaultVisible='true'
-        onChange={(_,p) => {onChange && onChange(p)}}
+        index={0}
+        defaultVisible={true}
+        onChange={(_, pipeline : components["schemas"]["Pipeline"]) => {onChange && onChange(pipeline)}}
       />
     </form >
   );

@@ -2,26 +2,27 @@
 import { useState } from 'react';
 import OASFieldEditor from './OASFieldEditor';
 
+import { SchemaMapType } from "../SchemaType";
+
 interface OASObjectEditorProps {
-  object
-  , schema
-  , fieldOrders
-  , field
-  , bg
-  , onHelpChange
-  , onChange
-  , type
-  , index
-  , defaultVisible
-  , onMoveUp
-  , onMoveDown
-  , onRemove
+  object : any
+  , schema : SchemaMapType
+  , field : string
+  , bg : number // row number for background formatting
+  , onHelpChange : (help : string) => void
+  , onChange : (changedField : string, value : any) => void
+  , type : string
+  , index : number
+  , defaultVisible? : boolean
+  , onMoveUp? : any
+  , onMoveDown? : any
+  , onRemove? : any
 }
-function OASObjectEditor({object, schema, fieldOrders, field, bg, onHelpChange, onChange, type, index, defaultVisible, onMoveUp, onMoveDown, onRemove} : OASObjectEditorProps) {
+function OASObjectEditor({object, schema, field, bg, onHelpChange, onChange, type, index, defaultVisible, onMoveUp, onMoveDown, onRemove} : OASObjectEditorProps) {
 
   const [visible, setVisible] = useState(defaultVisible)
 
-  function handleInputChange(changedField, value) {
+  function handleInputChange(changedField : string, value : any) {
     var rep={...object}
     rep[changedField] = value
     onChange(field, rep)
@@ -43,7 +44,7 @@ function OASObjectEditor({object, schema, fieldOrders, field, bg, onHelpChange, 
           bg={bg + (i % 2)}
           object={object}
           schema={schema}
-          fieldOrders={fieldOrders}
+          type={schema[type].name}
           onHelpChange={onHelpChange}
           onChange={handleInputChange}
           parentType={type}

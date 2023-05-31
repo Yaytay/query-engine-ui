@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import * as React from 'react';
 
 import Box from '@mui/material/Box';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
@@ -14,84 +15,99 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-function TreeViewFileItemLabel(props) {
+import { components } from "../Query-Engine-Schema";
+
+interface TreeViewFileItemLabelProps {
+  id : string
+  , node : components["schemas"]["DesignNode"]
+  , onDelete : (node: components["schemas"]["DesignNode"]) => void
+  , onRename : (node: components["schemas"]["DesignNode"], newName : string) => void
+  , onNewFolder : (node: components["schemas"]["DesignDir"]) => void
+  , onNewPipeline : (node: components["schemas"]["DesignDir"]) => void
+  , onNewPermissions : (node: components["schemas"]["DesignDir"]) => void
+}
+function TreeViewFileItemLabel(props : TreeViewFileItemLabelProps) {
 
   var [name, setName] = useState(props.node.name);
   var [disabled, setDisabled] = useState(true);
 
-  var [anchorMenu, setAnchorMenu] = useState(null);
+  var [anchorMenu, setAnchorMenu] = useState(null as Element | null);
   const menuOpen = Boolean(anchorMenu);
 
-  const input = useRef(null);
+  const input = React.useRef<HTMLInputElement>(null)
 
-  function renameClick(e) {
+  function renameClick() {
     setAnchorMenu(null)
     setDisabled(false)
-    input.current.focus()
+    input && input.current && input.current.focus()
   }
 
-  const handleOpenMenu = (e) => {
+  const handleOpenMenu = (e : React.MouseEvent<any>) => {
     e.stopPropagation()
     setAnchorMenu(e.currentTarget);
   };
 
-  const handleCloseNavMenu = (e) => {
+  const handleCloseNavMenu = (e : MouseEvent) => {
     e.stopPropagation()
     setAnchorMenu(null)
   };
 
-  function handleInputChange(e) {
-    setName(e.target.value)
+  function handleInputChange(e : React.ChangeEvent<HTMLInputElement>) {
+    setName(e.currentTarget.value)
   }
 
-  function handleDelete(e) {
+  function handleDelete() {
     props.onDelete && props.onDelete(props.node)
   }
 
-  function siblingExists(node, newName) {
-    return node.parent && (node.parent.children.find(n => n.name === newName) === undefined ? false : true);
+  function siblingExists(node : any, sibling : string) {
+    return node.parent && (node.parent.children.find((n : components["schemas"]["DesignNode"]) => n.name === sibling) === undefined ? false : true);
   }
 
-  function loseFocus(e) {
+  function loseFocus() {
     if (name === props.node.name) {
       setDisabled(true)
     } else if (siblingExists(props.node, name)) {
-      input.current.focus()
+      input && input.current && input.current.focus()
     } else {
       setDisabled(true)
       props.onRename && props.onRename(props.node, name)
     }
   }
 
-  function keyPress(e) {
-    if (e.keyCode === 13) {
-      input.current.blur();
-    } else if (e.keyCode === 27) {
+  function keyPress(e : React.KeyboardEvent<HTMLInputElement>) {
+    if (e.code === '\r') {
+      input && input.current && input.current.blur();
+    } else if (e.code === '\t') {
       name = props.node.name
       setName(props.node.name);
-      input.current.blur();
+      input && input.current && input.current.blur();
     }
   }
 
+  const isDirectory = (n : components["schemas"]["DesignNode"]) : n is components["schemas"]["DesignDir"] => {
+    return Array.isArray(n.children);
+  }
+
   useEffect(() => {
-    input.current.focus()
+    input && input.current && input.current.focus()
   }, [disabled])
 
   const menuItems = []
   if (Array.isArray(props.node.children)) {
     menuItems.push(
-      <MenuItem key="newfolder" onClick={e => { e.stopPropagation(); props.onNewFolder && props.onNewFolder(props.node) }}>
+      <MenuItem key="newfolder" onClick={e => { e.stopPropagation(); props.onNewFolder && isDirectory(props.node) && props.onNewFolder(props.node) }}>
         <CreateNewFolderIcon fontSize="small" className="mr-2" /> New folder
       </MenuItem>
     )
     menuItems.push(
-      <MenuItem key="newpipeline" onClick={e => { e.stopPropagation(); props.onNewFolder && props.onNewPipeline(props.node) }}>
+      <MenuItem key="newpipeline" onClick={e => { e.stopPropagation(); props.onNewPipeline && isDirectory(props.node) && props.onNewPipeline(props.node) }}>
         <PostAddIcon fontSize="small" className="mr-2" /> New pipeline
       </MenuItem>
     )
     if (!props.node.children.find(n => n.name === 'permissions.jexl')) {
       menuItems.push(
-        <MenuItem key="newpermissions" onClick={e => { e.stopPropagation(); props.onNewFolder && props.onNewPermissions(props.node) }}>
+        <MenuItem key="newpermissions" onClick={e => { e.stopPropagation(); props.onNewPermissions && isDirectory(props.node) && props.onNewPermissions(props.node) }}>
           <EnhancedEncryptionIcon fontSize="small" className="mr-2" /> New permissions
         </MenuItem>
       )
@@ -152,8 +168,7 @@ function TreeViewFileItemLabel(props) {
           open={menuOpen}
           onClose={handleCloseNavMenu}
           children={menuItems}
-        >
-        </Menu>
+        />
       </Box>
     </Box>
 

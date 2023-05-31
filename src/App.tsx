@@ -81,7 +81,7 @@ function App() {
         <Routes>
           <Route index element={<Home designMode={designMode} />}></Route>
           <Route path='/design' element={
-            <Design available={available} baseUrl={baseUrl} onChange={refresh} />
+            <Design baseUrl={baseUrl} onChange={refresh} />
           }></Route>
           <Route path='/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
           <Route path='/demo' element={<Demo />}></Route>

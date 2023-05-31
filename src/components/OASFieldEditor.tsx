@@ -10,27 +10,26 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import Tooltip from '@mui/material/Tooltip';
 
-import { components } from "../Query-Engine-Schema";
+import { SchemaMapType } from "../SchemaType";
 
 interface OASFieldEditorProps {
   id : string
   , object : any
-  , schema : any
-  , fieldOrders : any
-  , field : any
-  , bg : any
-  , onHelpChange : any
-  , onChange : any
-  , type : any
+  , schema : SchemaMapType
+  , field : string
+  , bg : number // row number for background formatting
+  , onHelpChange : (help : string) => void
+  , onChange : (field : string, newValue : any) => void
+  , type : string
   , index : number
   , visible : boolean
   , parentType : any
-  , onDrop : any
-  , onMoveUp : any
-  , onMoveDown : any
-  , onRemove : any
+  , onDrop? : any
+  , onMoveUp? : any
+  , onMoveDown? : any
+  , onRemove? : any
 }
-function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, onChange, onHelpChange, parentType, onDrop, index, onMoveUp, onMoveDown, onRemove } : OASFieldEditorProps) {
+function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHelpChange, parentType, onDrop, index, onMoveUp, onMoveDown, onRemove } : OASFieldEditorProps) {
 
   const colours = [' bg-white', ' bg-slate-50', ' bg-slate-100', ' bg-slate-200', ' bg-slate-300']
   const parentSchema = schema[parentType]
@@ -41,7 +40,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
 
   const bgcol = (bg < colours.length) ? colours[bg] : colours[0]
 
-  function typeFromRef(arg) {
+  function typeFromRef(arg : string) {
     var lastPos = arg.lastIndexOf('/')
     if (lastPos > 0) {
       return arg.substring(lastPos + 1);
@@ -52,7 +51,7 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
 
   if (!fieldSchema) {
     console.log("Field " + field + " not found in " + JSON.stringify(schema))
-    return (<div f={field} />)
+    return (<div data-field={field} />)
   }
 
   if (!object) {
@@ -60,19 +59,15 @@ function OASFieldEditor({ id, schema, field, fieldOrders, bg, object, visible, o
     object = {}
   }
 
-  function handleChange(newValue) {
+  function handleChange(newValue : any) {
     onChange(field, newValue);
   }
 
-  function onFocus(e) {
+  function onFocus(e : React.MouseEvent<Element>) {
     var text = '<h3>' + field + '</h3>' + fieldSchema.description
     var ref;
-    if (fieldSchema.items && fieldSchema.items['$ref']) {
-      ref = fieldSchema.items['$ref']
-    } else if (fieldSchema['$ref']) {
+    if (fieldSchema['$ref']) {
       ref = fieldSchema['$ref']
-    } else if (fieldSchema.additionalProperties && fieldSchema.additionalProperties['$ref']) {
-      ref = fieldSchema.additionalProperties['$ref']
     }
     console.log(fieldSchema)
     if (ref) {

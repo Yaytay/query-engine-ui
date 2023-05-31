@@ -1,8 +1,18 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import Textarea from 'react-expanding-textarea'
 
 
-function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange, onHelpChange }) {
+interface PipelineEditorFieldProps {
+  id : string
+  , parentSchema : any
+  , name : string
+  , parent : any
+  , visible : boolean
+  , onChange : (field : string, newValue : any) => void
+  , onHelpChange : (help : string) => void
+}
+
+function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange, onHelpChange } : PipelineEditorFieldProps) {
 
   const field = parentSchema['properties'][name]
   const help = onHelpChange ?? function () { }
@@ -14,8 +24,8 @@ function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange
     return (<div />)
   }
 
-  function handleInputChange(e) {
-    onChange(name, e.target.value);
+  function handleInputChange(e : React.ChangeEvent<HTMLInputElement>) {
+    onChange(name, e.currentTarget.value);
   }
 
   function onFocus() {
@@ -24,26 +34,25 @@ function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange
 
   const classes = "grow bg-transparent appearance-none px-1 text-gray-700 leading-tight font-mono overflow-wrap resize";
 
-  var input;
+  var ctrl;
   if (!field) {
-    input = (<div />)
+    ctrl = (<div />)
   } else if (field.type === 'boolean') {
-    input = (
+    ctrl = (
       <select
         id={id}
         placeholder={field.prompt}
         value={parent[name] ? 1 : 0}
-        onChange={e => { onChange(name, (e.target.value > 0) ? true : false) }}
+        onChange={e => { onChange(name, (e.target.value !== '0') ? true : false) }}
         onFocus={onFocus ?? null}
         ref={input}
-        pattern={field.pattern}
       >
         <option value="1">true</option>
         <option value="0">false</option>
       </select>
     )
   } else if (field.type === 'integer') {
-    input = (
+    ctrl = (
       <input className={classes}
         id={id}
         type='text'
@@ -56,7 +65,7 @@ function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange
       />
     )
   } else if (field.maxLength) {
-    input = (
+    ctrl = (
       <input className={classes}
         id={id}
         type='text'
@@ -69,7 +78,7 @@ function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange
       />
     )
   } else if (field.enum) {
-    input = (
+    ctrl = (
       <select
         id={id}
         placeholder={field.prompt}
@@ -87,7 +96,7 @@ function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange
       </select>
     )
   } else {
-    input = (
+    ctrl = (
       <Textarea className={classes + ' h-6'}
         id={id}
         placeholder={field.prompt}
@@ -106,7 +115,7 @@ function PipelineEditorField({ id, parentSchema, name, parent, visible, onChange
     return (
       <div className="flex" onClick={onFocus}>
         <label className="px-1 text-blue-500">{name}:</label>
-        {input}
+        {ctrl}
       </div>
     )
   } else {
