@@ -17,9 +17,12 @@ export interface PropertyType {
   , description: string
   , default: string
   , maxLength: number
-  , "$ref": string
+  , ref: string
   , required: boolean
   , minItems: number
+  , title: string
+  , 'x-prompt': string
+  , enum: string[]
 }
 
 export interface PropertyMapType {
@@ -39,7 +42,7 @@ export interface SchemaType {
   , description: string
   , collectedProperties: PropertyMapType
   , sortedProperties: string[]
-  , discriminator: any
+  , discriminator?: DiscriminatorType
   , hasRequired: boolean
 
 }
@@ -95,7 +98,6 @@ export function buildSchema(openapi: any): SchemaMapType {
         props[req].required = true
       })
     }
-    console.log(props)
     return props
   }
 
@@ -122,13 +124,14 @@ export function buildSchema(openapi: any): SchemaMapType {
     return sortedProperties
   }
 
-  function buildDiscriminator(schema : any) {
+  function buildDiscriminator(schema : any) : DiscriminatorType | undefined {
     if (schema.discriminator) {
       var discriminator : DiscriminatorType
       discriminator = { propertyName: schema.discriminator.propertyName, mapping: new Map<string, string>() }
       Object.keys(schema.discriminator.mapping).forEach(dk => {
         discriminator.mapping.set(dk, typeFromRef(schema.discriminator.mapping[dk]))
       })
+      return discriminator
     }
   }
 
@@ -151,6 +154,7 @@ export function buildSchema(openapi: any): SchemaMapType {
     result[k] = simpleSchema
   })
 
+  console.log('OpenAPI schema:', openapi)
   console.log('Built schema:', result)
   return result
 }

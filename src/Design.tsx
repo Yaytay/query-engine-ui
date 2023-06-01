@@ -21,10 +21,10 @@ import TreeView from '@mui/lab/TreeView';
 import { components } from "./Query-Engine-Schema";
 import { SchemaMapType, buildSchema } from "./SchemaType";
 
-var onChange : any;
+var onChange = () => {};
 
 interface DesignProps {
-  onChange :  any
+  onChange :  () => void
   , baseUrl : string
 }
 function Design(props : DesignProps) {
@@ -115,9 +115,7 @@ function Design(props : DesignProps) {
         setFiles(j)
         setParents(j)
         setNodeMap(buildNodeMap(j))
-        if (onChange) {
-          onChange()
-        }
+        onChange()
         return j
       })
       .catch(e => {
@@ -154,9 +152,7 @@ function Design(props : DesignProps) {
         setSnackOpen(true)
       })
 
-  }, 
-  // eslint-disable-next-line   
-  [props.baseUrl, handleResponse, getAllDirs])
+  }, [props.baseUrl])
 
   const [currentFile, setCurrentFile] = useState(null as  components["schemas"]["DesignFile"] | null);
 
@@ -196,9 +192,7 @@ function Design(props : DesignProps) {
             throw Error(t)
           })
         } else {
-          if (onChange) {
-            onChange()
-          }
+          onChange()
           return r.text()
         }
       })
@@ -313,7 +307,6 @@ function Design(props : DesignProps) {
   }
 
   function fileDrawerWidthChange(w : number) {
-    console.log(w)
     if (w > 400) {
       setFileDrawerWidth(w)
     }
@@ -430,7 +423,11 @@ function Design(props : DesignProps) {
             onChange={ (p :  components["schemas"]["Pipeline"] )  => { setFileContents(p) } }
           />)
           :
-          (<textarea className="grow font-mono p-3" value={fileContentsString ?? ''} disabled={fileContentsString === null} />)
+          (<textarea 
+            className="grow font-mono p-3" 
+            value={fileContentsString ?? ''} 
+            disabled={fileContentsString === null} 
+            onChange={(e  : any) => setFileContentsString(e.currentTarget.value)} />)
         }
         <Snackbar open={snackOpen} autoHideDuration={10000} message={snackMessage} onClose={snackClose} />
       </div>
@@ -454,7 +451,7 @@ function Design(props : DesignProps) {
                   <KeyboardDoubleArrowRightIcon fontSize="small" />
                 </IconButton>
               </div>
-              <div className="flex-auto p-3">
+              <div className="flex-auto p-3 prose">
                 HELP
               </div>
             </div>

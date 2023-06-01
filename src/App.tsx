@@ -51,7 +51,6 @@ function App() {
     }, []);
 
   const refresh = function() {
-    console.log('refresh');
     let url = new URL(baseUrl + 'api/info/available');
     fetch(url)
       .then(r => r.json())

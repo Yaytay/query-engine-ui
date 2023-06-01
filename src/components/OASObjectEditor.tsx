@@ -22,36 +22,40 @@ function OASObjectEditor({object, schema, field, bg, onHelpChange, onChange, typ
 
   const [visible, setVisible] = useState(defaultVisible)
 
+  var objectSchema = schema[type]
+
   function handleInputChange(changedField : string, value : any) {
     var rep={...object}
     rep[changedField] = value
     onChange(field, rep)
   }
 
-  if (schema[type].discriminator) {
-    const d = schema[type].discriminator;
-    if (object && object[d.propertyName] && d.mapping[object[d.propertyName]]) {
-      type = d.mapping[object[d.propertyName]]
+  if (objectSchema.discriminator) {
+    const d = objectSchema.discriminator;
+    if (object && d && object[d.propertyName]) {
+      var newType = d.mapping.get(object[d.propertyName])
+      if (newType) {
+        type = newType
+      }
     }
   }
 
   return (
     <div className="grow">
-      { schema[type].sortedProperties.map((f,i) => { 
+      { objectSchema.sortedProperties.map((f,i) => { 
         return (<OASFieldEditor
           id={f}
           key={f}
           bg={bg + (i % 2)}
           object={object}
           schema={schema}
-          type={schema[type].name}
           onHelpChange={onHelpChange}
           onChange={handleInputChange}
           parentType={type}
-          visible={visible || !schema[type].hasRequired}
+          visible={visible || !objectSchema.hasRequired}
           field={f}
           index={index}
-          onDrop={i === 0 && schema[type].hasRequired ? () => setVisible(!visible) : null}
+          onDrop={i === 0 && objectSchema.hasRequired ? () => setVisible(!visible) : null}
           onMoveUp={i === 0 && onMoveUp ? onMoveUp : null}
           onMoveDown={i === 0 && onMoveDown ? onMoveDown : null}
           onRemove={i === 0 && onRemove ? onRemove : null}

@@ -20,7 +20,6 @@ interface OASFieldEditorProps {
   , bg : number // row number for background formatting
   , onHelpChange : (help : string) => void
   , onChange : (field : string, newValue : any) => void
-  , type : string
   , index : number
   , visible : boolean
   , parentType : any
@@ -32,6 +31,7 @@ interface OASFieldEditorProps {
 function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHelpChange, parentType, onDrop, index, onMoveUp, onMoveDown, onRemove } : OASFieldEditorProps) {
 
   const colours = [' bg-white', ' bg-slate-50', ' bg-slate-100', ' bg-slate-200', ' bg-slate-300']
+
   const parentSchema = schema[parentType]
   const fieldSchema = parentSchema.collectedProperties[field]
   const help = onHelpChange ?? function () { }
@@ -63,11 +63,30 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
     onChange(field, newValue);
   }
 
-  function onFocus(e : React.MouseEvent<Element>) {
+  function onFocusMouseEvent(e : React.MouseEvent<any>) {
     var text = '<h3>' + field + '</h3>' + fieldSchema.description
     var ref;
-    if (fieldSchema['$ref']) {
-      ref = fieldSchema['$ref']
+    if (fieldSchema.ref) {
+      ref = fieldSchema.ref
+    }
+    console.log(fieldSchema)
+    if (ref) {
+      ref = typeFromRef(ref)
+      var s = schema[ref]
+      if (s) {
+        text = '<h3>' + s.name + '</h3>' + s.description
+      }
+    }
+
+    help(text)
+    e.preventDefault()
+  }
+
+  function onFocusFocusEvent(e : React.FocusEvent<any>) {
+    var text = '<h3>' + field + '</h3>' + fieldSchema.description
+    var ref;
+    if (fieldSchema.ref) {
+      ref = fieldSchema.ref
     }
     console.log(fieldSchema)
     if (ref) {
@@ -154,16 +173,15 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
     // Boolean field
     return (
       <div className={"flex align-top" + hidden + bgcol}>
-        <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
+        <label className="px-1 text-blue-500" onClick={onFocusMouseEvent}>{field}:</label>
         <select
           id={id}
-          placeholder={field.prompt}
+          placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
           value={value ? 1 : 0}
           className={bgcol}
-          onChange={e => { handleChange((e.target.value > 0) ? true : false) }}
-          onFocus={onFocus}
+          onChange={e => { handleChange(e.target.value ? true : false) }}
+          onFocus={onFocusFocusEvent}
           ref={input}
-          pattern={field.pattern}
         >
           <option value="1" key={field +  1}>true</option>
           <option value="0" key={field +  0}>false</option>
@@ -177,16 +195,15 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
     // Integer field
     return (
       <div className={"flex" + hidden + bgcol}>
-        <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
+        <label className="px-1 text-blue-500" onClick={onFocusMouseEvent}>{field}:</label>
         <input className={classes + bgcol}
           id={id}
           type='text'
-          placeholder={field.prompt}
+          placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
           value={value}
           onChange={e => handleChange(e.target.value)}
-          onFocus={onFocus}
+          onFocus={onFocusFocusEvent}
           ref={input}
-          pattern={field.pattern}
         />
         {minusControl}{upControl}{downControl}{dropControl}
       </div>
@@ -195,16 +212,15 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
     // Short text field
     return (
       <div className={"flex align-top" + hidden + bgcol}>
-        <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
+        <label className="px-1 text-blue-500" onClick={onFocusMouseEvent}>{field}:</label>
         <input className={classes + bgcol}
           id={id}
           type='text'
           value={value}
           onChange={e => handleChange(e.target.value)}
-          onFocus={onFocus}
+          onFocus={onFocusFocusEvent}
           ref={input}
-          pattern={fieldSchema.pattern}
-          placeholder={fieldSchema['x-prompt']}
+          placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
         />
         {minusControl}{upControl}{downControl}{dropControl}
       </div>
@@ -213,16 +229,15 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
     // Enum/select field
     return (
       <div className={"flex" + hidden + bgcol}>
-        <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
+        <label className="px-1 text-blue-500" onClick={onFocusMouseEvent}>{field}:</label>
         <select
           id={id}
           className={bgcol}
-          placeholder={fieldSchema.prompt}
+          placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
           value={value}
           onChange={e => handleChange(e.target.value)}
-          onFocus={onFocus}
+          onFocus={onFocusFocusEvent}
           ref={input}
-          pattern={fieldSchema.pattern}
         >
           {
             fieldSchema.enum.map(v => {
@@ -239,7 +254,7 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
     return (
       <div className={hidden + bgcol}>
         <div className='flex'>
-          <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
+          <label className="px-1 text-blue-500" onClick={onFocusMouseEvent}>{field}:</label>
           <div className='grow' />
           <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
             var newArr = object[field] ? [...object[field]] : [];
@@ -262,7 +277,6 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                 object={v}
                 schema={schema}
                 field={field}
-                fieldOrders={fieldOrders}
                 onHelpChange={help}
                 bg={bg}
                 type={typeFromRef(fieldSchema.items['$ref'])}
@@ -295,11 +309,11 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
         })}
       </div>
     )
-  } else if (fieldSchema['$ref']) {
+  } else if (fieldSchema.ref) {
     // Single object field
     return (
       <div className={"flex flex-col" + hidden + bgcol}>
-        <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
+        <label className="px-1 text-blue-500" onClick={onFocusMouseEvent}>{field}:</label>
         <div className="flex">
           <div className="">
             &nbsp;&nbsp;
@@ -307,13 +321,13 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
           <div className="grow flex flex-col">
             <div className="flex" >
               <OASObjectEditor
+                index={0}
                 object={object[field]}
                 schema={schema}
                 field={field}
                 bg={bg}
-                fieldOrders={fieldOrders}
                 onHelpChange={help}
-                type={typeFromRef(fieldSchema['$ref'])}
+                type={typeFromRef(fieldSchema.ref)}
                 onChange={(f, v) => {
                   handleChange(v);
                 }}
@@ -330,7 +344,7 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
     return (
       <div className={hidden + bgcol}>
         <div className='flex'>
-          <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
+          <label className="px-1 text-blue-500" onClick={onFocusMouseEvent}>{field}:</label>
           <div className='grow' />
           <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
             var newObj = { ...object[field] }
@@ -365,10 +379,10 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                         delete newObj[v]
                         handleChange(newObj)
                       }}
-                      onFocus={onFocus}
+                      onFocus={onFocusFocusEvent}
                       ref={input}
                       pattern={fieldSchema.pattern}
-                      placeholder={fieldSchema['x-prompt']}
+                      placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
                     />
                     :
                     <div className='grow' />
@@ -393,7 +407,7 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                       schema={schema}
                       field={field}
                       bg={bg}
-                      fieldOrders={fieldOrders}
+                      index={i}
                       onHelpChange={help}
                       type={typeFromRef(fieldSchema.additionalProperties['$ref'])}
                       onChange={(f, v) => {
@@ -412,13 +426,13 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
     // Long text field
     return (
       <div className={"flex" + hidden + bgcol}>
-        <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
+        <label className="px-1 text-blue-500" onClick={onFocusMouseEvent}>{field}:</label>
         <Textarea className={classes + ' h-6' + bgcol}
-          id={id}          
-          placeholder={field.prompt}
+          id={id}
+          placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
           value={value}
           onChange={e => handleChange(e.target.value)}
-          onFocus={onFocus}
+          onFocus={onFocusFocusEvent}
           ref={input}
         />
         {dropControl}
