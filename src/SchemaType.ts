@@ -17,12 +17,13 @@ export interface PropertyType {
   , description: string
   , default: string
   , maxLength: number
-  , ref: string
+  , $ref: string
   , required: boolean
   , minItems: number
   , title: string
   , 'x-prompt': string
   , enum: string[]
+  , items: string
 }
 
 export interface PropertyMapType {
@@ -67,6 +68,14 @@ export function buildSchema(openapi: any): SchemaMapType {
       props = { ...schema.properties }
     }
     Object.keys(props).forEach(pp => {
+      if (props[pp].type === 'array') {
+        if (props[pp].minItems > 0) {
+          props[pp].required = true
+        }
+        if (schema.properties[pp].items && schema.properties[pp].items.$ref) {
+          props[pp].items = typeFromRef(schema.properties[pp].items.$ref)
+        }
+      }
       if (props[pp].type === 'array' && props[pp].minItems > 0) {
         props[pp].required = true
       }

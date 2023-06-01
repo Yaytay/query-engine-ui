@@ -66,8 +66,8 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
   function onFocusMouseEvent(e : React.MouseEvent<any>) {
     var text = '<h3>' + field + '</h3>' + fieldSchema.description
     var ref;
-    if (fieldSchema.ref) {
-      ref = fieldSchema.ref
+    if (fieldSchema.$ref) {
+      ref = fieldSchema.$ref
     }
     console.log(fieldSchema)
     if (ref) {
@@ -85,8 +85,8 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
   function onFocusFocusEvent(e : React.FocusEvent<any>) {
     var text = '<h3>' + field + '</h3>' + fieldSchema.description
     var ref;
-    if (fieldSchema.ref) {
-      ref = fieldSchema.ref
+    if (fieldSchema.$ref) {
+      ref = fieldSchema.$ref
     }
     console.log(fieldSchema)
     if (ref) {
@@ -249,7 +249,7 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
         {minusControl}{upControl}{downControl}{dropControl}
       </div>
     )
-  } else if (fieldSchema.items && fieldSchema.items['$ref']) {
+  } else if (fieldSchema.items) {
     // Array field
     return (
       <div className={hidden + bgcol}>
@@ -261,13 +261,13 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
             newArr.push({});
             handleChange(newArr);
           }}>
-            <Tooltip title={'Create a new ' + typeFromRef(fieldSchema.items['$ref'])}>
+            <Tooltip title={'Create a new ' + fieldSchema.items}>
               <AddIcon fontSize="inherit" />
             </Tooltip>
           </IconButton>
         </div>
 
-        {object[field] && object[field].map((v, i) => {
+        {object[field] && object[field].map((v : any, i : number) => {
           return (
             <div className="flex" key={field + i}>
               <div className="">
@@ -279,9 +279,9 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                 field={field}
                 onHelpChange={help}
                 bg={bg}
-                type={typeFromRef(fieldSchema.items['$ref'])}
+                type={fieldSchema.items}
                 index={i}
-                onChange={(f, v) => {
+                onChange={(_, v) => {
                   var newArr = [...object[field]];
                   newArr[i] = v;
                   handleChange(newArr);
@@ -309,7 +309,7 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
         })}
       </div>
     )
-  } else if (fieldSchema.ref) {
+  } else if (fieldSchema.$ref) {
     // Single object field
     return (
       <div className={"flex flex-col" + hidden + bgcol}>
@@ -327,8 +327,8 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                 field={field}
                 bg={bg}
                 onHelpChange={help}
-                type={typeFromRef(fieldSchema.ref)}
-                onChange={(f, v) => {
+                type={typeFromRef(fieldSchema.$ref)}
+                onChange={(_, v) => {
                   handleChange(v);
                 }}
               />
@@ -381,7 +381,6 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                       }}
                       onFocus={onFocusFocusEvent}
                       ref={input}
-                      pattern={fieldSchema.pattern}
                       placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
                     />
                     :
@@ -410,7 +409,7 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                       index={i}
                       onHelpChange={help}
                       type={typeFromRef(fieldSchema.additionalProperties['$ref'])}
-                      onChange={(f, v) => {
+                      onChange={(_, v) => {
                         handleChange(v);
                       }}
                     />
