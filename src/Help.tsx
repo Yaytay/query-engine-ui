@@ -85,7 +85,7 @@ function Help(props : HelpProps) {
       return (
         <TreeItem key={node.name} nodeId={node.path} label={node.title ?? node.name} />
       )
-    } else {
+    } else if (node.name) {
       return (
         <TreeItem key={node.name} nodeId={node.path} label={node.name} >
           { node.children && node.children.map((child) => renderTree(child)) }
