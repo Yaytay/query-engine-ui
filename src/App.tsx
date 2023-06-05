@@ -28,7 +28,7 @@ function App() {
   const [designMode, setDesignMode] = useState(defaultState.designMode);
   const [docs, setDocs] = useState(defaultState.docs);
 
-  const baseUrl = 'http://localhost:8000/';
+  const baseUrl =  process.env.NODE_ENV === 'production' ? window.location.href.replace(/ui$/,'') : 'http://localhost:8000/';
 
   useEffect(() => {
     let url = new URL(baseUrl + 'api/info/available');
