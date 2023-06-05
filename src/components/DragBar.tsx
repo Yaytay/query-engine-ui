@@ -24,7 +24,7 @@ function DragBar(props : DragBarProps) {
   }
 
   return (
-    <div className="w-1 cursor-col-resize border-l-2 h-full"
+    <div className="w-1 cursor-col-resize border-l-2 "
       onPointerDown={dragStart} 
       onPointerMove={dragMove} 
       onPointerUp={dragStop} 

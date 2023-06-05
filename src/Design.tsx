@@ -387,8 +387,8 @@ function Design(props : DesignProps) {
           <DragBar onChange={fileDrawerWidthChange} />
         </>
       )}
-      {true || displayFileDrawer || (
-        <div className="grow w-10 border-r-2 align-top">
+      {displayFileDrawer || (
+        <div className="grow max-w-max border-r-2 align-top">
           <div>
             <IconButton sx={{ 'borderRadius': '20%' }} onClick={fileDrawerHide}>
               <KeyboardDoubleArrowRightIcon fontSize="small" />

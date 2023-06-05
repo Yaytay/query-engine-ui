@@ -11,6 +11,10 @@ const fieldOrders = new Map<string, string[]>([
   , ['Source', ['type']]
 ])
 
+export interface RefType {
+  $ref: string
+}
+
 export interface PropertyType {
   name: string
   , type: string
@@ -24,6 +28,7 @@ export interface PropertyType {
   , 'x-prompt': string
   , enum: string[]
   , items: string
+  , additionalProperties: RefType
 }
 
 export interface PropertyMapType {

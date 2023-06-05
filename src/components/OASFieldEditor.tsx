@@ -193,6 +193,89 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
         {minusControl}{upControl}{downControl}{dropControl}
       </div>
     )
+  } else if (fieldSchema.type === 'object') {
+    // Map field
+    return (
+      <div className={hidden + bgcol}>
+        <div className='flex'>
+          <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
+          <div className='grow' />
+          <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
+            var newObj = { ...object[field] }
+            var newName = 'new'
+            for (var i = 1; newObj.hasOwnProperty(newName); ++i) {
+                newName = 'new' + i
+            }
+            newObj[newName] = {}
+            handleChange(newObj)
+          }}>
+            <Tooltip title={'Create a new ' + typeFromRef(fieldSchema.additionalProperties.$ref)}>
+              <AddIcon fontSize="inherit" />
+            </Tooltip>
+          </IconButton>
+        </div>
+        {object[field] && Object.keys(object[field]).map((v, i) => {
+          return (
+            <div className="flex flex-col" key={field + i}>
+              <div className="flex" key={i}>
+                <div className="">
+                  &nbsp;&nbsp;
+                </div>
+                <div className="grow flex flex-col">
+                  <div className="flex" key={i}>
+                    <input className={'bg-transobject appearance-none px-1 text-gray-700 leading-tight font-mono overflow-wrap'}
+                      id={id}
+                      type='text'
+                      value={v}
+                      onChange={e => {
+                        var newObj = { ...object[field] }
+                        newObj[e.target.value] = object[field][v]
+                        delete newObj[v]
+                        handleChange(newObj)
+                      }}
+                      onFocus={onFocus}
+                      ref={input}
+                      pattern={fieldSchema.pattern}
+                      placeholder={fieldSchema['x-prompt']}
+                    />
+                    :
+                    <div className='grow' />
+                    <div className="flex-none">
+                      <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
+                        var newObj = { ...object[field] }
+                        delete newObj[v]
+                        handleChange(newObj)
+                      }}>
+                        <Tooltip title={'Delete this ' + typeFromRef(fieldSchema.additionalProperties['$ref'])}>
+                          <RemoveIcon fontSize="inherit" />
+                        </Tooltip>
+                      </IconButton>
+                    </div>
+                  </div>
+                  <div className="flex" >
+                    <div className="">
+                      &nbsp;&nbsp;
+                    </div>
+                    <OASObjectEditor
+                      object={object[field][v]}
+                      schema={schema}
+                      field={field}
+                      index={i}
+                      bg={bg}
+                      onHelpChange={help}
+                      type={typeFromRef(fieldSchema.additionalProperties['$ref'])}
+                      onChange={(f, v) => {
+                        handleChange(v);
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    )  
   } else if (fieldSchema.maxLength) {
     // Short text field
     return (
@@ -312,7 +395,6 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
         }
       }
     }
- 
 
     return (
       <div className={"flex flex-col" + hidden + bgcol}>
