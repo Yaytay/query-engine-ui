@@ -296,6 +296,24 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
     )
   } else if (fieldSchema.$ref) {
     // Single object field
+    var type=typeFromRef(fieldSchema.$ref)
+
+    if (schema[type].discriminator) {
+      var discriminatorProperty = schema[type].discriminator?.propertyName
+      var discriminatorMapping = schema[type].discriminator?.mapping
+      if (discriminatorProperty && discriminatorMapping) {
+        var discriminatorValue = object[field][discriminatorProperty]
+        if (discriminatorValue) {
+          var subRef = discriminatorMapping.get(discriminatorValue)
+          if (subRef) {
+            // Change the type to the sub type indicated by the discriminator
+            type = typeFromRef(subRef)
+          }
+        }
+      }
+    }
+ 
+
     return (
       <div className={"flex flex-col" + hidden + bgcol}>
         <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
@@ -312,7 +330,7 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                 field={field}
                 bg={bg}
                 onHelpChange={help}
-                type={typeFromRef(fieldSchema.$ref)}
+                type={type}
                 onChange={(_, v) => {
                   handleChange(v);
                 }}
