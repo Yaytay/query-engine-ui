@@ -29,6 +29,7 @@ export interface PropertyType {
   , enum: string[]
   , items: string
   , additionalProperties: RefType
+  , pattern: string
 }
 
 export interface PropertyMapType {
