@@ -186,13 +186,13 @@ function Nav(props : NavProps) {
                 }}
               >
                 { props.designMode && 
-                  <Link to="/Design" >
+                  <Link to="/ui/design" >
                     <MenuItem key='Design' onClick={handleCloseNavMenu}>
                       <Typography textAlign="center">Design</Typography>
                     </MenuItem>
                   </Link>
                 }
-                <Link to="/Test">
+                <Link to="/ui/test">
                   <MenuItem key='Test' onClick={handleCloseNavMenu}>
                     <Typography textAlign="center">Test</Typography>
                   </MenuItem>
@@ -200,7 +200,7 @@ function Nav(props : NavProps) {
                 <NestedMenuItem parentMenuOpen={navOpen} label={'Data'}>
                   <QueryFolderLevel items={props.available.children} parentMenuOpen={navOpen} />
                 </NestedMenuItem>
-                <Link to="/Help">
+                <Link to="/ui/help">
                   <MenuItem key='Help' onClick={handleCloseNavMenu}>
                     <Typography textAlign="center">Help</Typography>
                   </MenuItem>
@@ -228,13 +228,13 @@ function Nav(props : NavProps) {
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                 { props.designMode && 
-                  <Link to="/Design">
+                  <Link to="/ui/design">
                     <Button key='Design' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
                       Design
                     </Button>
                   </Link>
                 }
-                <Link to="/Test">
+                <Link to="/ui/test">
                   <Button key='Test' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
                     Test
                   </Button>
@@ -245,7 +245,7 @@ function Nav(props : NavProps) {
                 <Menu anchorEl={anchorElData} open={dataOpen} onClose={handleCloseDataMenu}>
                   <QueryFolderLevel items={props.available.children} parentMenuOpen={dataOpen} />
                 </Menu>
-                <Link to="/Help">
+                <Link to="/ui/help">
                   <Button key='Help' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
                     Help
                   </Button>
