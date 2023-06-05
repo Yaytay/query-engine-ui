@@ -29,20 +29,20 @@ function App() {
   const [docs, setDocs] = useState(defaultState.docs);
 
   function buildApiBaseUrl() : string {
-    if (process.env.NODE_ENV === 'production') {
-      var url = window.location.href.replace(/\/ui$/,'')
+    if (import.meta.env.MODE == 'development') {
+      return 'http://localhost:8000/';
+    } else {
+      var url = window.location.href
+      url = url.replace(/\/ui\/?$/,'')
       if (url.endsWith('/')) {
         return url
       } else {
         return url + '/'
       }
-    } else {
-      return 'http://localhost:8000/';
     }
   }
 
   const baseUrl =  buildApiBaseUrl();
-  console.log(baseUrl)
 
   useEffect(() => {
     let url = new URL(baseUrl + 'api/info/available');
