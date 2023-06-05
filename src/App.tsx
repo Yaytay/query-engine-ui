@@ -28,7 +28,21 @@ function App() {
   const [designMode, setDesignMode] = useState(defaultState.designMode);
   const [docs, setDocs] = useState(defaultState.docs);
 
-  const baseUrl =  process.env.NODE_ENV === 'production' ? window.location.href.replace(/ui$/,'') : 'http://localhost:8000/';
+  function buildApiBaseUrl() : string {
+    if (process.env.NODE_ENV === 'production') {
+      var url = window.location.href.replace(/\/ui$/,'')
+      if (url.endsWith('/')) {
+        return url
+      } else {
+        return url + '/'
+      }
+    } else {
+      return 'http://localhost:8000/';
+    }
+  }
+
+  const baseUrl =  buildApiBaseUrl();
+  console.log(baseUrl)
 
   useEffect(() => {
     let url = new URL(baseUrl + 'api/info/available');
