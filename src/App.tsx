@@ -93,12 +93,11 @@ function App() {
         </div>        
         <Routes>
           <Route index element={<Home designMode={designMode} />}></Route>
-          <Route path='/ui/design' element={
-            <Design baseUrl={baseUrl} onChange={refresh} />
-          }></Route>
+          <Route index path='/ui' element={<Home designMode={designMode} />}></Route>
+          <Route path='/ui/design' element={<Design baseUrl={baseUrl} onChange={refresh} />}></Route>
           <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
           <Route path='/ui/demo' element={<Demo />}></Route>
-          <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+          <Route path='/ui/help/*' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
         </Routes>
       </Router>
     </ThemeProvider>

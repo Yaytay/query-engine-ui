@@ -82,10 +82,12 @@ function Help(props : HelpProps) {
 
   const renderTree = (node : components["schemas"]["DocNode"]) => {
     if (isDocFile(node)) {
-      return (
-        <TreeItem key={node.name} nodeId={node.path} label={node.title ?? node.name} />
-      )
-    } else if (node.name) {
+      if (node.title) {
+        return (
+          <TreeItem key={node.name} nodeId={node.path} label={node.title ?? node.name} />
+        )
+      }
+    } else {
       return (
         <TreeItem key={node.name} nodeId={node.path} label={node.name} >
           { node.children && node.children.map((child) => renderTree(child)) }

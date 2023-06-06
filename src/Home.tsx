@@ -9,7 +9,7 @@ function Home(props : HomeProps) {
         <div className="grid h-screen place-content-center">
             <div>
                 { props.designMode && 
-                    <Link to="/design">
+                    <Link to="/ui/design">
                         <div className="w-80 bg-zinc-100 p-5 m-10 float-left text-center">
                             <h2>Design</h2>
                             The design view lets you edit pipelines, and also change any other
@@ -17,18 +17,17 @@ function Home(props : HomeProps) {
                         </div>
                     </Link>
                 }
-                <Link to="/test">
+                <Link to="/ui/test">
                     <div className="w-80 bg-zinc-100 p-5 m-10 float-left text-center">
                         <h2>Test</h2>
                         The test view lets you run a pipeline repeatedly and see the results
                         immediately.
                     </div>
                 </Link>
-                <Link to="/demo">
+                <Link to="/ui/help">
                     <div className="w-80 bg-zinc-100 p-5 m-10 float-left text-center">
-                        <h2>Demo</h2>
-                        The demo view is an approximation to how you should integrate the
-                        query engine into your application.
+                        <h2>Documentation</h2>
+                        Access to the Query Engine documentation.
                     </div>
                 </Link>
             </div>
