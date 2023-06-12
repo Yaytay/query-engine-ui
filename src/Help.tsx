@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import DragBar from './components/DragBar'
 
@@ -15,6 +15,7 @@ import TreeView from '@mui/lab/TreeView';
 
 import ReactMarkdown from 'react-markdown'
 import { components } from "./Query-Engine-Schema";
+import { useParams, useNavigate } from 'react-router-dom';
 
 interface HelpProps {
   docs: components["schemas"]["DocDir"]
@@ -23,10 +24,37 @@ interface HelpProps {
 
 function Help(props : HelpProps) {
 
-  const [doc, setDoc] = useState('');
- 
+  const [doc, setDoc] = useState('')
   const [drawerWidth, setDrawerWidth] = useState(250)
   const [displayDrawer, setDisplayDrawer] = useState(true)
+  const { parent, stub } = useParams()
+  const navigate = useNavigate()
+
+  function getDocFromStub() {
+    if (stub) {
+      if (parent) {
+        return parent + '/' + stub
+      } else {
+        return stub
+      }
+    }  
+    return 'Introduction.MD'
+  }
+
+  const path =  getDocFromStub()
+  console.log(path)
+
+  useEffect(() => {
+    if (path) {
+      let url = new URL(props.baseUrl + 'api/docs/' + path);
+      console.log(url)
+      fetch(url)
+        .then(r => r.text())
+        .then(b => {
+          setDoc(b)
+        })  
+    }
+  }, [path])
 
   interface TabPanelProps {
     children: any
@@ -68,12 +96,7 @@ function Help(props : HelpProps) {
   AddToNodeMap(props.docs);
 
   function fileSelected(_ : any, path : string) {
-    let url = new URL(props.baseUrl + 'api/docs/' + path);
-    fetch(url)
-      .then(r => r.text())
-      .then(b => {
-        setDoc(b)
-      })
+    navigate('/ui/help/' + path);
   }
 
   const isDocFile = (n : components["schemas"]["DocNode"]) : n is components["schemas"]["DocFile"] => {

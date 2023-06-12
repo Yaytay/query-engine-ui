@@ -5,7 +5,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Nav from './components/Nav';
 import Home from './Home';
 import Design from './Design';
@@ -30,7 +30,12 @@ function App() {
 
   function buildApiBaseUrl() : string {
     if (import.meta.env.MODE == 'development') {
-      return 'http://localhost:8000/';
+      console.log(import.meta.env)
+      if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL;
+      } else {
+        return 'http://localhost:8000/';
+      }
     } else {
       var url = window.location.href
       url = url.replace(/\/ui\/?$/,'')
@@ -42,7 +47,8 @@ function App() {
     }
   }
 
-  const baseUrl =  buildApiBaseUrl();
+  const baseUrl =  buildApiBaseUrl()
+  console.log("API URL: " + baseUrl)
 
   useEffect(() => {
     let url = new URL(baseUrl + 'api/info/available');
@@ -87,19 +93,19 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <div className="flex-none">
-          <Nav available={available} designMode={designMode} />
-        </div>        
-        <Routes>
-          <Route index element={<Home designMode={designMode} />}></Route>
-          <Route index path='/ui' element={<Home designMode={designMode} />}></Route>
-          <Route path='/ui/design' element={<Design baseUrl={baseUrl} onChange={refresh} />}></Route>
-          <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
-          <Route path='/ui/demo' element={<Demo />}></Route>
-          <Route path='/ui/help/*' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
-        </Routes>
-      </Router>
+      <div className="flex-none">
+        <Nav available={available} designMode={designMode} />
+      </div>        
+      <Routes>
+        <Route index element={<Home designMode={designMode} />}></Route>
+        <Route index path='/ui' element={<Home designMode={designMode} />}></Route>
+        <Route path='/ui/design' element={<Design baseUrl={baseUrl} onChange={refresh} />}></Route>
+        <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
+        <Route path='/ui/demo' element={<Demo />}></Route>
+        <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+        <Route path='/ui/help/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+        <Route path='/ui/help/:parent/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+      </Routes>
     </ThemeProvider>
   );
 }
