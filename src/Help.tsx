@@ -14,8 +14,9 @@ import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 
 import ReactMarkdown from 'react-markdown'
-import { components } from "./Query-Engine-Schema";
-import { useParams, useNavigate } from 'react-router-dom';
+import remarkGfm from 'remark-gfm'
+import { components } from "./Query-Engine-Schema"
+import { useParams, useNavigate } from 'react-router-dom'
 
 interface HelpProps {
   docs: components["schemas"]["DocDir"]
@@ -173,7 +174,7 @@ function Help(props : HelpProps) {
         component="main"
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
-        <ReactMarkdown children={doc} className="prose max-w-full" />
+        <ReactMarkdown children={doc} className="prose max-w-full" remarkPlugins={[remarkGfm]} />
       </Box>
     </div>);
 }
