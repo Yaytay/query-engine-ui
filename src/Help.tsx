@@ -13,8 +13,7 @@ import Tab from '@mui/material/Tab';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import DOMPurify from 'dompurify';
 import { components } from "./Query-Engine-Schema"
 import { useParams, useNavigate } from 'react-router-dom'
 
@@ -25,9 +24,9 @@ interface HelpProps {
 
 function Help(props : HelpProps) {
 
-  const [doc, setDoc] = useState('')
   const [drawerWidth, setDrawerWidth] = useState(250)
   const [displayDrawer, setDisplayDrawer] = useState(true)
+  const [rawHtml, setRawHtml] = useState('')
   const { parent, stub } = useParams()
   const navigate = useNavigate()
 
@@ -52,7 +51,7 @@ function Help(props : HelpProps) {
       fetch(url)
         .then(r => r.text())
         .then(b => {
-          setDoc(b)
+          setRawHtml(DOMPurify.sanitize(b))
         })  
     }
   }, [path])
@@ -174,7 +173,7 @@ function Help(props : HelpProps) {
         component="main"
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
-        <ReactMarkdown children={doc} className="prose max-w-full" remarkPlugins={[remarkGfm]} />
+        {rawHtml && (<div className="rawHtmlData" dangerouslySetInnerHTML={{ __html: rawHtml }}></div>)}
       </Box>
     </div>);
 }
