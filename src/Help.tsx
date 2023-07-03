@@ -13,7 +13,6 @@ import Tab from '@mui/material/Tab';
 import TreeItem from '@mui/lab/TreeItem';
 import TreeView from '@mui/lab/TreeView';
 
-import DOMPurify from 'dompurify';
 import { components } from "./Query-Engine-Schema"
 import { useParams, useNavigate } from 'react-router-dom'
 
