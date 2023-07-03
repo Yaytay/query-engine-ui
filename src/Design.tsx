@@ -354,7 +354,7 @@ function Design(props : DesignProps) {
   };
 
   return (
-    <div className="flex-auto flex flex-row overflow-hidden" ref={outerBox}>
+    <div className="h-full flex-auto flex flex-row overflow-hidden" ref={outerBox}>
       {displayFileDrawer && (
         <>
           <div style={{ width: fileDrawerWidth }} className="box-border " >
@@ -398,9 +398,11 @@ function Design(props : DesignProps) {
       )}
 
       <div className="grow flex flex-col overflow-hidden">
-        <div style={{ borderColor: 'divider' }} className="flex border-b p-3">
-          <div className="grow">
-            {currentFile == null ? 'No file selected' : currentFile.path}
+        <div className="flex border-b">
+          <div style={{ borderColor: 'divider' }} className="flex p-3 grow">
+            <div className="grow">
+              {currentFile == null ? 'No file selected' : currentFile.path}
+            </div>
           </div>
           <div>
             <Tooltip title="Validate">
@@ -451,7 +453,7 @@ function Design(props : DesignProps) {
                   <KeyboardDoubleArrowRightIcon fontSize="small" />
                 </IconButton>
               </div>
-              <div className="flex-auto p-3 prose">
+              <div className="flex-auto p-3">
                 HELP
               </div>
             </div>

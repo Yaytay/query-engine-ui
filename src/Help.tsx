@@ -26,7 +26,7 @@ function Help(props : HelpProps) {
 
   const [drawerWidth, setDrawerWidth] = useState(250)
   const [displayDrawer, setDisplayDrawer] = useState(true)
-  const [rawHtml, setRawHtml] = useState('')
+  const [helpUrl, setHelpUrl] = useState(props.baseUrl + 'api/docs/Introduction.html')
   const { parent, stub } = useParams()
   const navigate = useNavigate()
 
@@ -38,7 +38,7 @@ function Help(props : HelpProps) {
         return stub
       }
     }  
-    return 'Introduction.MD'
+    return 'Introduction.html'
   }
 
   const path =  getDocFromStub()
@@ -46,13 +46,7 @@ function Help(props : HelpProps) {
 
   useEffect(() => {
     if (path) {
-      let url = new URL(props.baseUrl + 'api/docs/' + path);
-      console.log(url)
-      fetch(url)
-        .then(r => r.text())
-        .then(b => {
-          setRawHtml(DOMPurify.sanitize(b))
-        })  
+      setHelpUrl(props.baseUrl + 'api/docs/' + path)
     }
   }, [path])
 
@@ -171,9 +165,9 @@ function Help(props : HelpProps) {
 
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{ flexGrow: 1, p: 0, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
-        {rawHtml && (<div className="rawHtmlData" dangerouslySetInnerHTML={{ __html: rawHtml }}></div>)}
+        <iframe src={helpUrl}  width={'100%'} height={'100%'} ></iframe>
       </Box>
     </div>);
 }

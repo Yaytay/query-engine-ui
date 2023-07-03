@@ -4,17 +4,17 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useState, useEffect } from 'react';
+import { lazy, useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Nav from './components/Nav';
 import Home from './Home';
-import Design from './Design';
 import Demo from './Demo';
 import Test from './Test';
 import Help from './Help';
 import CssBaseline from '@mui/material/CssBaseline';
 import { components } from "./Query-Engine-Schema";
 
+const Design = lazy(() => import('./Design'))
 
 function App() {
 
@@ -57,16 +57,19 @@ function App() {
       .then(j => {
         setAvailable(j);
       })
-    let dmurl = new URL(baseUrl + 'api/design/enabled');
-    fetch(dmurl)
-      .then(r => {
-        setDesignMode(r.ok)
-      })
     let docurl = new URL(baseUrl + 'api/docs');
     fetch(docurl)
       .then(r => r.json())
       .then(j => {
         setDocs(j);
+      })
+    let dmurl = new URL(baseUrl + 'api/design/enabled');
+    fetch(dmurl)
+      .then(r => {
+        setDesignMode(r.ok)
+        if (r.ok) {
+
+        }
       })
     }, []);
 
