@@ -38,7 +38,7 @@ function App() {
       }
     } else {
       var url = window.location.href
-      url = url.replace(/\/ui\/?$/,'')
+      url = url.replace(/\/ui\/?.*$/,'')
       if (url.endsWith('/')) {
         return url
       } else {
