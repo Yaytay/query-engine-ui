@@ -187,6 +187,12 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
           placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
           value={value}
           onChange={e => handleChange(e.target.value)}
+          onKeyUp={(e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              e.currentTarget.blur();
+            }            
+          })}
           onFocus={onFocus}
           ref={input}
         />
@@ -233,6 +239,12 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                         delete newObj[v]
                         handleChange(newObj)
                       }}
+                      onKeyUp={(e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          e.currentTarget.blur();
+                        }            
+                      })}
                       onFocus={onFocus}
                       ref={input}
                       pattern={fieldSchema.pattern}
@@ -288,6 +300,12 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
           type='text'
           value={value}
           onChange={e => handleChange(e.target.value)}
+          onKeyUp={(e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              e.currentTarget.blur();
+            }            
+          })}
           onFocus={onFocus}
           ref={input}
           placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
