@@ -4,7 +4,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { lazy, useState, useEffect } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Nav from './components/Nav';
 import Home from './Home';
@@ -102,7 +102,11 @@ function App() {
       <Routes>
         <Route index element={<Home designMode={designMode} />}></Route>
         <Route index path='/ui' element={<Home designMode={designMode} />}></Route>
-        <Route path='/ui/design' element={<Design baseUrl={baseUrl} onChange={refresh} />}></Route>
+        <Route path='/ui/design' element={
+          <Suspense>
+            <Design baseUrl={baseUrl} onChange={refresh} />
+          </Suspense>
+          }></Route>
         <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
         <Route path='/ui/demo' element={<Demo />}></Route>
         <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
