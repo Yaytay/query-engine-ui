@@ -264,8 +264,10 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
                       bg={bg}
                       onHelpChange={help}
                       type={typeFromRef(fieldSchema.additionalProperties['$ref'])}
-                      onChange={(_, v) => {
-                        handleChange(v);
+                      onChange={(_, nv) => {
+                        var rep={...object[field]}
+                        rep[v] = nv
+                        handleChange(rep);
                       }}
                     />
                   </div>
