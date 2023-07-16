@@ -11,6 +11,7 @@ import Home from './Home';
 import Demo from './Demo';
 import Test from './Test';
 import Help from './Help';
+import { Manage, ManagementEndpointType } from './Manage';
 import CssBaseline from '@mui/material/CssBaseline';
 import { components } from "./Query-Engine-Schema";
 
@@ -27,6 +28,7 @@ function App() {
   const [available, setAvailable] = useState(defaultState.available);
   const [designMode, setDesignMode] = useState(defaultState.designMode);
   const [docs, setDocs] = useState(defaultState.docs);
+  const [managementEndpoints, setManagementEndpoints] = useState(null as ManagementEndpointType[] | null);
 
   function buildApiBaseUrl() : string {
     if (import.meta.env.MODE == 'development') {
@@ -63,14 +65,17 @@ function App() {
       .then(j => {
         setDocs(j);
       })
-    let dmurl = new URL(baseUrl + 'api/design/enabled');
-    fetch(dmurl)
-      .then(r => {
-        setDesignMode(r.ok)
-        if (r.ok) {
-
-        }
-      })
+      let dmurl = new URL(baseUrl + 'api/design/enabled');
+      fetch(dmurl)
+        .then(r => {
+          setDesignMode(r.ok)
+        })
+      let murl = new URL(baseUrl + 'manage');
+      fetch(murl)
+        .then(r => r.json())
+        .then(j => {
+          setManagementEndpoints(j);
+        })
     }, []);
 
   const refresh = function() {
@@ -97,11 +102,11 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div className="flex-none">
-        <Nav available={available} designMode={designMode} />
+        <Nav available={available} designMode={designMode} managementEndpoints={managementEndpoints} />
       </div>        
       <Routes>
-        <Route index element={<Home designMode={designMode} />}></Route>
-        <Route index path='/ui' element={<Home designMode={designMode} />}></Route>
+        <Route index element={<Home designMode={designMode} managementEndpoints={managementEndpoints} />}></Route>
+        <Route index path='/ui' element={<Home designMode={designMode} managementEndpoints={managementEndpoints} />}></Route>
         <Route path='/ui/design' element={
           <Suspense>
             <Design baseUrl={baseUrl} onChange={refresh} />
@@ -112,6 +117,8 @@ function App() {
         <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
         <Route path='/ui/help/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
         <Route path='/ui/help/:parent/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+        <Route path='/ui/manage' element={<Manage endpoints={managementEndpoints} />}></Route>
+        <Route path='/ui/manage/:stub' element={<Manage endpoints={managementEndpoints} />}></Route>
       </Routes>
     </ThemeProvider>
   );

@@ -19,6 +19,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { components } from "../Query-Engine-Schema";
 
 import {NestedMenuItem} from 'mui-nested-menu';
+import { ManagementEndpointType } from '../Manage';
 
 var [anchorElNav, setAnchorElNav] = [null, (_ : any) => {}]
 var [anchorElData, setAnchorElData] = [null, (_ : any) => {}]
@@ -103,6 +104,7 @@ function QueryFolderLevel(props : QueryFolderLevelProps) {
 interface NavProps {
   designMode: boolean
   , available: components["schemas"]["PipelineDir"]
+  , managementEndpoints: ManagementEndpointType[] | null
 }
 
 function Nav(props : NavProps) {
@@ -200,6 +202,13 @@ function Nav(props : NavProps) {
                 <NestedMenuItem parentMenuOpen={navOpen} label={'Data'}>
                   <QueryFolderLevel items={props.available.children} parentMenuOpen={navOpen} />
                 </NestedMenuItem>
+                { props.managementEndpoints && 
+                  <Link to="/ui/manage" >
+                  <MenuItem key='Manage' onClick={handleCloseNavMenu}>
+                    <Typography textAlign="center">Manage</Typography>
+                  </MenuItem>
+                </Link>
+              }
                 <Link to="/ui/help">
                   <MenuItem key='Help' onClick={handleCloseNavMenu}>
                     <Typography textAlign="center">Help</Typography>
@@ -245,6 +254,13 @@ function Nav(props : NavProps) {
                 <Menu anchorEl={anchorElData} open={dataOpen} onClose={handleCloseDataMenu}>
                   <QueryFolderLevel items={props.available.children} parentMenuOpen={dataOpen} />
                 </Menu>
+                { props.managementEndpoints && 
+                  <Link to="/ui/manage">
+                    <Button key='Manage' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
+                      Manage
+                    </Button>
+                  </Link>
+                }
                 <Link to="/ui/help">
                   <Button key='Help' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
                     Help

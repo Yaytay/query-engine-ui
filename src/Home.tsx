@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
+import { ManagementEndpointType } from './Manage';
 
 interface HomeProps {
     designMode :  boolean
+    , managementEndpoints: ManagementEndpointType[] | null
 }
 
 function Home(props : HomeProps) {
@@ -24,6 +26,14 @@ function Home(props : HomeProps) {
                         immediately.
                     </div>
                 </Link>
+                { props.managementEndpoints && 
+                    <Link to="/ui/manage">
+                        <div className="w-80 bg-zinc-100 p-5 m-10 float-left text-center">
+                            <h2>Manage</h2>
+                            Management endpoints for controlling or debugging the service.
+                        </div>
+                    </Link>
+                }
                 <Link to="/ui/help">
                     <div className="w-80 bg-zinc-100 p-5 m-10 float-left text-center">
                         <h2>Documentation</h2>
