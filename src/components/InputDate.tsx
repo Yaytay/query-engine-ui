@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { InputStdProps } from './InputStdProps';
-import 'moment';
 
 function InputDate(props : InputStdProps) {
 
