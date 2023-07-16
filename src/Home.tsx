@@ -4,6 +4,7 @@ import { ManagementEndpointType } from './Manage';
 interface HomeProps {
     designMode :  boolean
     , managementEndpoints: ManagementEndpointType[] | null
+    , apiUrl : string | null
 }
 
 function Home(props : HomeProps) {
@@ -40,6 +41,14 @@ function Home(props : HomeProps) {
                         Access to the Query Engine documentation.
                     </div>
                 </Link>
+                { props.apiUrl && 
+                    <Link to="/ui/api">
+                        <div className="w-80 bg-zinc-100 p-5 m-10 float-left text-center">
+                            <h2>API</h2>
+                            API Documentation.
+                        </div>
+                    </Link>
+                }
             </div>
         </div>
     );

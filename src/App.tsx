@@ -11,6 +11,7 @@ import Home from './Home';
 import Demo from './Demo';
 import Test from './Test';
 import Help from './Help';
+import Api from './Api';
 import { Manage, ManagementEndpointType } from './Manage';
 import CssBaseline from '@mui/material/CssBaseline';
 import { components } from "./Query-Engine-Schema";
@@ -29,6 +30,7 @@ function App() {
   const [designMode, setDesignMode] = useState(defaultState.designMode);
   const [docs, setDocs] = useState(defaultState.docs);
   const [managementEndpoints, setManagementEndpoints] = useState(null as ManagementEndpointType[] | null);
+  const [apiUrl, setApiUrl] = useState(null as string | null);
 
   function buildApiBaseUrl() : string {
     if (import.meta.env.MODE == 'development') {
@@ -76,7 +78,14 @@ function App() {
         .then(j => {
           setManagementEndpoints(j);
         })
-    }, []);
+      let apidocurl = new URL(baseUrl + 'openapi');
+      fetch(apidocurl)
+        .then(r => {
+          if (r.ok) {
+            setApiUrl(baseUrl + 'openapi');
+          }
+        })
+      }, []);
 
   const refresh = function() {
     let url = new URL(baseUrl + 'api/info/available');
@@ -105,8 +114,8 @@ function App() {
         <Nav available={available} designMode={designMode} managementEndpoints={managementEndpoints} />
       </div>        
       <Routes>
-        <Route index element={<Home designMode={designMode} managementEndpoints={managementEndpoints} />}></Route>
-        <Route index path='/ui' element={<Home designMode={designMode} managementEndpoints={managementEndpoints} />}></Route>
+        <Route index element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} />}></Route>
+        <Route index path='/ui' element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} />}></Route>
         <Route path='/ui/design' element={
           <Suspense>
             <Design baseUrl={baseUrl} onChange={refresh} />
@@ -114,11 +123,12 @@ function App() {
           }></Route>
         <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
         <Route path='/ui/demo' element={<Demo />}></Route>
+        <Route path='/ui/manage' element={<Manage endpoints={managementEndpoints} />}></Route>
+        <Route path='/ui/manage/:stub' element={<Manage endpoints={managementEndpoints} />}></Route>
         <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
         <Route path='/ui/help/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
         <Route path='/ui/help/:parent/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
-        <Route path='/ui/manage' element={<Manage endpoints={managementEndpoints} />}></Route>
-        <Route path='/ui/manage/:stub' element={<Manage endpoints={managementEndpoints} />}></Route>
+        <Route path='/ui/api' element={<Api url={apiUrl} />}></Route>
       </Routes>
     </ThemeProvider>
   );

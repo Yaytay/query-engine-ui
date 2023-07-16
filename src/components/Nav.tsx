@@ -214,6 +214,11 @@ function Nav(props : NavProps) {
                     <Typography textAlign="center">Help</Typography>
                   </MenuItem>
                 </Link>
+                <Link to="/ui/api">
+                  <MenuItem key='API' onClick={handleCloseNavMenu}>
+                    <Typography textAlign="center">API</Typography>
+                  </MenuItem>
+                </Link>
               </Menu>
             </Box>
             <QeIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -264,6 +269,11 @@ function Nav(props : NavProps) {
                 <Link to="/ui/help">
                   <Button key='Help' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
                     Help
+                  </Button>
+                </Link>
+                <Link to="/ui/api">
+                  <Button key='API' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
+                    API
                   </Button>
                 </Link>
             </Box>
