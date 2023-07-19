@@ -18,13 +18,13 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { components } from "../Query-Engine-Schema";
 
-import {NestedMenuItem} from 'mui-nested-menu';
+import { NestedMenuItem } from 'mui-nested-menu';
 import { ManagementEndpointType } from '../Manage';
 
 var [anchorElNav, setAnchorElNav] = [null, (_ : any) => {}]
 var [anchorElData, setAnchorElData] = [null, (_ : any) => {}]
 
-var [modalIsOpen, setIsOpen] = [null as boolean | null, (_ : any) => {}]
+var [modalIsOpen, setModalIsOpen] = [null as boolean | null, (_ : any) => {}]
 var [args, setArgs] = [null, (_ : any) => {}]
 
 var pipeline : components["schemas"]["PipelineFile"]
@@ -46,16 +46,16 @@ function displayParameters(item : components["schemas"]["PipelineFile"]) {
   }
   setArgs(ta);
 
-  setIsOpen(true);
+  setModalIsOpen(true);
 }
 
 function closeModal() {
-  setIsOpen(false);
+  setModalIsOpen(false);
 }
 
 function submitModal(values : any) {
   console.log(values);
-  setIsOpen(false);
+  setModalIsOpen(false);
 }
 
 interface QueryMenuItemProps {
@@ -109,7 +109,7 @@ interface NavProps {
 
 function Nav(props : NavProps) {
 
-  [modalIsOpen, setIsOpen] = useState(false);
+  [modalIsOpen, setModalIsOpen] = useState(false);
   [args, setArgs] = useState({} as any);  
   
   [anchorElNav, setAnchorElNav] = useState(null);
