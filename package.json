@@ -3,10 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "overrides": {
-    "react": "npm:@preact/compat@17.1.2",
-    "react-dom": "npm:@preact/compat@17.1.2"
-  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -18,7 +14,7 @@
   "dependencies": {
     "@mui/system": "^5.14.1",
     "@types/dompurify": "^3.0.2",
-    "@preact/compat": "17.1.2",
+    "react-dom": "^18.2.0",
     "vite-plugin-svgr": "^3.2.0"
   },
   "devDependencies": {
@@ -31,7 +27,6 @@
     "@mui/lab": "^5.0.0-alpha.137",
     "@mui/material": "^5.14.1",
     "@mui/x-date-pickers": "^6.10.0",
-    "@preact/preset-vite": "^2.5.0",
     "@tailwindcss/typography": "^0.5.9",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",

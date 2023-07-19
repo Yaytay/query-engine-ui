@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import preact from "@preact/preset-vite";
+import react from '@vitejs/plugin-react'
 import svgr from "vite-plugin-svgr"
 import pluginRewriteAll from 'vite-plugin-rewrite-all'
 
@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     pluginRewriteAll()
     ,svgr()
-    ,preact()
+    ,react()
   ],
   base: "",
   appType: "spa",

@@ -1,6 +1,6 @@
 import './Nav.css';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Parameters from './Parameters';
 import Modal from 'react-modal';
 import QeIcon from './QeIcon';
@@ -17,8 +17,6 @@ import { components } from "../Query-Engine-Schema";
 import { NestedDropdown, MenuItemData } from 'mui-nested-menu';
 import { ManagementEndpointType } from '../Manage';
 
-var [anchorEl, setAnchorEl] = [null, (_ : any) => {}]
-
 var [modalIsOpen, setModalIsOpen] = [null as boolean | null, (_ : any) => {}]
 var [args, setArgs] = [null, (_ : any) => {}]
 
@@ -26,7 +24,6 @@ var pipeline : components["schemas"]["PipelineFile"]
 
 
 function displayParameters(item : components["schemas"]["PipelineFile"]) {
-  setAnchorEl(null);
   console.log(item);
   pipeline = item;
 
@@ -61,13 +58,11 @@ interface NavProps {
 function Nav(props : NavProps) {
 
   [modalIsOpen, setModalIsOpen] = useState(false);
-  [args, setArgs] = useState({} as any);  
+  [args, setArgs] = useState({} as any);
+  const navigate = useNavigate()
   
-  [anchorEl, setAnchorEl] = useState(null);
-
   const handleCloseMenu = () => {
     console.log('handleCloseMenu');
-    setAnchorEl(null);
   };
 
   if (process.env.NODE_ENV !== 'test') {
@@ -93,16 +88,26 @@ function Nav(props : NavProps) {
   function topMenuItems() : MenuItemData {
     const items : MenuItemData[] = []
     if (props.designMode) {
-      items.push({ label: 'Design', callback: (event, item) => console.log('Design clicked', event, item)})
+      items.push({ label: 'Design', callback: () => {
+        navigate('/ui/design')
+      }})
     }
-    items.push({ label: 'Test', callback: (event, item) => console.log('Test clicked', event, item)})
+    items.push({ label: 'Test', callback: () => {
+      navigate('/ui/test')
+    }})
     items.push(dataMenuItems(props.available))
     if (props.managementEndpoints) {
-      items.push({ label: 'Manage', callback: (event, item) => console.log('Manage clicked', event, item)})
+      items.push({ label: 'Manage', callback: () => {
+        navigate('/ui/manage')
+      }})
     }
-    items.push({ label: 'Help', callback: (event, item) => console.log('Help clicked', event, item)})
-    items.push({ label: 'API', callback: (event, item) => console.log('Api clicked', event, item)})
-    return { label: '', leftIcon: <MenuIcon />, callback: (event, item) => console.log('Api clicked', event, item), items: items};
+    items.push({ label: 'Help', callback: () => {
+      navigate('/ui/help')
+    }})
+    items.push({ label: 'API', callback: () => {
+      navigate('/ui/api')
+    }})
+    return { label: '', items: items};
   }
 
   function dataMenuItems(node: components["schemas"]["PipelineNode"]) : MenuItemData {    
@@ -113,7 +118,9 @@ function Nav(props : NavProps) {
       }
       return { label: node.name, callback: (event, item) => console.log('Data clicked', event, item), items: items}
     } else {
-      return { label: node.name, callback: (event, item) => console.log('Data clicked', event, item)}
+      return { label: node.name, callback: () => {
+        displayParameters(node)
+      }}
     }
   }
 
@@ -131,8 +138,20 @@ function Nav(props : NavProps) {
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
               <NestedDropdown
                 menuItemsData={topMenuItems()}
-                MenuProps={{elevation: 3}}
-                ButtonProps={{variant: 'outlined'}}
+                MenuProps={
+                  {
+                    elevation: 3
+
+                  }
+                }
+                ButtonProps={
+                  {
+                    variant: 'text'
+                    , sx: { my: 2, color: 'white' }
+                    , startIcon: <MenuIcon/>
+                    , endIcon: <></>
+                  }
+                }
                 onClick={() => console.log('Clicked')}
               /> 
             </Box>
