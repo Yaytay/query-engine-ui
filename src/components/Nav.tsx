@@ -6,23 +6,18 @@ import Modal from 'react-modal';
 import QeIcon from './QeIcon';
 
 import AppBar from '@mui/material/AppBar';
-import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
 import { components } from "../Query-Engine-Schema";
 
-import { NestedMenuItem } from 'mui-nested-menu';
+import { NestedDropdown, MenuItemData } from 'mui-nested-menu';
 import { ManagementEndpointType } from '../Manage';
 
-var [anchorElNav, setAnchorElNav] = [null, (_ : any) => {}]
-var [anchorElData, setAnchorElData] = [null, (_ : any) => {}]
+var [anchorEl, setAnchorEl] = [null, (_ : any) => {}]
 
 var [modalIsOpen, setModalIsOpen] = [null as boolean | null, (_ : any) => {}]
 var [args, setArgs] = [null, (_ : any) => {}]
@@ -31,8 +26,7 @@ var pipeline : components["schemas"]["PipelineFile"]
 
 
 function displayParameters(item : components["schemas"]["PipelineFile"]) {
-  setAnchorElNav(null);
-  setAnchorElData(null);
+  setAnchorEl(null);
   console.log(item);
   pipeline = item;
 
@@ -58,49 +52,6 @@ function submitModal(values : any) {
   setModalIsOpen(false);
 }
 
-interface QueryMenuItemProps {
-  item: components["schemas"]["PipelineFile"]
-} 
-
-function QueryMenuItem(props : QueryMenuItemProps) {
-  return (
-    <MenuItem onClick={_ => displayParameters(props.item)}>
-      {props.item.title ?? props.item.name}
-    </MenuItem>
-  );
-}
-
-interface QueryFolderLevelProps {
-  items: components["schemas"]["PipelineNode"][] | undefined
-  , parentMenuOpen: boolean
-}
-
-function QueryFolderLevel(props : QueryFolderLevelProps) {
-  var children = props.items;
-
-  if (children) {
-    return (
-      <>
-        {children.map((value, _) => {
-          if (value.children) {
-            return (
-              <NestedMenuItem key={value.path} parentMenuOpen={props.parentMenuOpen} label={value.name}>
-                <QueryFolderLevel items={value.children} parentMenuOpen={props.parentMenuOpen}></QueryFolderLevel>
-              </NestedMenuItem>
-            );
-          } else {
-            return (
-              <QueryMenuItem key={value.path} item={value} />
-            );
-          }
-        })}
-      </>
-    );
-  } else {
-    return (<div/>)
-  }
-}
-
 interface NavProps {
   designMode: boolean
   , available: components["schemas"]["PipelineDir"]
@@ -112,28 +63,16 @@ function Nav(props : NavProps) {
   [modalIsOpen, setModalIsOpen] = useState(false);
   [args, setArgs] = useState({} as any);  
   
-  [anchorElNav, setAnchorElNav] = useState(null);
-  const navOpen = Boolean(anchorElNav);
+  [anchorEl, setAnchorEl] = useState(null);
 
-  [anchorElData, setAnchorElData] = useState(null);
-  const dataOpen = Boolean(anchorElData);
-
-  const handleOpenNavMenu = (event : React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorElNav(event.currentTarget);
+  const handleCloseMenu = () => {
+    console.log('handleCloseMenu');
+    setAnchorEl(null);
   };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleOpenDataMenu = (e : React.MouseEvent<HTMLElement>) => setAnchorElData(e.currentTarget);
-  const handleCloseDataMenu = () => setAnchorElData(null);
 
   if (process.env.NODE_ENV !== 'test') {
     Modal.setAppElement('#root');
   }
-
-  // const pages = ['Design', 'Test', 'Demo', 'Settngs', 'Help'];
 
   const customStyles = {
     content: {
@@ -147,6 +86,37 @@ function Nav(props : NavProps) {
     },
   };
 
+  if (props.available.name === '') {
+    props.available.name = 'Data';
+  }
+
+  function topMenuItems() : MenuItemData {
+    const items : MenuItemData[] = []
+    if (props.designMode) {
+      items.push({ label: 'Design', callback: (event, item) => console.log('Design clicked', event, item)})
+    }
+    items.push({ label: 'Test', callback: (event, item) => console.log('Test clicked', event, item)})
+    items.push(dataMenuItems(props.available))
+    if (props.managementEndpoints) {
+      items.push({ label: 'Manage', callback: (event, item) => console.log('Manage clicked', event, item)})
+    }
+    items.push({ label: 'Help', callback: (event, item) => console.log('Help clicked', event, item)})
+    items.push({ label: 'API', callback: (event, item) => console.log('Api clicked', event, item)})
+    return { label: '', leftIcon: <MenuIcon />, callback: (event, item) => console.log('Api clicked', event, item), items: items};
+  }
+
+  function dataMenuItems(node: components["schemas"]["PipelineNode"]) : MenuItemData {    
+    if (node.children) {
+      const items : MenuItemData[] = []
+      for (var idx in node.children) {
+        items.push(dataMenuItems(node.children[idx]))
+      }
+      return { label: node.name, callback: (event, item) => console.log('Data clicked', event, item), items: items}
+    } else {
+      return { label: node.name, callback: (event, item) => console.log('Data clicked', event, item)}
+    }
+  }
+
   return (
     <>
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles}>
@@ -157,69 +127,14 @@ function Nav(props : NavProps) {
           <Toolbar disableGutters>
             <Link to="/">
               <QeIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1}}/>
-            </Link>
+            </Link>            
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                open={navOpen}
-                onClose={handleCloseNavMenu}
-                sx={{
-                  display: { xs: 'block', md: 'none' },
-                }}
-              >
-                { props.designMode && 
-                  <Link to="/ui/design" >
-                    <MenuItem key='Design' onClick={handleCloseNavMenu}>
-                      <Typography textAlign="center">Design</Typography>
-                    </MenuItem>
-                  </Link>
-                }
-                <Link to="/ui/test">
-                  <MenuItem key='Test' onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">Test</Typography>
-                  </MenuItem>
-                </Link>
-                <NestedMenuItem parentMenuOpen={navOpen} label={'Data'}>
-                  <QueryFolderLevel items={props.available.children} parentMenuOpen={navOpen} />
-                </NestedMenuItem>
-                { props.managementEndpoints && 
-                  <Link to="/ui/manage" >
-                  <MenuItem key='Manage' onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">Manage</Typography>
-                  </MenuItem>
-                </Link>
-              }
-                <Link to="/ui/help">
-                  <MenuItem key='Help' onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">Help</Typography>
-                  </MenuItem>
-                </Link>
-                <Link to="/ui/api">
-                  <MenuItem key='API' onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">API</Typography>
-                  </MenuItem>
-                </Link>
-              </Menu>
+              <NestedDropdown
+                menuItemsData={topMenuItems()}
+                MenuProps={{elevation: 3}}
+                ButtonProps={{variant: 'outlined'}}
+                onClick={() => console.log('Clicked')}
+              /> 
             </Box>
             <QeIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
             <Typography
@@ -243,36 +158,41 @@ function Nav(props : NavProps) {
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                 { props.designMode && 
                   <Link to="/ui/design">
-                    <Button key='Design' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
+                    <Button key='Design' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
                       Design
                     </Button>
                   </Link>
                 }
                 <Link to="/ui/test">
-                  <Button key='Test' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
+                  <Button key='Test' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
                     Test
                   </Button>
                 </Link>
-                <Button key='Data' sx={{ my: 2, color: 'white' }} onClick={handleOpenDataMenu} endIcon={<ArrowDropDown />}>
-                  Data
-                </Button>
-                <Menu anchorEl={anchorElData} open={dataOpen} onClose={handleCloseDataMenu}>
-                  <QueryFolderLevel items={props.available.children} parentMenuOpen={dataOpen} />
-                </Menu>
+                <NestedDropdown
+                  menuItemsData={dataMenuItems(props.available)}
+                  MenuProps={{elevation: 3}}
+                  ButtonProps={
+                    {
+                      variant: 'text'
+                      , sx: { my: 2, color: 'white' }
+                    }
+                  }
+                  onClick={() => console.log('Clicked')}
+                /> 
                 { props.managementEndpoints && 
                   <Link to="/ui/manage">
-                    <Button key='Manage' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
+                    <Button key='Manage' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
                       Manage
                     </Button>
                   </Link>
                 }
                 <Link to="/ui/help">
-                  <Button key='Help' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
+                  <Button key='Help' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
                     Help
                   </Button>
                 </Link>
                 <Link to="/ui/api">
-                  <Button key='API' sx={{ my: 2, color: 'white' }} onClick={handleCloseNavMenu}>
+                  <Button key='API' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
                     API
                   </Button>
                 </Link>

@@ -157,7 +157,13 @@ function Test(props : TestProps) {
             const type = r.headers.get('Content-Type');
             r.text().then(t => {
               if ("text/html" === type) {
-                setRawHtml('<div>' + DOMPurify.sanitize(t) + '</div>');
+                setRawHtml('<div>' + DOMPurify.sanitize(
+                  t
+                  , {
+                      ALLOWED_TAGS: ['table', 'thead', 'tbody', 'tr', 'th', 'td']
+                      , ALLOWED_ATTR: ['class']
+                    }
+                  ) + '</div>');
                 setData(null);
               } else {
                 setRawHtml(null);
