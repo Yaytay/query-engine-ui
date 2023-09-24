@@ -52,7 +52,7 @@ function App() {
   }
 
   const baseUrl =  buildApiBaseUrl()
-  console.log("API URL: " + baseUrl)
+  console.log("API URL: ", baseUrl)
 
   useEffect(() => {
     let url = new URL(baseUrl + 'api/info/available');

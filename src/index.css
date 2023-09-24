@@ -35,3 +35,7 @@ table.qetable th,td {
 table.qetable tr.oddRow {
   background-color: lightcyan;
 }
+
+input[disabled] {
+  pointer-events:none
+}
