@@ -9,12 +9,12 @@ function InputSelect(props : InputStdProps) {
 
   var value = useState(getOption(possibleValues, props.arg.multiValued, props.value))
 
-  function handleInputChange(e : React.ChangeEvent<HTMLSelectElement>) {    
-      console.log('InputSelect: ' + JSON.stringify(e));
-    if (Array.isArray(e)) {
-      props.onChange(e.map(v => v.value));
+  function handleInputChange(option: any) {    
+      console.log('InputSelect: ', option);
+    if (Array.isArray(option)) {
+      props.onChange(option.map(v => v.value));
     } else {
-      props.onChange(e.currentTarget.value);
+      props.onChange(option.value);
     }
   }
 
