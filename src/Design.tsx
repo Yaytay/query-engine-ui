@@ -52,7 +52,7 @@ function Design(props : DesignProps) {
 
   const outerBox = React.useRef<HTMLDivElement>(null)
 
-  if (props.onChange !== undefined && onChange === undefined) {
+  if (props.onChange !== undefined) {
     onChange = props.onChange
   }
 
@@ -184,8 +184,17 @@ function Design(props : DesignProps) {
     if (!currentFile) {
       return
     }    
-    const url = new URL(props.baseUrl + 'api/design/file/' + currentFile.path);
-    fetch(url, { method: 'PUT', body: JSON.stringify(fileContents), headers: { 'Content-Type': 'application/json' } })
+    const url = new URL(props.baseUrl + 'api/design/file/' + currentFile.path)
+    var type : string;
+    var contents : string;
+    if (currentFile.path.endsWith('.jexl')) {
+      type = 'application/jexl'
+      contents = fileContentsString || ''
+    } else {
+      type = 'application/json'
+      contents = JSON.stringify(fileContents)
+    }
+    fetch(url, { method: 'PUT', body: contents, headers: { 'Content-Type': type } })
       .then(r => {
         if (!r.ok) {
           return r.text().then(t => {
