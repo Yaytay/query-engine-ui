@@ -37,7 +37,7 @@ export interface paths {
     post: operations["validate"];
   };
   "/api/docs": {
-    /** @description Return a list of available  documents */
+    /** @description Return a tree of available  documentation */
     get: operations["getAvailable"];
   };
   "/api/docs/{path}": {
@@ -56,7 +56,7 @@ export interface components {
   schemas: {
     DesignDir: {
       name: string;
-      children: (components["schemas"]["DesignNode"])[];
+      children: components["schemas"]["DesignNode"][];
       path: string;
       /** Format: date-time */
       modified: string;
@@ -67,7 +67,7 @@ export interface components {
     }, "modified" | "name" | "path" | "size">;
     DesignNode: {
       name: string;
-      children?: (components["schemas"]["DesignNode"])[];
+      children?: components["schemas"]["DesignNode"][];
       path: string;
       /** Format: date-time */
       modified: string;
@@ -87,7 +87,7 @@ export interface components {
       /**
        * @description <P>The data type of an Argument.</P>
        * <P>All arguments will be received as Strings and will be parsed to the relavant type.</P>
-       *  
+       *
        * @enum {string}
        */
       type: "String" | "Integer" | "Long" | "Double" | "Date" | "Time" | "DateTime";
@@ -135,7 +135,7 @@ export interface components {
        * Declaring mandatory arguments to not be optional results in a better user experience when
        * the users fail to provide it.
        * </P>
-       *  
+       *
        * @default false
        */
       optional?: boolean;
@@ -148,7 +148,7 @@ export interface components {
        * <P>
        * If an argument that is not multi-valued is provided multiple times the Query Engine will fail to run the Pipeline.
        * </P>
-       *  
+       *
        * @default false
        */
       multiValued?: boolean;
@@ -160,7 +160,7 @@ export interface components {
        * <P>
        * If an argument that should be ignored is provided the Query Engine will fail to run the Pipeline.
        * </P>
-       *  
+       *
        * @default false
        */
       ignored?: boolean;
@@ -175,7 +175,7 @@ export interface components {
        * This serves no purpose in the processing of the pipeline (it is explicitly not validated at runtime).
        * </P>
        */
-      dependsUpon?: (string)[];
+      dependsUpon?: string[];
       /**
        * @description <P>The default value for the argument, as a string.</P>
        * <P>
@@ -214,7 +214,7 @@ export interface components {
        * </P>
        */
       maximumValue?: string;
-      possibleValues?: (components["schemas"]["ArgumentValue"])[];
+      possibleValues?: components["schemas"]["ArgumentValue"][];
       /**
        * @description <P>A URL that will provide a list of possible values that the argument may have.</P>
        * <P>
@@ -235,7 +235,7 @@ export interface components {
        * <li>Objects containing a &quot;value&quot; field.
        * <li>Objects containing a &quot;value&quot; field and a &quot;label&quot; field.
        * </ul>
-       * 
+       *
        * The PossibleValuesUrl overrides the PossibleValues, a UI may choose to display the PossibleValues whilst the request to the PossibleValuesUrl is in flight, but the
        * end result should be the values returned by the PossibleValuesUrl.
        * <P>
@@ -285,10 +285,8 @@ export interface components {
     /**
      * @description <P>
      * Conditions are expressions using <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> that control access to something.
-     * </P>
      * <P>
      * Conditions can be applied to entire directories (in the permissions.jexl file); to Pipelines or to Endpoints.
-     * </P>
      * <P>
      * The context of a Condition includes a variable called &quot;req&quot; that includes:
      * <UL>
@@ -320,7 +318,6 @@ export interface components {
      * A condition should return either the boolean true or false.
      * In addition if it returns the string "true" it will be considered to be true.
      * Any other return value will be considered false.
-     * </P>
      * <P>
      * Some examples Conditions are
      * <UL>
@@ -375,7 +372,7 @@ export interface components {
       key?: string;
       /**
        * @description <P>The name of the field that will contain the type of each endpoint.</P>
-       *  
+       *
        * @default type
        */
       typeField?: string;
@@ -393,7 +390,7 @@ export interface components {
        * , but if the pipeline produces rows in which both fields have values the resulting Endpoint
        * will be invalid.
        * </P>
-       *  
+       *
        * @default url
        */
       urlField?: string;
@@ -404,7 +401,7 @@ export interface components {
        * , but if the pipeline produces rows in which both fields have values the resulting Endpoint
        * will be invalid.
        * </P>
-       *  
+       *
        * @default urlTemplate
        */
       urlTemplateField?: string;
@@ -415,7 +412,7 @@ export interface components {
        * , but if the pipeline produces rows in which both secretField and either of the other two have values
        * the resulting Endpoint will be invalid.
        * </P>
-       *  
+       *
        * @default secret
        */
       secretField?: string;
@@ -426,7 +423,7 @@ export interface components {
        * , but if the pipeline produces rows in which both secretField and either of the other two have values
        * the resulting Endpoint will be invalid.
        * </P>
-       *  
+       *
        * @default username
        */
       usernameField?: string;
@@ -437,13 +434,13 @@ export interface components {
        * , but if the pipeline produces rows in which both secretField and either of the other two have values
        * the resulting Endpoint will be invalid.
        * </P>
-       *  
+       *
        * @default password
        */
       passwordField?: string;
       /**
        * @description <P>The name of the field that will contain the condition for each endpoint.</P>
-       *  
+       *
        * @default condition
        */
       conditionField?: string;
@@ -476,7 +473,7 @@ export interface components {
     Endpoint: {
       /**
        * @description <P>The type of an Endpoint.</P>
-       *  
+       *
        * @enum {string}
        */
       type: "SQL" | "HTTP";
@@ -550,13 +547,13 @@ export interface components {
      * <P>
      * The format to use for a pipeline is chosen by according to the following rules:
      * <ol>
-     * 
+     *
      * <li><pre>_fmt</pre> query string.<br>
      * If the HTTP request includes a <pre>_fmt</pre> query string argument each Format specified in the Pipeline will be checked (in order)
      * for a matching response from the {@link uk.co.spudsoft.query.defn.Format#getName()} method.
      * The first matching Format will be returned.
      * If no matching Format is found an error will be returned.
-     * 
+     *
      * <li>Path extension.<br>
      * If the path in the HTTP request includes a '.' (U+002E, Unicode FULL STOP) after the last '/' (U+002F, Unicode SOLIDUS) character everything following that
      * character will be considered to be the extension, furthermore the extension (and full stop character) will be removed from the filename being sought.
@@ -564,20 +561,39 @@ export interface components {
      * for a matching response from the {@link uk.co.spudsoft.query.defn.Format#getExtension()} method.
      * The first matching Format will be returned.
      * If no matching Format is found an error will be returned.
-     * 
+     *
      * <li>Accept header.<br>
      * If the HTTP request includes an 'Accept' header each Format specified in the Pipeline will be checked (in order)
      * for a matching response from the {@link uk.co.spudsoft.query.defn.Format#getMediaType() ()} method.
      * Note that most web browsers include "*\/*" in their default Accept headers, which will match any Format that specifies a MediaType.
      * The first matching Format will be returned.
      * If no matching Format is found an error will be returned.
-     * 
+     *
      * <li>Default<br>
      * If the request does not use any of these mechanisms then the first Format specified in the Pipeline will be used.
      * </ol>
      * <p>
      */
     Format: {
+      /**
+       * @description <P>The media type of the format.</P>
+       * <P>
+       * The media type is used to determine the format based upon the Accept header in the request.
+       * If multiple formats have the same media type the first in the list will be used.
+       * </P>
+       * <P>
+       * The media type will also be set as the Content-Type header in the response.
+       * </P>
+       */
+      mediaType?: string;
+      /**
+       * @description <P>The extension of the format.</P>
+       * <P>
+       * The extension is only used to determine the format based upon the URL path.
+       * If multiple formats have the same extension the first in the list will be used.
+       * </P>
+       */
+      extension?: string;
       /**
        * @description <P>The name of the format.</P>
        * <P>
@@ -593,29 +609,10 @@ export interface components {
       name?: string;
       /**
        * @description <P>The type of Format being configured.<P>
-       *  
+       *
        * @enum {string}
        */
       type: "JSON" | "XLSX" | "Delimited" | "HTML";
-      /**
-       * @description <P>The extension of the format.</P>
-       * <P>
-       * The extension is only used to determine the format based upon the URL path.
-       * If multiple formats have the same extension the first in the list will be used.
-       * </P>
-       */
-      extension?: string;
-      /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       */
-      mediaType?: string;
     };
     FormatDelimited: WithRequired<{
       type: "Delimited";
@@ -689,7 +686,7 @@ export interface components {
       mediaType?: string;
       /**
        * @description <P>The name of the sheet that will contain the data in the Excel Workbook.</P>
-       *  
+       *
        * @default data
        */
       sheetName?: string;
@@ -707,7 +704,7 @@ export interface components {
        * If the value is true all cells in the output will have a thin black border.
        * This includes cells with a null value, but excludes cells outside the range of the data.
        * </P>
-       *  
+       *
        * @default true
        */
       gridLines?: boolean;
@@ -716,7 +713,7 @@ export interface components {
        * <P>
        * If the value is true the first row on the Worksheet will contain the field names (or the overriding names from the columns defined here).
        * </P>
-       *  
+       *
        * @default true
        */
       headers?: boolean;
@@ -776,7 +773,7 @@ export interface components {
        * <LI><font style="color: #0A5F42">0A5F42</font>
        * </UL>
        * </P>
-       *  
+       *
        * @default 000000
        */
       fgColour?: string;
@@ -795,7 +792,7 @@ export interface components {
        * <LI><font style="background-color: #0A5F42">0A5F42</font>
        * </UL>
        * </P>
-       *  
+       *
        * @default FFFFFF
        */
       bgColour?: string;
@@ -831,7 +828,7 @@ export interface components {
        */
       format?: string;
       /**
-       * Format: double 
+       * Format: double
        * @description <P>The width of the column in Excel column width units.</P>
        * <P>
        * One unit of column width is equal to the width of one character in the Normal style. For proportional fonts, the width of the character 0 (zero) is used.
@@ -849,7 +846,7 @@ export interface components {
       /** @description <P>The name of the font.</P> */
       fontName?: string;
       /**
-       * Format: int32 
+       * Format: int32
        * @description <P>The size of the font.</P>
        * <P>
        * Font size is measured in points (approximately 1/72 of an inch).
@@ -903,7 +900,7 @@ export interface components {
      */
     Pipeline: {
       source: components["schemas"]["Source"];
-      processors?: (components["schemas"]["Processor"])[];
+      processors?: components["schemas"]["Processor"][];
       /**
        * @description <P>
        * The title of the Pipeline that will be used in the UI in preference to the filename.
@@ -931,7 +928,7 @@ export interface components {
        * </P>
        */
       condition?: string;
-      arguments?: (components["schemas"]["Argument"])[];
+      arguments?: components["schemas"]["Argument"][];
       /**
        * @description <P>
        * Endpoints are the actual providers of data to the Pipeline.
@@ -942,20 +939,29 @@ export interface components {
        * </P>
        */
       sourceEndpoints?: {
-        [key: string]: components["schemas"]["Endpoint"] | undefined;
+        [key: string]: components["schemas"]["Endpoint"];
       };
-      dynamicEndpoints?: (components["schemas"]["DynamicEndpoint"])[];
-      formats?: (components["schemas"]["Format"])[];
+      dynamicEndpoints?: components["schemas"]["DynamicEndpoint"][];
+      formats?: components["schemas"]["Format"][];
     };
-    /** @description <P>Processors to run on the data as it flows from the Source.</P> */
+    /** @description Processors modify the data stream in flight. */
     Processor: {
       /**
        * @description <P>The type of Processor being configured.</P>
-       *  
+       *
        * @enum {string}
        */
       type: "LIMIT" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "SCRIPT";
     };
+    /**
+     * @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
+     *
+     * Two child pipelines must be defined:
+     * <ul>
+     * <li>The definition  pipeline, that is queried in its entirety at the beginning and that defines the columns that will be found.
+     * <li>The values pipeline, that is queried in parallel with the main stream and the supplies the data for the dynamic columns.
+     * </il>
+     */
     ProcessorDynamicField: WithRequired<{
       type: "DYNAMIC_FIELD";
     } & Omit<components["schemas"]["Processor"], "type"> & {
@@ -1009,7 +1015,7 @@ export interface components {
       name?: string;
       /**
        * @description <P>The type of Source being configured.</P>
-       *  
+       *
        * @enum {string}
        */
       type: "TEST" | "SQL" | "HTTP";
@@ -1025,7 +1031,7 @@ export interface components {
      */
     SourcePipeline: {
       source: components["schemas"]["Source"];
-      processors?: (components["schemas"]["Processor"])[];
+      processors?: components["schemas"]["Processor"][];
     };
     SourceSql: WithRequired<{
       type: "SQL";
@@ -1060,7 +1066,7 @@ export interface components {
        */
       query?: string;
       /**
-       * Format: int32 
+       * Format: int32
        * @description <P>The number of rows to get from the Source at a time.</P>
        * <P>
        * A larger streaming fetch size will slow the initial data, but may be quicker overall (at the cost of more memory).
@@ -1069,7 +1075,7 @@ export interface components {
        */
       streamingFetchSize?: number;
       /**
-       * Format: int32 
+       * Format: int32
        * @description <P>The maxmimum number of connections to open to the Endpoint.</P>
        * <P>
        * If there are likely to be multiple concurrent pipelines running to the same Endpoint it can be beneficial to set this to a small number, otherwise leave it at the default.
@@ -1077,7 +1083,7 @@ export interface components {
        */
       maxPoolSize?: number;
       /**
-       * Format: int32 
+       * Format: int32
        * @description <P>The maxmimum number of connections have queued up for the Endpoint.</P>
        * <P>
        * This is unlikely to be useful.
@@ -1150,30 +1156,30 @@ export interface components {
       rowCount?: number;
     }, "type">;
     DocDir: WithRequired<components["schemas"]["DocNode"] & {
-      children?: (components["schemas"]["DocNode"])[];
+      children?: components["schemas"]["DocNode"][];
     }, "children" | "name" | "path">;
     DocFile: WithRequired<components["schemas"]["DocNode"] & {
       title?: string;
     }, "name" | "path" | "title">;
     DocNode: {
       name: string;
-      children?: (components["schemas"]["DocNode"])[];
+      children?: components["schemas"]["DocNode"][];
       path: string;
     };
-    ImmutableListArgument: (components["schemas"]["Argument"])[];
-    ImmutableListFormat: (components["schemas"]["Format"])[];
+    ImmutableListArgument: components["schemas"]["Argument"][];
+    ImmutableListFormat: components["schemas"]["Format"][];
     PipelineDir: WithRequired<components["schemas"]["PipelineNode"] & {
-      children?: (components["schemas"]["PipelineNode"])[];
+      children?: components["schemas"]["PipelineNode"][];
     }, "children" | "name" | "path">;
     PipelineFile: WithRequired<components["schemas"]["PipelineNode"] & {
       title?: string;
       description?: string;
-      arguments?: (components["schemas"]["Argument"])[];
-      destinations?: (components["schemas"]["Format"])[];
+      arguments?: components["schemas"]["Argument"][];
+      destinations?: components["schemas"]["Format"][];
     }, "name" | "path">;
     PipelineNode: {
       name: string;
-      children?: (components["schemas"]["PipelineNode"])[];
+      children?: components["schemas"]["PipelineNode"][];
       path: string;
     };
   };
@@ -1183,6 +1189,8 @@ export interface components {
   headers: never;
   pathItems: never;
 }
+
+export type $defs = Record<string, never>;
 
 export type external = Record<string, never>;
 
@@ -1216,11 +1224,11 @@ export interface operations {
     };
     requestBody?: {
       content: {
-        "inode/directory,application/json,application/yaml,application/yaml+velocity,application/json+velocity,application/jexl": (string)[];
+        "inode/directory,application/json,application/yaml,application/yaml+velocity,application/json+velocity,application/jexl": string[];
       };
     };
     responses: {
-      /** @description The list of all and directories files. */
+      /** @description The list of all directories and files. */
       200: {
         content: {
           "application/json": components["schemas"]["DesignDir"];
@@ -1236,7 +1244,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The list of all and directories files. */
+      /** @description The list of all directories and files. */
       200: {
         content: {
           "application/json": components["schemas"]["DesignDir"];
@@ -1293,7 +1301,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The list of all and directories files. */
+      /** @description The list of all directories and files. */
       200: {
         content: {
           "application/json": components["schemas"]["DesignDir"];
@@ -1305,7 +1313,7 @@ export interface operations {
   validate: {
     requestBody?: {
       content: {
-        "application/json,application/yaml": (string)[];
+        "application/json,application/yaml": string[];
       };
     };
     responses: {
@@ -1317,13 +1325,13 @@ export interface operations {
       };
     };
   };
-  /** @description Return a list of available  documents */
+  /** @description Return a tree of available  documentation */
   getAvailable: {
     responses: {
       /** @description The list of available documents. */
       200: {
         content: {
-          "application/json": (components["schemas"]["DocNode"])[];
+          "application/json": components["schemas"]["DocNode"][];
         };
       };
     };
@@ -1350,7 +1358,7 @@ export interface operations {
       /** @description The list of available pipelines. */
       200: {
         content: {
-          "application/json": (components["schemas"]["PipelineNode"])[];
+          "application/json": components["schemas"]["PipelineNode"][];
         };
       };
     };

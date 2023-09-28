@@ -165,6 +165,10 @@ function Test(props : TestProps) {
                     }
                   ) + '</div>');
                 setData(null);
+              } else if ("application/json" === type) {
+                setRawHtml(null)
+                const formatted = JSON.stringify(JSON.parse(t), null, 2)
+                setData(formatted);
               } else {
                 setRawHtml(null);
                 setData(t);
