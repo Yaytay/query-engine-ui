@@ -743,8 +743,7 @@ export interface components {
        * </P>
        */
       columns?: {
-        empty?: boolean;
-        [key: string]: components["schemas"]["FormatXlsxColumn"] | undefined;
+        [key: string]: components["schemas"]["FormatXlsxColumn"];
       };
     }), "type">;
     /**
@@ -875,8 +874,7 @@ export interface components {
      * </P>
      */
     ImmutableMapStringFormatXlsxColumn: {
-      empty?: boolean;
-      [key: string]: components["schemas"]["FormatXlsxColumn"] | undefined;
+      [key: string]: components["schemas"]["FormatXlsxColumn"];
     };
     /**
      * @description <P>The Pipeline is the fundamental unit of processing in QueryEngine.</P>
