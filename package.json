@@ -43,7 +43,7 @@
     "react-expanding-textarea": "^2.3.6",
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.16.0",
-    "react-select": "^5.7.4",
+    "react-select": "^5.7.7",
     "react-switch": "^7.0.0",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.2.2",
