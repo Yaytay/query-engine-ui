@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@mui/system": "^5.14.10",
-    "@types/dompurify": "^3.0.2",
+    "@types/dompurify": "^3.0.3",
     "react-dom": "^18.2.0",
     "vite-plugin-svgr": "^4.1.0"
   },
@@ -34,7 +34,7 @@
     "@types/react-modal": "^3.16.1",
     "@vitejs/plugin-react": "^4.0.4",
     "autoprefixer": "^10.4.16",
-    "dompurify": "^3.0.5",
+    "dompurify": "^3.0.6",
     "eslint": "^8.51.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
