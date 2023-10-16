@@ -24,7 +24,7 @@
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.14.12",
-    "@mui/lab": "^5.0.0-alpha.137",
+    "@mui/lab": "^5.0.0-alpha.148",
     "@mui/material": "^5.14.12",
     "@mui/x-date-pickers": "^6.14.0",
     "@svgr/webpack": "^8.1.0",
