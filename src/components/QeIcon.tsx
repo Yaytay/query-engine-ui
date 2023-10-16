@@ -1,6 +1,6 @@
 /// <reference types="vite-plugin-svgr/client" />
 import SvgIcon from '@mui/material/SvgIcon';
-import { ReactComponent as Logo  } from './qe.svg';
+import Logo from './qe.svg?react';
 import { SxProps } from '@mui/material';
 
 interface QeIconProps {
