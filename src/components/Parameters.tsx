@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {Form} from '@formio/react';
-import ReactShadowRoot from 'react-shadow-root';
 import { components } from "../Query-Engine-Schema";
 
 interface ParametersProps {
