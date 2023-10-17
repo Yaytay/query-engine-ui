@@ -238,7 +238,7 @@ function Test(props : TestProps) {
               </Box>
             </TabPanel>
             <TabPanel value={tabPanel} index={1}>
-              { currentFile && (<Parameters onRequestSubmit={submit} closeable={false} pipeline={currentFile} values={args} onRequestClose={() => {}} />) }
+              { currentFile && (<Parameters baseUrl={props.baseUrl} onRequestSubmit={submit} closeable={false} pipeline={currentFile} values={args} onRequestClose={() => {}} />) }
             </TabPanel>
           </div>
           <DragBar onChange={drawerWidthChange} />

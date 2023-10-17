@@ -39,3 +39,13 @@ table.qetable tr.oddRow {
 input[disabled] {
   pointer-events:none
 }
+
+input { 
+  border: 0px; 
+}
+textarea { 
+  border: 0px; 
+}
+select { 
+  border: 0px; 
+}

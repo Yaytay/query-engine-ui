@@ -51,6 +51,7 @@ function submitModal(values : any) {
 
 interface NavProps {
   designMode: boolean
+  , baseUrl: string
   , available: components["schemas"]["PipelineDir"]
   , managementEndpoints: ManagementEndpointType[] | null
 }
@@ -127,7 +128,7 @@ function Nav(props : NavProps) {
   return (
     <>
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles}>
-        <Parameters onRequestClose={closeModal} onRequestSubmit={submitModal} pipeline={pipeline} values={args} closeable={true} />
+        <Parameters baseUrl={props.baseUrl} onRequestClose={closeModal} onRequestSubmit={submitModal} pipeline={pipeline} values={args} closeable={true} />
       </Modal>
       <AppBar position="static">
         <Container maxWidth="xl">

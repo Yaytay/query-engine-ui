@@ -20,6 +20,7 @@ import TreeView from '@mui/lab/TreeView';
 
 import { components } from "./Query-Engine-Schema";
 import { SchemaMapType, buildSchema } from "./SchemaType";
+import { borders } from '@mui/system';
 
 var onChange = () => {};
 

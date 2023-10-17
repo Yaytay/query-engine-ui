@@ -24,6 +24,11 @@ function OASObjectEditor({object, schema, field, bg, onHelpChange, onChange, typ
 
   var objectSchema = schema[type]
 
+  if (!objectSchema) {
+    console.log("No schema for ", type, " @ ", field);
+    return ;
+  }
+
   function handleInputChange(changedField : string, value : any) {
     var rep={...object}
     rep[changedField] = value
