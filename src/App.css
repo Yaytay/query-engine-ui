@@ -32,3 +32,25 @@ body {
   100% { transform: translateX(0) }
 }
 
+.formio-component-form .row {
+  margin-left: 0px;  
+  margin-right: 0px;
+}
+
+.formio-component-form .qe-arguments .fieldset-body .formio-component {
+  width: 340px;
+}
+
+.formio-component-form .qe-arguments .fieldset-body .formio-component .form-text {
+  font-size: 0.9rem;
+}
+
+.formio-component-form .qe-arguments fieldset .fieldset-body {
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: column wrap;
+  column-gap: 30px;
+  height: 30vh;
+  width: 30vw;
+}
+
