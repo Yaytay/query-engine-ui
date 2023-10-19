@@ -39,6 +39,7 @@ body {
 
 .formio-component-form .qe-arguments .fieldset-body .formio-component {
   width: 340px;
+  break-inside: avoid-column;
 }
 
 .formio-component-form .qe-arguments .fieldset-body .formio-component .form-text {
@@ -46,11 +47,7 @@ body {
 }
 
 .formio-component-form .qe-arguments fieldset .fieldset-body {
-  display: flex;
-  justify-content: flex-start;
-  flex-flow: column wrap;
   column-gap: 30px;
-  height: 30vh;
-  width: 30vw;
+  column-count: 2;
 }
 

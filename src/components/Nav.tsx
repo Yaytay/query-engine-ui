@@ -22,23 +22,34 @@ var [args, setArgs] = [null, (_ : any) => {}]
 
 var pipeline : components["schemas"]["PipelineFile"]
 
+const layoutXY : [number, number][] = [
+  [1,1]
+  , [1,1]
+  , [1,2]
+  , [1,3]
+  , [2,2]
+  , [2,3]
+  , [2,3]
+  , [2,4]
+  , [2,4]
+  , [3,3]
+  , [3,4]
+  , [3,4]
+  , [3,4]
+  , [3,5]  
+]
 
-function displayParameters(item : components["schemas"]["PipelineFile"]) {
-  console.log(item);
-  pipeline = item;
-
-  var ta : any = {
-    '_fmt': (Array.isArray(pipeline.destinations) ? pipeline.destinations[0].name : null)
-  }
-  if (pipeline.arguments) {
-    pipeline.arguments.forEach(arg => {
-      ta[arg.name] = arg.defaultValue ?? '';
-    });
-  }
-  setArgs(ta);
-
-  setModalIsOpen(true);
-}
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    width: 'auto',
+    height: 'auto',
+    transform: 'translate(-50%, -50%)',
+    padding: '0px',
+    margin: '0px'
+  },
+};
 
 function closeModal() {
   setModalIsOpen(false);
@@ -70,17 +81,63 @@ function Nav(props : NavProps) {
     Modal.setAppElement('#root');
   }
 
-  const customStyles = {
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      transform: 'translate(-50%, -50%)',
-      padding: '0px',
-      margin: '0px'
-    },
-  };
+  function fudgeColumnCount(count : number) {
+    for(let i = 0; i < document.styleSheets.length; ++i) {
+      const stylesheet = document.styleSheets[i]
+      for(let j = 0; j < stylesheet.cssRules.length; ++j) {
+        const rule = stylesheet.cssRules[j]
+        if (rule.constructor.name === 'CSSStyleRule') {
+          let styleRule = rule as CSSStyleRule
+          if (styleRule.selectorText === '.formio-component-form .qe-arguments fieldset .fieldset-body') {
+            console.log(i, j, rule)
+            styleRule.style.columnCount = count.toString()
+            return 
+          }
+        }
+      }
+    }
+  }
+
+  function determineDimensions() {
+    const baseHeight = 620;
+    const baseWidth = 100;
+    const minWidth = 500;
+    const heightPer = 120;
+    const widthPer = 360;
+    var x = 0;
+    var y = 0;
+    if (pipeline.arguments) {
+      if (pipeline.arguments.length > 12) {
+        x = 3;
+        y = 4;
+      } else {
+        x = layoutXY[pipeline.arguments.length][0];
+        y = layoutXY[pipeline.arguments.length][1];
+      }
+    }
+    customStyles.content.height = baseHeight + heightPer * y + 'px';
+    customStyles.content.width = Math.max(minWidth, baseWidth + widthPer * x) + 'px';
+    fudgeColumnCount(x)
+  }
+
+  function displayParameters(item : components["schemas"]["PipelineFile"]) {
+    console.log(item);
+    pipeline = item;
+  
+    var ta : any = {
+      '_fmt': (Array.isArray(pipeline.destinations) ? pipeline.destinations[0].name : null)
+    }
+    if (pipeline.arguments) {
+      pipeline.arguments.forEach(arg => {
+        ta[arg.name] = arg.defaultValue ?? '';
+      });
+    }
+    setArgs(ta);
+
+    setModalIsOpen(true);
+    determineDimensions()
+  }
+  
 
   if (props.available.name === '') {
     props.available.name = 'Data';
