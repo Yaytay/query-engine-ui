@@ -22,32 +22,16 @@ var [args, setArgs] = [null, (_ : any) => {}]
 
 var pipeline : components["schemas"]["PipelineFile"]
 
-const layoutXY : [number, number][] = [
-  [1,1]
-  , [1,1]
-  , [1,2]
-  , [1,3]
-  , [2,2]
-  , [2,3]
-  , [2,3]
-  , [2,4]
-  , [2,4]
-  , [3,3]
-  , [3,4]
-  , [3,4]
-  , [3,4]
-  , [3,5]  
-]
-
 const customStyles = {
   content: {
     top: '50%',
     left: '50%',
-    width: 'auto',
-    height: 'auto',
     transform: 'translate(-50%, -50%)',
     padding: '0px',
-    margin: '0px'
+    margin: '0px',
+    height: 'fit-content',
+    width: 'fit-content',
+    overflow: 'visible'
   },
 };
 
@@ -81,45 +65,6 @@ function Nav(props : NavProps) {
     Modal.setAppElement('#root');
   }
 
-  function fudgeColumnCount(count : number) {
-    for(let i = 0; i < document.styleSheets.length; ++i) {
-      const stylesheet = document.styleSheets[i]
-      for(let j = 0; j < stylesheet.cssRules.length; ++j) {
-        const rule = stylesheet.cssRules[j]
-        if (rule.constructor.name === 'CSSStyleRule') {
-          let styleRule = rule as CSSStyleRule
-          if (styleRule.selectorText === '.formio-component-form .qe-arguments fieldset .fieldset-body') {
-            console.log(i, j, rule)
-            styleRule.style.columnCount = count.toString()
-            return 
-          }
-        }
-      }
-    }
-  }
-
-  function determineDimensions() {
-    const baseHeight = 620;
-    const baseWidth = 100;
-    const minWidth = 500;
-    const heightPer = 120;
-    const widthPer = 360;
-    var x = 0;
-    var y = 0;
-    if (pipeline.arguments) {
-      if (pipeline.arguments.length > 12) {
-        x = 3;
-        y = 4;
-      } else {
-        x = layoutXY[pipeline.arguments.length][0];
-        y = layoutXY[pipeline.arguments.length][1];
-      }
-    }
-    customStyles.content.height = baseHeight + heightPer * y + 'px';
-    customStyles.content.width = Math.max(minWidth, baseWidth + widthPer * x) + 'px';
-    fudgeColumnCount(x)
-  }
-
   function displayParameters(item : components["schemas"]["PipelineFile"]) {
     console.log(item);
     pipeline = item;
@@ -135,9 +80,7 @@ function Nav(props : NavProps) {
     setArgs(ta);
 
     setModalIsOpen(true);
-    determineDimensions()
-  }
-  
+  }  
 
   if (props.available.name === '') {
     props.available.name = 'Data';
@@ -182,10 +125,19 @@ function Nav(props : NavProps) {
     }
   }
 
+  var columns = 1
+  if (pipeline && pipeline.arguments) {
+    if (pipeline.arguments.length > 8) {
+      columns = 3;
+    } else if (pipeline.arguments.length > 3) {
+      columns = 2;
+    }
+  }
+
   return (
     <>
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles}>
-        <Parameters baseUrl={props.baseUrl} onRequestClose={closeModal} onRequestSubmit={submitModal} pipeline={pipeline} values={args} closeable={true} />
+        <Parameters baseUrl={props.baseUrl} onRequestClose={closeModal} onRequestSubmit={submitModal} pipeline={pipeline} values={args} closeable={true} columns={columns}/>
       </Modal>
       <AppBar position="static">
         <Container maxWidth="xl">

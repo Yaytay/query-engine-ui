@@ -38,7 +38,6 @@ body {
 }
 
 .formio-component-form .qe-arguments .fieldset-body .formio-component {
-  width: 340px;
   break-inside: avoid-column;
 }
 
@@ -46,8 +45,14 @@ body {
   font-size: 0.9rem;
 }
 
-.formio-component-form .qe-arguments fieldset .fieldset-body {
-  column-gap: 30px;
-  column-count: 2;
+.col-md-6 {
+  padding-left: 0px;
 }
 
+.col-md-4 {
+  padding-left: 0px;
+}
+
+.col-md-12 {
+  padding-left: 0px;
+}

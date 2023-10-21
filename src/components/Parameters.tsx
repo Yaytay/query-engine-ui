@@ -9,6 +9,7 @@ interface ParametersProps {
   , onRequestClose: () => void  
   , pipeline: components["schemas"]["PipelineFile"]
   , values: any
+  , columns: number
 }
 
 function Parameters(props : ParametersProps) {
@@ -63,7 +64,7 @@ function Parameters(props : ParametersProps) {
   return (
     <>
       <div className="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400" style={rootStyle} >
-        <Form src={ props.baseUrl + 'api/formio/' + props.pipeline.path }
+        <Form src={ props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns}
           onSubmit={console.log}
           />
       </div>
