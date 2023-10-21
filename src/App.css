@@ -32,11 +32,6 @@ body {
   100% { transform: translateX(0) }
 }
 
-.formio-component-form .row {
-  margin-left: 0px;  
-  margin-right: 0px;
-}
-
 .formio-component-form .qe-arguments .fieldset-body .formio-component {
   break-inside: avoid-column;
 }
@@ -45,14 +40,3 @@ body {
   font-size: 0.9rem;
 }
 
-.col-md-6 {
-  padding-left: 0px;
-}
-
-.col-md-4 {
-  padding-left: 0px;
-}
-
-.col-md-12 {
-  padding-left: 0px;
-}
