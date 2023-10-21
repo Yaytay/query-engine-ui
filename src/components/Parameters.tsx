@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {Form} from '@formio/react';
 import { components } from "../Query-Engine-Schema";
 
@@ -14,11 +14,26 @@ interface ParametersProps {
 
 function Parameters(props : ParametersProps) {
 
-  var [values, setValues] = useState(props.values);
-  var [highlight, setHighlight] = useState({});
-  var [rootStyle, setRootStyle] = useState({});
+  var [values, setValues] = useState(props.values)
+  var [highlight, setHighlight] = useState({})
+  var [rootStyle, setRootStyle] = useState({})
+
+  var [form, setForm] = useState({})
+  var [curlStr, setCurlStr] = useState('')
+
+  var formObject : any
+
+  useEffect(() => {
+    fetch(props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns)
+      .then((response) => response.json())
+      .then((data) => {
+        setForm(data);
+      });
+  }, []);
 
   const closeable = props.closeable ?? true;
+
+  var curlStr : string;
 
   function close() {
     props.onRequestClose();
@@ -61,12 +76,64 @@ function Parameters(props : ParametersProps) {
     }
   }
 
+  function onSubmit(submission: any, arg2: any, arg3: any) {
+    console.log('onSubmit:', submission, arg2, arg3)
+    if (formObject) {
+      formObject.emit('submitDone', submission)
+    }
+  }
+
+  function onSubmitDone(submission: any) {
+    console.log('onSubmitDone:', submission)
+  }
+
+  function onChange(submission: any) {
+    console.log('Changed:', submission)
+  }
+
+  function onError(submission: any) {
+    console.log('onError:', submission)
+  }
+
+  function onRender(submission: any) {
+    console.log('onRender:', submission)
+  }
+
+  function onCustomEvent(submission: any) {
+    console.log('onCustomEvent:', submission)
+  }
+
+  function onPrevPage(submission: any) {
+    console.log('onPrevPage:', submission)
+  }
+
+  function onNextPage(submission: any) {
+    console.log('onNextPage:', submission)
+  }
+
+  function formReady(webform2: any) {
+    console.log('formReady:', webform2)
+    formObject = webform2
+  }
+
   return (
     <>
-      <div className="relative py-4 px-4 md:px-10 bg-white shadow-md rounded border border-gray-400" style={rootStyle} >
-        <Form src={ props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns}
-          onSubmit={console.log}
+      <div className="relative py-1 px-4 md:px-10 bg-white shadow-md rounded border border-gray-400" style={rootStyle} >
+        <Form 
+          form={form}
+          onSubmit={onSubmit}
+          onSubmitDone={onSubmitDone}
+          onChange={onChange}
+          onError={onError}
+          onRender={onRender}
+          onCustomEvent={onCustomEvent}
+          onPrevPage={onPrevPage}
+          onNextPage={onNextPage}
+          formReady={formReady}
           />
+      </div>
+      <div>
+        {curlStr}
       </div>
     </>
   );

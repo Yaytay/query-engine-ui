@@ -127,7 +127,9 @@ function Nav(props : NavProps) {
 
   var columns = 1
   if (pipeline && pipeline.arguments) {
-    if (pipeline.arguments.length > 8) {
+    if (pipeline.arguments.length > 9) {
+      columns = 4;
+    } else if (pipeline.arguments.length > 6) {
       columns = 3;
     } else if (pipeline.arguments.length > 3) {
       columns = 2;
