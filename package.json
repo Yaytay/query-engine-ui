@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@formio/react": "^5.2.4-rc.1",
-    "@mui/system": "^5.14.13",
+    "@mui/system": "^5.14.14",
     "@types/dompurify": "^3.0.3",
     "bootstrap": "^4.6.0",
     "formiojs": "^4.17.2",
