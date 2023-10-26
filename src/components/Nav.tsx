@@ -40,7 +40,7 @@ function closeModal() {
 }
 
 function submitModal(values : any) {
-  console.log(values);
+  console.log("Submitted: ", values);
   setModalIsOpen(false);
 }
 
@@ -64,7 +64,7 @@ function Nav(props : NavProps) {
   if (process.env.NODE_ENV !== 'test') {
     Modal.setAppElement('#root');
   }
-
+  
   function displayParameters(item : components["schemas"]["PipelineFile"]) {
     console.log(item);
     pipeline = item;
@@ -78,7 +78,6 @@ function Nav(props : NavProps) {
       });
     }
     setArgs(ta);
-
     setModalIsOpen(true);
   }  
 
@@ -139,7 +138,16 @@ function Nav(props : NavProps) {
   return (
     <>
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles}>
-        <Parameters baseUrl={props.baseUrl} onRequestClose={closeModal} onRequestSubmit={submitModal} pipeline={pipeline} values={args} closeable={true} columns={columns}/>
+        <Parameters 
+            baseUrl={props.baseUrl} 
+            onRequestClose={closeModal} 
+            onRequestSubmit={submitModal} 
+            pipeline={pipeline} 
+            values={args} 
+            closeable={true} 
+            columns={columns}
+            displayUrl={true}
+            />
       </Modal>
       <AppBar position="static">
         <Container maxWidth="xl">

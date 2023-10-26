@@ -23,6 +23,23 @@ interface TestProps {
   , window: Window
 }
 
+export function ArgsToArgs(pipeline: components["schemas"]["PipelineFile"], args : any) {
+  if (args == null || !pipeline || !pipeline.arguments) {
+    return null;
+  }
+  var result = [] as any[];
+  for (var i = 0; i < pipeline.arguments.length; ++i) {
+    const arg = pipeline.arguments[i].name
+    if (args[arg]) {
+      result.push(arg + '=' + encodeURIComponent(args[arg]));
+    }
+  }
+  if (args['_fmt']) {
+    result.push('_fmt=' + encodeURIComponent(args['_fmt']));
+  }
+return result.join('&');
+}
+
 function Test(props : TestProps) {
 
   const emptyTable = (
@@ -57,20 +74,6 @@ function Test(props : TestProps) {
   const handleChange = (_ : any, newTabIndex : number) => {
     setTabPanel(newTabIndex);
   };
-
-  function ArgsToArgs(args : any) {
-    if (args == null) {
-      return null;
-    }
-    var result = [] as any[];
-    Object.keys(args).forEach(k => {
-      if (args[k] !== '') {
-        result.push(k + '=' + encodeURIComponent(args[k]));
-      }
-    });
-    return result.join('&');
-  }
-
 
   interface TabPanelProps {
     children: any
@@ -136,18 +139,20 @@ function Test(props : TestProps) {
     return null;
   }
 
-  function submit() {
+  function submit(values: any) {
     if (!currentFile) {
       return 
     }
-    var query = ArgsToArgs(args);
+    var query = ArgsToArgs(currentFile, values);
     var url = props.baseUrl + 'query/' + currentFile.path + (query == null ? '' : ('?' + query))
     console.log(url)
 
-    if (!args) {
+    if (!values) {
       return
     }
-    var dest = findDestination(args._fmt);
+    console.log('submit', values)
+    setArgs(values)
+    var dest = findDestination(values._fmt);
     if (dest && (dest.type === 'XLSX')) {
       props.window.open(url, "_blank");
     } else {
@@ -212,7 +217,7 @@ function Test(props : TestProps) {
 
 
   return (
-    <div className="h-full flex">
+    <div className="h-full flex qe-test">
       {displayDrawer && (
         <>
           <div style={{ width: drawerWidth }} className="h-full box-border " >
@@ -237,8 +242,17 @@ function Test(props : TestProps) {
                 </TreeView>
               </Box>
             </TabPanel>
-            <TabPanel value={tabPanel} index={1}>
-              { currentFile && (<Parameters baseUrl={props.baseUrl} onRequestSubmit={submit} closeable={false} pipeline={currentFile} values={args} onRequestClose={() => {}} columns={1} />) }
+            <TabPanel value={tabPanel} index={1} >
+              { currentFile && (<Parameters 
+                  baseUrl={props.baseUrl} 
+                  onRequestSubmit={submit} 
+                  closeable={false} 
+                  pipeline={currentFile} 
+                  values={args} 
+                  onRequestClose={() => {}} 
+                  columns={1} 
+                  displayUrl={true} 
+                  />) }
             </TabPanel>
           </div>
           <DragBar onChange={drawerWidthChange} />

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import {Form} from '@formio/react';
 import { components } from "../Query-Engine-Schema";
+import { ArgsToArgs } from '../Test';
+
 
 interface ParametersProps {
   baseUrl : string
@@ -10,18 +12,19 @@ interface ParametersProps {
   , pipeline: components["schemas"]["PipelineFile"]
   , values: any
   , columns: number
+  , displayUrl: boolean
 }
 
 function Parameters(props : ParametersProps) {
 
-  var [values, setValues] = useState(props.values)
-  var [highlight, setHighlight] = useState({})
-  var [rootStyle, setRootStyle] = useState({})
-
   var [form, setForm] = useState({})
-  var [curlStr, setCurlStr] = useState('')
+  var [urlStr, setUrlStr] = useState('')
+  var [values, setValue] = useState(props.values)
 
   var formObject : any
+
+  console.log('Props: ', props)
+  console.log('Values: ', values)
 
   useEffect(() => {
     fetch(props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns)
@@ -31,53 +34,11 @@ function Parameters(props : ParametersProps) {
       });
   }, []);
 
-  const closeable = props.closeable ?? true;
+  function onSubmit(submission: any) {
+    console.log('onSubmit:', submission)
 
-  var curlStr : string;
+    props.onRequestSubmit(submission.data);
 
-  function close() {
-    props.onRequestClose();
-  }
-
-  function submit() {
-    var allGood = true;
-    let h = {} as any;
-    if (props.pipeline.arguments) {
-      for (var i = 0; i < props.pipeline.arguments.length; ++i) {
-        var arg = props.pipeline.arguments[i];
-        if (!values[arg.name] && !arg.optional) {
-          h[arg.name] = true;
-          allGood = false;
-        }
-      }
-    }
-
-    if (allGood) {
-      setHighlight({});
-      props.onRequestSubmit(values);
-    } else {
-      setHighlight(h);
-      setRootStyle({ animationName: 'horizontal-shaking', animationIterationCount: '3', animationDuration: '0.05s' });
-      setTimeout(() => {
-        setRootStyle({});
-      }, 500);
-    }
-  }
-
-  const destOptions = props.pipeline.destinations == null ? [] : props.pipeline.destinations.map((value) => {
-    return { value: value.name, label: value.name };
-  });
-
-  function getOption(value : any) {
-    for (var i in destOptions) {
-      if (destOptions[i].value === value) {
-        return destOptions[i];
-      }
-    }
-  }
-
-  function onSubmit(submission: any, arg2: any, arg3: any) {
-    console.log('onSubmit:', submission, arg2, arg3)
     if (formObject) {
       formObject.emit('submitDone', submission)
     }
@@ -89,6 +50,10 @@ function Parameters(props : ParametersProps) {
 
   function onChange(submission: any) {
     console.log('Changed:', submission)
+    if (props.displayUrl) {
+      const query = ArgsToArgs(props.pipeline, submission.data);
+      setUrlStr(props.baseUrl + 'query/' + props.pipeline.path + (query == null ? '' : ('?' + query)))
+    }
   }
 
   function onError(submission: any) {
@@ -101,6 +66,9 @@ function Parameters(props : ParametersProps) {
 
   function onCustomEvent(submission: any) {
     console.log('onCustomEvent:', submission)
+    if (submission.component.key === '_cancel') {
+      props.onRequestClose();
+    }
   }
 
   function onPrevPage(submission: any) {
@@ -118,9 +86,10 @@ function Parameters(props : ParametersProps) {
 
   return (
     <>
-      <div className="relative py-1 px-4 md:px-10 bg-white shadow-md rounded border border-gray-400" style={rootStyle} >
+      <div className="relative py-1 px-4 md:px-10 bg-white shadow-md rounded border border-gray-400" >
         <Form 
           form={form}
+          submission={values}
           onSubmit={onSubmit}
           onSubmitDone={onSubmitDone}
           onChange={onChange}
@@ -131,9 +100,13 @@ function Parameters(props : ParametersProps) {
           onNextPage={onNextPage}
           formReady={formReady}
           />
-      </div>
-      <div>
-        {curlStr}
+        {
+          props.displayUrl && (
+            <div>
+              <a href={urlStr} target="_blank">Direct Link</a>
+            </div>
+          )
+        }
       </div>
     </>
   );

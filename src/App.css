@@ -40,3 +40,6 @@ body {
   font-size: 0.8rem;
 }
 
+div.qe-test .qe_formio_cancel_button {
+  display: none;
+}
