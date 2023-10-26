@@ -19,7 +19,7 @@ function Parameters(props : ParametersProps) {
 
   var [form, setForm] = useState({})
   var [urlStr, setUrlStr] = useState('')
-  var [values, setValue] = useState(props.values)
+  var [values, _] = useState(props.values)
 
   var formObject : any
 
