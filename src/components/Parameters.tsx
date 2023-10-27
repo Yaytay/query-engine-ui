@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import {Form} from '@formio/react';
+import { useState, useLayoutEffect, useRef } from 'react';
+import { Form } from '@formio/react';
+import { Formio }  from 'formiojs';
 import { components } from "../Query-Engine-Schema";
 import { ArgsToArgs } from '../Test';
 
@@ -17,31 +18,35 @@ interface ParametersProps {
 
 function Parameters(props : ParametersProps) {
 
+  Formio.requireLibrary('flatpickr-formio', 'flatpickr-formio', 'https://cdn.jsdelivr.net/npm/flatpickr');
+
   var [form, setForm] = useState({})
   var [urlStr, setUrlStr] = useState('')
-  var [values, _] = useState(props.values)
-
-  var formObject : any
-
+  var [sub, _] = useState({data: props.values})
+  
   console.log('Props: ', props)
-  console.log('Values: ', values)
+  console.log('Sub: ', sub)
 
-  useEffect(() => {
-    fetch(props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns)
-      .then((response) => response.json())
-      .then((data) => {
-        setForm(data);
-      });
-  }, []);
+  const url = useRef(props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns);
+  const lastUrl = useRef('')
+
+  useLayoutEffect(() => {
+    if (lastUrl.current !== url.current) {
+      console.log('Fetching form', url, 'not', lastUrl)
+      lastUrl.current = url.current
+      fetch(url.current)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Setting form")
+          setForm(data);
+        });
+    }
+  }, [url]);
 
   function onSubmit(submission: any) {
     console.log('onSubmit:', submission)
 
     props.onRequestSubmit(submission.data);
-
-    if (formObject) {
-      formObject.emit('submitDone', submission)
-    }
   }
 
   function onSubmitDone(submission: any) {
@@ -81,7 +86,6 @@ function Parameters(props : ParametersProps) {
 
   function formReady(webform2: any) {
     console.log('formReady:', webform2)
-    formObject = webform2
   }
 
   return (
@@ -89,7 +93,7 @@ function Parameters(props : ParametersProps) {
       <div className="relative py-1 px-4 md:px-10 bg-white shadow-md rounded border border-gray-400" >
         <Form 
           form={form}
-          submission={values}
+          submission={sub}
           onSubmit={onSubmit}
           onSubmitDone={onSubmitDone}
           onChange={onChange}
