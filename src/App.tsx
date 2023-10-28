@@ -33,13 +33,11 @@ function App() {
   const [apiUrl, setApiUrl] = useState(null as string | null);
 
   function buildApiBaseUrl() : string {
-    if (import.meta.env.MODE == 'development') {
+    if (import.meta.env.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL;
+    } else if (import.meta.env.MODE == 'development') {
       console.log(import.meta.env)
-      if (import.meta.env.VITE_API_URL) {
-        return import.meta.env.VITE_API_URL;
-      } else {
-        return 'http://localhost:8000/';
-      }
+      return 'http://localhost:8000/';
     } else {
       var url = window.location.href
       url = url.replace(/\/ui\/?.*$/,'')

@@ -1,15 +1,15 @@
-import { useState, useLayoutEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Form } from '@formio/react';
 import { Formio }  from 'formiojs';
 import { components } from "../Query-Engine-Schema";
 import { ArgsToArgs } from '../Test';
-
+import * as equal from 'fast-deep-equal/es6/react';
 
 interface ParametersProps {
   baseUrl : string
   , closeable : boolean
   , onRequestSubmit: (values : any[]) => void
-  , onRequestClose: () => void  
+  , onRequestClose?: () => void | undefined
   , pipeline: components["schemas"]["PipelineFile"]
   , values: any
   , columns: number
@@ -18,35 +18,49 @@ interface ParametersProps {
 
 function Parameters(props : ParametersProps) {
 
+  useEffect(() => {
+    console.log('Mounted Parameters')
+    return () => {
+      console.log("Unmounted Parameters");
+    };    
+  }, []);  
+
   Formio.requireLibrary('flatpickr-formio', 'flatpickr-formio', 'https://cdn.jsdelivr.net/npm/flatpickr');
 
-  var [form, setForm] = useState({})
   var [urlStr, setUrlStr] = useState('')
   var [sub, _] = useState({data: props.values})
+  const [form, setForm] = useState({})
   
   console.log('Props: ', props)
   console.log('Sub: ', sub)
 
   const url = useRef(props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns);
-  const lastUrl = useRef('')
+  const formSet = useRef({})
 
-  useLayoutEffect(() => {
-    if (lastUrl.current !== url.current) {
-      console.log('Fetching form', url, 'not', lastUrl)
-      lastUrl.current = url.current
-      fetch(url.current)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Setting form")
-          setForm(data);
-        });
-    }
-  }, [url]);
+  var webform: any
+
+  useEffect(() => {
+    console.log('Fetching form', url)
+    fetch(url.current)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Setting form', formSet.current, data, form)
+        if (!equal(formSet.current, data)) {
+          console.log("Actually setting form")
+          formSet.current = data
+          setForm(data)
+        }
+      });
+  }, [props.baseUrl, props.pipeline.path, props.columns]);
 
   function onSubmit(submission: any) {
     console.log('onSubmit:', submission)
-
     props.onRequestSubmit(submission.data);
+
+    if (webform) {
+      webform.emit('submitDone')
+    }
+
   }
 
   function onSubmitDone(submission: any) {
@@ -71,7 +85,7 @@ function Parameters(props : ParametersProps) {
 
   function onCustomEvent(submission: any) {
     console.log('onCustomEvent:', submission)
-    if (submission.component.key === '_cancel') {
+    if (submission.component.key === '_cancel' && props.onRequestClose) {
       props.onRequestClose();
     }
   }
@@ -86,8 +100,10 @@ function Parameters(props : ParametersProps) {
 
   function formReady(webform2: any) {
     console.log('formReady:', webform2)
+    webform = webform2
   }
 
+  console.log('Rendering with', form, sub)
   return (
     <>
       <div className="relative py-1 px-4 md:px-10 bg-white shadow-md rounded border border-gray-400" >

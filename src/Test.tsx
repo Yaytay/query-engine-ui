@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 import DragBar from './components/DragBar'
 import Parameters from './components/Parameters';
@@ -40,6 +40,31 @@ export function ArgsToArgs(pipeline: components["schemas"]["PipelineFile"], args
 return result.join('&');
 }
 
+interface TabPanelProps {
+  children: any
+  , value: number
+  , index: number    
+}
+
+function TabPanel({ children, value, index, ...other } : TabPanelProps) {
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
 function Test(props : TestProps) {
 
   const emptyTable = (
@@ -60,8 +85,6 @@ function Test(props : TestProps) {
     </table>
   )
 
-  // const [mobileOpen, setMobileOpen] = useState(false);
-
   const [tabPanel, setTabPanel] = useState(0);
   const [currentFile, setCurrentFile] = useState(null as components["schemas"]["PipelineFile"] | null);
   const [args, setArgs] = useState(null as any);
@@ -74,30 +97,6 @@ function Test(props : TestProps) {
   const handleChange = (_ : any, newTabIndex : number) => {
     setTabPanel(newTabIndex);
   };
-
-  interface TabPanelProps {
-    children: any
-    , value: number
-    , index: number    
-  }
-
-  function TabPanel({ children, value, index, ...other } : TabPanelProps) {
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box sx={{ p: 3 }}>
-            {children}
-          </Box>
-        )}
-      </div>
-    );
-  }
 
   const nodeMap = {} as any
   const expanded = [] as string[]
@@ -115,6 +114,7 @@ function Test(props : TestProps) {
   function fileSelected(_ : any, path : string) {
     console.log(path);
     if (nodeMap[path]) {
+      console.log('Setting current file', nodeMap[path])
       setCurrentFile(nodeMap[path]);
       const ta = {} as any
       if (nodeMap[path].arguments) {
@@ -139,7 +139,7 @@ function Test(props : TestProps) {
     return null;
   }
 
-  function submit(values: any) {
+  const submit = useCallback((values: any) => {
     if (!currentFile) {
       return 
     }
@@ -186,8 +186,8 @@ function Test(props : TestProps) {
           }
         })
     }
-
-  }
+  }, [props.baseUrl, currentFile?.path])
+  console.log('Submit callback dependencies:', props.baseUrl, currentFile?.path)
 
   const isPipelineFile = (n : components["schemas"]["PipelineNode"]) : n is components["schemas"]["PipelineFile"] => {
     return ! Array.isArray(n.children);
@@ -215,6 +215,7 @@ function Test(props : TestProps) {
     setDisplayDrawer(!displayDrawer)
   }
 
+  console.log('Rendering with', tabPanel, displayDrawer, currentFile, props.baseUrl)
 
   return (
     <div className="h-full flex qe-test">
@@ -249,7 +250,6 @@ function Test(props : TestProps) {
                   closeable={false} 
                   pipeline={currentFile} 
                   values={args} 
-                  onRequestClose={() => {}} 
                   columns={1} 
                   displayUrl={true} 
                   />) }
