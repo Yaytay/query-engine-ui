@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 import DragBar from './components/DragBar'
 import Parameters from './components/Parameters';
@@ -37,7 +37,7 @@ export function ArgsToArgs(pipeline: components["schemas"]["PipelineFile"], args
   if (args['_fmt']) {
     result.push('_fmt=' + encodeURIComponent(args['_fmt']));
   }
-return result.join('&');
+  return result.join('&');
 }
 
 interface TabPanelProps {
@@ -99,20 +99,24 @@ function Test(props : TestProps) {
   };
 
   const nodeMap = {} as any
-  const allNodes = [] as string[]
+  const allDirs = [] as string[]
 
   function AddToNodeMap(node : components["schemas"]["PipelineNode"]) {
     if (Array.isArray(node.children)) {
       node.children.forEach(n => AddToNodeMap(n));
-      allNodes.push(node.path);
+      allDirs.push(node.path);
     } else {
       nodeMap[node.path] = node;
     }
   }
   AddToNodeMap(props.available);
 
-  const [expanded, setExpanded] = useState(allNodes)
+  const [expanded, setExpanded] = useState([] as string[])
   const [selected, setSelected] = useState('')
+
+  useEffect(() => {
+    setExpanded(allDirs) 
+  }, [props.available])
 
   const handleToggle = (_: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds)
@@ -151,24 +155,25 @@ function Test(props : TestProps) {
     return null;
   }
 
-  const submit = useCallback((values: any) => {
+  function submit(values: any) : Promise<void> {
     if (!currentFile) {
-      return 
+      return Promise.resolve()
     }
     var query = ArgsToArgs(currentFile, values);
     var url = props.baseUrl + 'query/' + currentFile.path + (query == null ? '' : ('?' + query))
     console.log(url)
 
     if (!values) {
-      return
+      return Promise.resolve()
     }
     console.log('submit', values)
     setArgs(values)
     var dest = findDestination(values._fmt);
     if (dest && (dest.type === 'XLSX')) {
       props.window.open(url, "_blank");
+      return Promise.resolve()
     } else {
-      fetch(url)
+      return fetch(url)
         .then(r => {
           if (r.ok) {
             const type = r.headers.get('Content-Type');
@@ -196,9 +201,9 @@ function Test(props : TestProps) {
               setData(t);
             })
           }
-        })
+        })        
     }
-  }, [props.baseUrl, currentFile?.path])
+  }
 
   const isPipelineFile = (n : components["schemas"]["PipelineNode"]) : n is components["schemas"]["PipelineFile"] => {
     return ! Array.isArray(n.children);

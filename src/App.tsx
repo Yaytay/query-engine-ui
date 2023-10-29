@@ -109,7 +109,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div className="flex-none">
-        <Nav baseUrl={baseUrl} available={available} designMode={designMode} managementEndpoints={managementEndpoints} />
+        <Nav baseUrl={baseUrl} available={available} designMode={designMode} managementEndpoints={managementEndpoints} window={window} />
       </div>        
       <Routes>
         <Route index element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} />}></Route>

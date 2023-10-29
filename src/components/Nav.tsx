@@ -16,6 +16,7 @@ import { components } from "../Query-Engine-Schema";
 
 import { NestedDropdown, MenuItemData } from 'mui-nested-menu';
 import { ManagementEndpointType } from '../Manage';
+import { ArgsToArgs } from '../Test';
 
 var [modalIsOpen, setModalIsOpen] = [null as boolean | null, (_ : any) => {}]
 var [args, setArgs] = [null, (_ : any) => {}]
@@ -39,16 +40,12 @@ function closeModal() {
   setModalIsOpen(false);
 }
 
-function submitModal(values : any) {
-  console.log("Submitted: ", values);
-  setModalIsOpen(false);
-}
-
 interface NavProps {
   designMode: boolean
   , baseUrl: string
   , available: components["schemas"]["PipelineDir"]
   , managementEndpoints: ManagementEndpointType[] | null
+  , window: Window
 }
 
 function Nav(props : NavProps) {
@@ -60,6 +57,37 @@ function Nav(props : NavProps) {
   const handleCloseMenu = () => {
     console.log('handleCloseMenu');
   };
+
+  function submitModal(values : any): Promise<void> {
+    console.log("Submitted: ", values);
+    if (!pipeline) {
+      return Promise.resolve()
+    }
+    var query = ArgsToArgs(pipeline, values);
+    var url = props.baseUrl + 'query/' + pipeline.path + (query == null ? '' : ('?' + query))
+    console.log(url)
+  
+    if (!values) {
+      return Promise.resolve()
+    }
+    console.log('submit', values)
+    setArgs(values)
+    var w = props.window.open(url, pipeline.path)
+    if (window.location.href.startsWith(props.baseUrl)) {
+      return new Promise(function(resolve, _) {
+        if (w) {
+          w.onload = (event: Event) => {
+            console.log("Load:", event)
+            resolve()
+            setModalIsOpen(false);
+            return null
+          }
+        }
+      }); 
+    } else {
+      return Promise.resolve()
+    }
+  }
 
   if (process.env.NODE_ENV !== 'test') {
     Modal.setAppElement('#root');

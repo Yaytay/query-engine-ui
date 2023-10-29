@@ -8,7 +8,7 @@ import * as equal from 'fast-deep-equal/es6/react';
 interface ParametersProps {
   baseUrl : string
   , closeable : boolean
-  , onRequestSubmit: (values : any[]) => void
+  , onRequestSubmit: (values : any[]) => Promise<void>
   , onRequestClose?: () => void | undefined
   , pipeline: components["schemas"]["PipelineFile"]
   , values: any
@@ -55,12 +55,13 @@ function Parameters(props : ParametersProps) {
 
   function onSubmit(submission: any) {
     console.log('onSubmit:', submission)
-    props.onRequestSubmit(submission.data);
-
-    if (webform) {
-      webform.emit('submitDone')
-    }
-
+    props.onRequestSubmit(submission.data)
+      .then((_) => {
+          if (webform) {
+            webform.emit('submitDone')
+          }
+        }
+      )
   }
 
   function onSubmitDone(submission: any) {
