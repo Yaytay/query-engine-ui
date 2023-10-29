@@ -10,8 +10,8 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import TreeItem from '@mui/lab/TreeItem';
-import TreeView from '@mui/lab/TreeView';
+import { TreeView } from '@mui/x-tree-view/TreeView'
+import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { useParams, useNavigate } from 'react-router-dom'
 
@@ -104,7 +104,7 @@ export function Manage(props : ManagementProps) {
     setDisplayDrawer(!displayDrawer)
   }
 
-
+  console.log(props)
   return (
     <div className="h-full flex">
       {displayDrawer && (

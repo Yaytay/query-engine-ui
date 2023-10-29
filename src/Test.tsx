@@ -11,8 +11,8 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import TreeItem from '@mui/lab/TreeItem';
-import TreeView from '@mui/lab/TreeView';
+import { TreeView } from '@mui/x-tree-view/TreeView'
+import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import DOMPurify from 'dompurify';
 import { components } from "./Query-Engine-Schema";
@@ -99,19 +99,31 @@ function Test(props : TestProps) {
   };
 
   const nodeMap = {} as any
-  const expanded = [] as string[]
+  const allNodes = [] as string[]
 
   function AddToNodeMap(node : components["schemas"]["PipelineNode"]) {
     if (Array.isArray(node.children)) {
       node.children.forEach(n => AddToNodeMap(n));
-      expanded.push(node.path);
+      allNodes.push(node.path);
     } else {
       nodeMap[node.path] = node;
     }
   }
   AddToNodeMap(props.available);
 
-  function fileSelected(_ : any, path : string) {
+  const [expanded, setExpanded] = useState(allNodes)
+  const [selected, setSelected] = useState('')
+
+  const handleToggle = (_: React.SyntheticEvent, nodeIds: string[]) => {
+    setExpanded(nodeIds)
+  };
+
+  const handleSelect = (_: React.SyntheticEvent, nodeId: string) => {
+    setSelected(nodeId)
+    fileSelected(nodeId)
+  };
+
+  function fileSelected(path : string) {
     console.log(path);
     if (nodeMap[path]) {
       console.log('Setting current file', nodeMap[path])
@@ -187,7 +199,6 @@ function Test(props : TestProps) {
         })
     }
   }, [props.baseUrl, currentFile?.path])
-  console.log('Submit callback dependencies:', props.baseUrl, currentFile?.path)
 
   const isPipelineFile = (n : components["schemas"]["PipelineNode"]) : n is components["schemas"]["PipelineFile"] => {
     return ! Array.isArray(n.children);
@@ -235,8 +246,10 @@ function Test(props : TestProps) {
                   defaultCollapseIcon={<FolderOpen />}
                   defaultExpandIcon={<Folder />}
                   defaultEndIcon={<Article />}
-                  defaultExpanded={expanded}
-                  onNodeSelect={fileSelected}
+                  expanded={expanded}
+                  selected={selected}
+                  onNodeToggle={handleToggle}
+                  onNodeSelect={handleSelect}
                   sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                 >
                   {props.available.children.map((node) => renderTree(node))}

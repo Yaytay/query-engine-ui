@@ -15,8 +15,8 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import SaveIcon from '@mui/icons-material/Save';
 import Snackbar from '@mui/material/Snackbar';
 import Tooltip from '@mui/material/Tooltip';
-import TreeItem from '@mui/lab/TreeItem';
-import TreeView from '@mui/lab/TreeView';
+import { TreeView } from '@mui/x-tree-view/TreeView'
+import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { components } from "./Query-Engine-Schema";
 import { SchemaMapType, buildSchema } from "./SchemaType";
@@ -30,7 +30,6 @@ interface DesignProps {
 function Design(props : DesignProps) {
 
   const [files, setFiles] = useState(null as components["schemas"]["DesignNode"] | null)
-  const [expanded, setExpanded] = useState([] as string[])
   const [nodeMap, setNodeMap] = useState(null as Map<string, components["schemas"]["DesignNode"]> | null)
 
   const [snackOpen, setSnackOpen] = useState(false)
@@ -212,7 +211,7 @@ function Design(props : DesignProps) {
       })
   }
 
-  function fileSelected(_ : any, nodeId : string) {
+  function fileSelected(nodeId : string) {
     var node = nodeMap && nodeMap.get(nodeId)
     if (node && isFile(node)) {
       setCurrentFile(node);
@@ -311,9 +310,17 @@ function Design(props : DesignProps) {
     handleResponse(fetch(url, { method: 'DELETE' }));
   }
 
-  function nodeToggled(_ : any, nodeIds : string[]) {
+  const [expanded, setExpanded] = useState([] as string[])
+  const [selected, setSelected] = useState('')
+
+  const handleToggle = (_: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds)
-  }
+  };
+
+  const handleSelect = (_: React.SyntheticEvent, nodeId: string) => {
+    setSelected(nodeId)
+    fileSelected(nodeId)
+  };
 
   function fileDrawerWidthChange(w : number) {
     if (w > 400) {
@@ -380,13 +387,13 @@ function Design(props : DesignProps) {
             <div className="grow flex flex-col">
               <TreeView
                 aria-label="file system navigator"
-                multiSelect={false}
                 defaultCollapseIcon={<FolderOpen />}
                 defaultExpandIcon={<Folder />}
                 defaultEndIcon={<Article />}
                 expanded={expanded}
-                onNodeSelect={fileSelected}
-                onNodeToggle={nodeToggled}
+                selected={selected}
+                onNodeToggle={handleToggle}
+                onNodeSelect={handleSelect}
                 sx={{ height: '100%', flexGrow: 1, maxWidth: '100%', overflowY: 'auto' }}
               >
                 {files && renderTree(files)}

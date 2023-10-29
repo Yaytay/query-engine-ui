@@ -10,8 +10,8 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import TreeItem from '@mui/lab/TreeItem';
-import TreeView from '@mui/lab/TreeView';
+import { TreeView } from '@mui/x-tree-view/TreeView'
+import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { components } from "./Query-Engine-Schema"
 import { useParams, useNavigate } from 'react-router-dom'
@@ -76,19 +76,31 @@ function Help(props : HelpProps) {
   }
 
   const nodeMap = {} as any
-  const expanded = [] as string[]
+  const allNodes = [] as string[]
 
   function AddToNodeMap(node : components["schemas"]["DocNode"]) {
     if (Array.isArray(node.children)) {
       node.children.forEach(n => AddToNodeMap(n));
-      expanded.push(node.path);
+      allNodes.push(node.path);
     } else {
       nodeMap[node.path] = node;
     }
   }
   AddToNodeMap(props.docs);
 
-  function fileSelected(_ : any, path : string) {
+  const [expanded, setExpanded] = useState(allNodes)
+  const [selected, setSelected] = useState('')
+
+  const handleToggle = (_: React.SyntheticEvent, nodeIds: string[]) => {
+    setExpanded(nodeIds)
+  };
+
+  const handleSelect = (_: React.SyntheticEvent, nodeId: string) => {
+    setSelected(nodeId)
+    fileSelected(nodeId)
+  };
+
+  function fileSelected(path : string) {
     navigate('/ui/help/' + path);
   }
 
@@ -140,8 +152,10 @@ function Help(props : HelpProps) {
                   defaultCollapseIcon={<FolderOpen />}
                   defaultExpandIcon={<Folder />}
                   defaultEndIcon={<Article />}
-                  defaultExpanded={expanded}
-                  onNodeSelect={fileSelected}
+                  expanded={expanded}
+                  selected={selected}
+                  onNodeToggle={handleToggle}
+                  onNodeSelect={handleSelect}
                   sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                 >
                   {props.docs.children && props.docs.children.map((node) => renderTree(node))}
