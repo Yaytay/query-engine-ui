@@ -74,7 +74,15 @@ function App() {
       fetch(murl)
         .then(r => r.json())
         .then(j => {
-          setManagementEndpoints(j);
+          if (j.location) {
+            fetch(j.location)
+            .then(r => r.json())
+            .then(j => {
+              setManagementEndpoints(j);
+            })
+          } else {
+            setManagementEndpoints(j);
+          }
         })
       let apidocurl = new URL(baseUrl + 'openapi');
       fetch(apidocurl)
