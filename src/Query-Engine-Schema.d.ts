@@ -8,33 +8,9 @@
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 export interface paths {
-  "/api/design/file/{path}": {
-    /** @description Return the contents of file. */
-    get: operations["getFile"];
-    /** @description Create a new file or folder. */
-    put: operations["putFile"];
-    /** @description Delete a file or folder. */
-    delete: operations["deleteFile"];
-  };
-  "/api/design/all": {
-    /** @description Return a list of all files and directories known */
-    get: operations["getAll"];
-  };
-  "/api/design/enabled": {
-    /** @description Return a single 'true', in order to check whether deisng mode is enabled */
-    get: operations["getEnabled"];
-  };
-  "/api/design/pipeline/{path}": {
-    /** @description Return the source of a pipeline. */
-    get: operations["getPipeline"];
-  };
-  "/api/design/rename/{path}": {
-    /** @description Rename a file or folder. */
-    post: operations["renameFile"];
-  };
-  "/api/design/validate": {
-    /** @description Validate a pipeline. */
-    post: operations["validate"];
+  "/api/auth-config": {
+    /** @description Return details of the available OAuth providers */
+    get: operations["get"];
   };
   "/api/docs": {
     /** @description Return a tree of available  documentation */
@@ -52,30 +28,32 @@ export interface paths {
     /** @description Return a list of available pipelines */
     get: operations["getAvailable_1"];
   };
+  "/api/session/profile": {
+    /** @description Return details of the current user */
+    get: operations["getProfile"];
+  };
 }
 
 export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
-    DesignDir: {
-      name: string;
-      children: components["schemas"]["DesignNode"][];
-      path: string;
-      /** Format: date-time */
-      modified: string;
+    AuthConfig: {
+      name?: string;
+      logo?: string;
     };
-    DesignFile: WithRequired<components["schemas"]["DesignNode"] & {
-      /** Format: int64 */
-      size?: number;
-    }, "modified" | "name" | "path" | "size">;
-    DesignNode: {
+    DocDir: WithRequired<components["schemas"]["DocNode"] & {
+      children?: components["schemas"]["DocNode"][];
+    }, "children" | "name" | "path">;
+    DocFile: WithRequired<components["schemas"]["DocNode"] & {
+      title?: string;
+    }, "name" | "path" | "title">;
+    DocNode: {
       name: string;
-      children?: components["schemas"]["DesignNode"][];
+      children?: components["schemas"]["DocNode"][];
       path: string;
-      /** Format: date-time */
-      modified: string;
     };
+    Form: unknown;
     /**
      * @description <P>
      * An Argument represents a named piece of data that will be passed in to a pipepline.
@@ -286,285 +264,6 @@ export interface components {
       label?: string;
     };
     /**
-     * @description <P>
-     * Conditions are expressions using <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> that control access to something.
-     * <P>
-     * Conditions can be applied to entire directories (in the permissions.jexl file); to Pipelines or to Endpoints.
-     * <P>
-     * The context of a Condition includes a variable called &quot;req&quot; that includes:
-     * <UL>
-     * <LI>requestId
-     * A unique ID for the request.  If Distributed Tracing is enabled this will be the Span ID, otherwise it will be a random UUID.
-     * <LI>String url
-     * The full URL of the request.
-     * <LI>host
-     * The host extracted from the URL.
-     * <LI>arguments
-     * A <A href="https://vertx.io/docs/apidocs/io/vertx/core/MultiMap.html" target="_blacnk">MultiMap</A> of query string arguments.
-     * <LI>headers
-     * A <A href="https://vertx.io/docs/apidocs/io/vertx/core/MultiMap.html" target="_blacnk">MultiMap</A> of request headers.
-     * <LI>cookies
-     * A map of request cookies.
-     * <LI>clientIp
-     * The IP address of client making the request, taken from the first of:
-     * <UL>
-     * <LI>The X-Cluster-Client-IP header.
-     * <LI>The X-Forwarded-For header.
-     * <LI>The actual IP address making the TCP connection.
-     * </UL>
-     * <LI>jwt
-     * The <A href="https://jwt.io/" target="_blank">Json Web Token</A> associated with the request, if any.
-     * <LI>clientIpIsIn
-     * A function that receives an array of IP addresses or subnets (in slash notation) and returns true if the clientIp matches any of them.
-     * </UL>
-     * <P>
-     * A condition should return either the boolean true or false.
-     * In addition if it returns the string "true" it will be considered to be true.
-     * Any other return value will be considered false.
-     * <P>
-     * Some examples Conditions are
-     * <UL>
-     * <LI><pre>req != null</pre>
-     * Checks that the request context is not null, pretty useless in a live environment.
-     * <LI><PRE>req.clientIpIsIn('127.0.0.1/32','172.17.0.1/16','0:0:0:0:0:0:0:1')</PRE>
-     * Checks that the client IP address is either localhost or in "172.17.0.0/16".
-     * <LI><PRE>req.host == 'localhost'</PRE>
-     * Checks that the host on the request is localhost.
-     * </UL>
-     */
-    Condition: {
-      expression?: string;
-    };
-    /**
-     * @description <P>
-     * Represents a pipeline that can used to generate endpoints before the main pipeline is run.
-     * </P>
-     * <P>
-     * The expected use is for the source to query a database that contains connection strings (in vertx format, not JDBC format)
-     * based on information contained in the request (usually extracted from a JWT).
-     * In this way a single pipeline can support multiple databases based upon request content.
-     * </P>
-     * <P>
-     * Most of the properties of the DynamicEndpointSource have default values and any fields that do not exist in the
-     * results stream from the source pipeline will be silently ignored, so the DynamicEndpointSource usually requires minimal configuration.
-     * </P>
-     * <P>
-     * If generated endpoints have a condition they will be silently dropped unless the condition is met.
-     * All remaining endpoints generated by the DynamicEndpointSource will be added to the endpoints usable by the outer query in the order they are returned by the source.
-     * If endpoints do not have unique keys this does mean that later ones will overwrite earlier ones.
-     * </P>
-     * <P>
-     * The original endpoints that existed before the DynamicEndpointSource do not have special protection
-     * , if the DynamicEndpointSource generates endpoints with the same key as existing endpoints they will be overwritten.
-     * </P>
-     * <P>
-     * Storing credentials unencrypted in a database is not ideal security, but it's better than putting them in a git repository.
-     * The recommendation would be to not start storing credentials in a database in order to satisfy the needs of the Query Engine,
-     * but if the credentials are already there then there is no reason to avoid using them.
-     * </P>
-     */
-    DynamicEndpoint: {
-      /**
-       * @description <P>Get the pipeline used to generate the endpoints.</P>
-       * <P>
-       * This pipeline can only use endpoints already in existence.
-       * This usually means those defined statically in the outer pipeline, but there is nothing to prevent a series of DynamicEndpointSource configurations
-       * with later ones using endpoints generated in earlier ones.
-       * </P>
-       * <P>
-       * If the data stream generated by the source is missing any fields those fields will be silently set to null in the generated endpoint.
-       * This means that the default configuration is usually adequate, just requiring key/keyField and source.
-       * </P>
-       * <P>
-       * A DynamicEndpointSource may return multiple endpoints.
-       * If multiple endpoints are returned all of those that pass their conditions will be added to the pipeline.
-       * For efficiency reasons the pipeline used in the DynamicEndpointSource should return as few endpoints as possible.
-       * </P>
-       * <P>
-       * If multiple endpoints are returned they should specify the keyField and have a unique key for each endpoint.
-       * In the absence of this all the key value will be used for all of the endpoints and only the last will be accessible.
-       * </P>
-       */
-      input: components["schemas"]["SourcePipeline"];
-      /**
-       * @description <P>The key used to identify all endpoints found by this DynamicEndpointSource.</P>
-       * <P>
-       * To be used when the source is only going to return a single endpoint and the key is not part of the query.
-       * There is no default value, either key or the keyField must be set.
-       * </P>
-       */
-      key?: string;
-      /**
-       * @description <P>The name of the field that will contain the type of each endpoint.</P>
-       *
-       * @default type
-       */
-      typeField?: string;
-      /**
-       * @description <P>The name of the field that will contain the key for each endpoint.</P>
-       * <P>
-       * There is no default value, either key or the keyField must be set.
-       * </P>
-       */
-      keyField?: string;
-      /**
-       * @description <P>The name of the field that will contain the URL for each endpoint.</P>
-       * <P>
-       * Note that it is entirely valid for both urlField and urlTemplateField to have values
-       * , but if the pipeline produces rows in which both fields have values the resulting Endpoint
-       * will be invalid.
-       * </P>
-       *
-       * @default url
-       */
-      urlField?: string;
-      /**
-       * @description <P>The name of the field that will contain the URL template for each endpoint.</P>
-       * <P>
-       * Note that it is entirely valid for both urlField and urlTemplateField to have values
-       * , but if the pipeline produces rows in which both fields have values the resulting Endpoint
-       * will be invalid.
-       * </P>
-       *
-       * @default urlTemplate
-       */
-      urlTemplateField?: string;
-      /**
-       * @description <P>The name of the field that will contain the secret for each endpoint.</P>
-       * <P>
-       * Note that it is entirely valid for both secretField and usernameField/passwordField to have values
-       * , but if the pipeline produces rows in which both secretField and either of the other two have values
-       * the resulting Endpoint will be invalid.
-       * </P>
-       *
-       * @default secret
-       */
-      secretField?: string;
-      /**
-       * @description <P>The name of the field that will contain the username for each endpoint.</P>
-       * <P>
-       * Note that it is entirely valid for both secretField and usernameField/passwordField to have values
-       * , but if the pipeline produces rows in which both secretField and either of the other two have values
-       * the resulting Endpoint will be invalid.
-       * </P>
-       *
-       * @default username
-       */
-      usernameField?: string;
-      /**
-       * @description <P>The name of the field that will contain the password for each endpoint.</P>
-       * <P>
-       * Note that it is entirely valid for both secretField and usernameField/passwordField to have values
-       * , but if the pipeline produces rows in which both secretField and either of the other two have values
-       * the resulting Endpoint will be invalid.
-       * </P>
-       *
-       * @default password
-       */
-      passwordField?: string;
-      /**
-       * @description <P>The name of the field that will contain the condition for each endpoint.</P>
-       *
-       * @default condition
-       */
-      conditionField?: string;
-    };
-    /**
-     * @description <P>Definition of an endpoint that can be used for querying data.</P>
-     * <P>
-     * An Endpoint represents a connection to a data source, where a Source represents an actual data query.
-     * For EndpointType.HTTP Sources there is often a one-to-one relationship between Source and Endpoint, but for EndpointType.SQL Sources there
-     * are often multiple Sources for a single Endpoint (for SQL a Source is a query and an Endpoint is a database).
-     * </P>
-     * <P>
-     * The credentials for an Endpoint can be specified in three ways:
-     * <ul>
-     * <li>By including them in the URL specified in the Endpoint definition.
-     * This is the least secure option as the URL value will be written to log entries.
-     * <li>By explicitly setting username/password on the Endpoint.
-     * The password will not be logged, but will be in your configuration files and thus in your source repo.
-     * <li>By using secrets set in the configuration of the query engine.
-     * This is the most secure option as it puts the responsibility on the deployment to protect the credentials.
-     * </ul>
-     * </P>
-     * <P>
-     * If the secret field is set it will take precedence over both the username and the password set in the Endpoint
-     * , as a result it is not valid to set either username or password at the same time as secret.
-     * The same does not apply to the condition field, that can be set on both the Endpoint and the Secret (and both conditions
-     * must be met for the Endpoint to work).
-     * </P>
-     */
-    Endpoint: {
-      /**
-       * @description <P>The type of Endpoint being configured</P>
-       *
-       * @enum {string}
-       */
-      type: "SQL" | "HTTP";
-      /**
-       * @description <P>A URL that defines the Endpoint.</P>
-       * <P>
-       * Invalid if the URL template field is provided.
-       * </P>
-       * <P>
-       * For security reasons the URL should not contain credentials - the URL may be logged but the username and password
-       * fields of the Endpoint will not be.
-       * </P>
-       */
-      url?: string;
-      /**
-       * @description <P>A StringTemplate that will be evaluated as the URL that defines the Endpoint.</P>
-       * <P>
-       * Invalid if the URL field is provided.
-       * </P>
-       * <P>
-       * For security reasons the URL should not contain credentials - the URL may be logged but the username and password
-       * fields of the Endpoint will not be.
-       * </P>
-       */
-      urlTemplate?: string;
-      /**
-       * @description <P>The name of the secret that contains the credentials to be used for the connection.</P>
-       * <P>
-       * Invalid if the username or password fields are provided.
-       * </P>
-       * <P>
-       * The named secret must be configured in the instance of the query engine.
-       * The currently running instance is in design mode and thus should not be your live instance,
-       * which unfortuantely means it is not possible to list the known secrets of your live instance here.
-       * Please ask your systems administrator for this information.
-       * </P>
-       */
-      secret?: string;
-      /**
-       * @description <P>The username that should be used when communicating with the endpoint.</P>
-       * <P>
-       * Invalid if the secret field  provided.
-       * </P>
-       * <P>
-       * The username will be logged.
-       * </P>
-       */
-      username?: string;
-      /**
-       * @description <P>The password that should be used when communicating with the endpoint.</P>
-       * <P>
-       * Invalid if the secret field  provided.
-       * </P>
-       * <P>
-       * The password will not be logged.
-       * </P>
-       * <P>
-       * Any password entered here will inevitably end up in your pipeline repo.
-       * This is not a security best practice.
-       * Please use secrets instead of username/password for live deployments.
-       * </P>
-       */
-      password?: string;
-      /** @description <P>A condition that must be passed for the endpoint to be used.</P> */
-      condition?: components["schemas"]["Condition"];
-    };
-    /**
      * @description <P>The configuration for the final WriteStream of a pipeline.</P>
      * <P>
      * Typically the final WriteStream is the HttpResponse.
@@ -601,25 +300,6 @@ export interface components {
      */
     Format: {
       /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       */
-      mediaType?: unknown;
-      /**
-       * @description <P>The extension of the format.</P>
-       * <P>
-       * The extension is only used to determine the format based upon the URL path.
-       * If multiple formats have the same extension the first in the list will be used.
-       * </P>
-       */
-      extension?: string;
-      /**
        * @description <P>The name of the format.</P>
        * <P>
        * The name is used to determine the format based upon the '_fmt' query string argument.
@@ -638,6 +318,25 @@ export interface components {
        * @enum {string}
        */
       type: "JSON" | "XLSX" | "Delimited" | "HTML";
+      /**
+       * @description <P>The extension of the format.</P>
+       * <P>
+       * The extension is only used to determine the format based upon the URL path.
+       * If multiple formats have the same extension the first in the list will be used.
+       * </P>
+       */
+      extension?: string;
+      /**
+       * @description <P>The media type of the format.</P>
+       * <P>
+       * The media type is used to determine the format based upon the Accept header in the request.
+       * If multiple formats have the same media type the first in the list will be used.
+       * </P>
+       * <P>
+       * The media type will also be set as the Content-Type header in the response.
+       * </P>
+       */
+      mediaType?: unknown;
     };
     FormatDelimited: WithRequired<{
       type: "Delimited";
@@ -880,400 +579,12 @@ export interface components {
        */
       fontSize?: number;
     };
+    ImmutableListArgument: components["schemas"]["Argument"][];
+    ImmutableListFormat: components["schemas"]["Format"][];
     ImmutableMapStringFormatXlsxColumn: {
       [key: string]: components["schemas"]["FormatXlsxColumn"];
     };
     MediaType: unknown;
-    /**
-     * @description <P>The Pipeline is the fundamental unit of processing in QueryEngine.</P>
-     * <P>
-     *  A single Pipeline takes data from a single Source, passes it through any number of Processors and finally delivers it to a Format.
-     *  The Processors within a Pipeline may pull in data from other Sources.
-     * </P>
-     * <P>
-     * A Source usually requires an Endpoint to tell it where to get the data from.
-     * This separation allows the same query to be used against multiple databases (potentially dynamically defined).
-     * </P>
-     * <P>
-     * A minimal Pipeline, therefore, must consist of at least a Source and a Format, and usually an Endpoint (unless using the Test Source).
-     * </P>
-     * <P>
-     * Pipelines may be considered either Interactive or Non-Interactive.
-     * The user of an Interactive Pipeline always runs the Pipeline via a form, and does not need to consider the actual URL being used at all.
-     * A Non-Interactive Pipeline is either used programatically or by being configured in some client system (such as PowerBI).
-     * A Non-Interactive Pipeline can be distinguished by the user having to know or construct the URL for it at some point.
-     * The distinctino is irrelevant to the Query Engine itself, but can help when configuring Pipelines.
-     */
-    Pipeline: {
-      /**
-       * @description <P>
-       * The query for the pipeline.
-       * </P>
-       */
-      source: components["schemas"]["Source"];
-      processors?: components["schemas"]["Processor"][];
-      /**
-       * @description <P>
-       * The title of the Pipeline that will be used in the UI in preference to the filename.
-       * </P>
-       * <P>
-       * The title is optional, but should usually be provided, particularly for Interactive Pipelines.
-       * </P>
-       */
-      title?: string;
-      /**
-       * @description <P>
-       * A description of the Pipeline that will be used in the UI to provide information to the user.
-       * </P>
-       * <P>
-       * The description is optional, but should always be provided.
-       * </P>
-       * <P>
-       * The description is optional should be kept relatively short as it will be included, in full, in the parameter gathering form for Interactive Pipelines.
-       * </P>
-       */
-      description?: string;
-      /**
-       * @description <P>
-       * A condition that constrains who can use the Pipeline.
-       * </P>
-       */
-      condition?: components["schemas"]["Condition"];
-      /**
-       * @description <P>
-       * A rate limit rule constrains how frequently pipelines can be run.
-       * </P>
-       */
-      rateLimitRules?: components["schemas"]["RateLimitRule"][];
-      arguments?: components["schemas"]["Argument"][];
-      /**
-       * @description <P>
-       * Endpoints are the actual providers of data to the Pipeline.
-       * Most Sources (all except the TestSource) work through an Endpoint.
-       * </P>
-       * <P>
-       * The segregation between Source and Endpoint allows a single Source to work with multiple Endpoints.
-       * </P>
-       */
-      sourceEndpoints?: {
-        [key: string]: components["schemas"]["Endpoint"];
-      };
-      dynamicEndpoints?: components["schemas"]["DynamicEndpoint"][];
-      formats?: components["schemas"]["Format"][];
-    };
-    /** @description Processors modify the data stream in flight. */
-    Processor: {
-      /**
-       * @description <P>The type of Processor being configured.</P>
-       *
-       * @enum {string}
-       */
-      type: "LIMIT" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "SCRIPT";
-    };
-    /**
-     * @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
-     *
-     * Two child pipelines must be defined:
-     * <ul>
-     * <li>The definition  pipeline, that is queried in its entirety at the beginning and that defines the columns that will be found.
-     * <li>The values pipeline, that is queried in parallel with the main stream and the supplies the data for the dynamic columns.
-     * </il>
-     */
-    ProcessorDynamicField: WithRequired<{
-      type: "DYNAMIC_FIELD";
-    } & Omit<components["schemas"]["Processor"], "type"> & {
-      innerJoin?: boolean;
-      fieldIdColumn?: string;
-      fieldNameColumn?: string;
-      fieldTypeColumn?: string;
-      fieldColumnColumn?: string;
-      parentIdColumn?: string;
-      valuesParentIdColumn?: string;
-      valuesFieldIdColumn?: string;
-      fieldDefns?: components["schemas"]["SourcePipeline"];
-      fieldValues?: components["schemas"]["SourcePipeline"];
-    }, "type">;
-    ProcessorGroupConcat: WithRequired<{
-      type: "GROUP_CONCAT";
-    } & Omit<components["schemas"]["Processor"], "type"> & {
-      input?: components["schemas"]["SourcePipeline"];
-      innerJoin?: boolean;
-      parentIdColumn?: string;
-      childIdColumn?: string;
-      childValueColumn?: string;
-      parentValueColumn?: string;
-      delimiter?: string;
-    }, "type">;
-    ProcessorLimit: WithRequired<{
-      type: "LIMIT";
-    } & Omit<components["schemas"]["Processor"], "type"> & {
-      /** Format: int32 */
-      limit?: number;
-    }, "type">;
-    ProcessorScript: WithRequired<{
-      type: "SCRIPT";
-    } & Omit<components["schemas"]["Processor"], "type"> & {
-      language?: string;
-      predicate?: string;
-      process?: string;
-    }, "type">;
-    /**
-     * @description <p>A definition of a rule that prevents a pipeline from running if previous runs that match the scope and time limit exceed the byte count.</p>
-     * <p>Note that rate limit rules are only evaluated before running a pipeline and do not take the current run into consideration at all.</p>
-     * <p>
-     * * As an example a rateLimit defined as:
-     * <pre>
-     * * scope: [ "username", "path" ]
-     * * timeLimit: PT10M
-     * * byteLimit: 10000000
-     * </pre>
-     * says that if the current user has executed the current pipeline (same path) within the past ten minutes generating more than ten million bytes then this request should be refused.
-     * </p>
-     * <p>
-     * Refused requests result in an HTTP status code 429 ("Too Many Requests").
-     * The body of the response will indicate whether the failure was caused by a RateLimit or a ConcurrencyRule but will not give further details.
-     * </p>
-     */
-    RateLimitRule: {
-      scope?: ("host" | "path" | "clientip" | "username")[];
-      /**
-       * @description <P>The duration of the rate limit.</P>
-       * <P>Expressions in ISO8601 time period notication (e.g. PT10M for ten minutes).</P>
-       */
-      timeLimit: {
-        /** Format: int64 */
-        seconds?: number;
-        positive?: boolean;
-        negative?: boolean;
-        zero?: boolean;
-        /** Format: int32 */
-        nano?: number;
-      };
-      runLimit?: string;
-      /** @description <P>The limit on the number of bytes that may be been sent by previous runs.</P> */
-      byteLimit: string;
-      /** Format: int32 */
-      concurrencyLimit?: number;
-      /** Format: int64 */
-      parsedRunLimit?: number;
-      /** Format: int64 */
-      parsedByteLimit?: number;
-    };
-    Source: {
-      /**
-       * @description <P>Get the name of the Source, that will be used in logging.</P>
-       * <P>
-       * This is optional, if it is not set a numeric (or delimited numeric) name will be allocated.
-       * </P>
-       */
-      name?: string;
-      /**
-       * @description <P>The type of Source being configured.</P>
-       *
-       * @enum {string}
-       */
-      type: "TEST" | "SQL" | "HTTP";
-    };
-    /**
-     * @description <P>A SourcePipeline is the core part of a Pipeline, without the globally defined elements.</P>
-     * <P>
-     * A SourcePipeline cannot be directly referenced externally, but is used within a Pipeline to declare the source and processing of the data.
-     * </P>
-     * <P>
-     * Every Pipeline is also a SourcePipeline.
-     * </P>
-     */
-    SourcePipeline: {
-      /**
-       * @description <P>
-       * The query for the pipeline.
-       * </P>
-       */
-      source: components["schemas"]["Source"];
-      processors?: unknown;
-    };
-    SourceSql: WithRequired<{
-      type: "SQL";
-    } & Omit<components["schemas"]["Source"], "type"> & {
-      /**
-       * @description <P>The name of the endpoint that provides the data for the Source.</P>
-       * <P>
-       * The endpoint represents with the HTTP endpoint or the SQL database that contains the actual data.
-       * </P>
-       * <P>
-       * The endpoint must be specified as either a straight name (this field) or as a template value (endpointEmplate).
-       * If both fields are provided it is an error.
-       * </P>
-       */
-      endpoint?: string;
-      /**
-       * @description <P>A templated version of the name of the endpoint that provides the data for the Source.</P>
-       * <P>
-       * The endpoint represents with the HTTP endpoint or the SQL database that contains the actual data.
-       * </P>
-       * <P>
-       * The endpoint must be specified as either a template value (this field) or as a straight name (endpoint).
-       * If both fields are provided it is an error.
-       * </P>
-       */
-      endpointTemplate?: string;
-      /**
-       * @description <P>The query to run against the Endpoint.</P>
-       * <P>
-       * A SQL statement.
-       * </P>
-       */
-      query?: string;
-      /**
-       * Format: int32
-       * @description <P>The number of rows to get from the Source at a time.</P>
-       * <P>
-       * A larger streaming fetch size will slow the initial data, but may be quicker overall (at the cost of more memory).
-       * Experiment with values in the range 10-1000.
-       * </P>
-       */
-      streamingFetchSize?: number;
-      /**
-       * Format: int32
-       * @description <P>The maxmimum number of connections to open to the Endpoint.</P>
-       * <P>
-       * If there are likely to be multiple concurrent pipelines running to the same Endpoint it can be beneficial to set this to a small number, otherwise leave it at the default.
-       * </P>
-       */
-      maxPoolSize?: number;
-      /**
-       * Format: int32
-       * @description <P>The maxmimum number of connections have queued up for the Endpoint.</P>
-       * <P>
-       * This is unlikely to be useful.
-       * </P>
-       */
-      maxPoolWaitQueueSize?: number;
-      /**
-       * @description <P>The idle timeout for the connection pool that will be created.</P>
-       * <P>
-       * After this time has passed the connection will be closed and a new one will be opened by subequent pipelines.
-       * </P>
-       * <P>
-       * The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
-       * The sections have suffixes in ASCII of "D", "H", "M" and "S" for days, hours, minutes and seconds, accepted in upper or lower case.
-       * The suffixes must occur in order.
-       * The ASCII letter "T" must occur before the first occurrence, if any, of an hour, minute or second section.
-       * At least one of the four sections must be present, and if "T" is present there must be at least one section after the "T".
-       * The number part of each section must consist of one or more ASCII digits.
-       * The number of days, hours and minutes must parse to an long.
-       * The number of seconds must parse to an long with optional fraction.
-       * The decimal point may be either a dot or a comma.
-       * The fractional part may have from zero to 9 digits.
-       * </P>
-       * <P>
-       * The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
-       * </P>
-       */
-      idleTimeout?: {
-        /** Format: int64 */
-        seconds?: number;
-        units?: {
-            timeBased?: boolean;
-            dateBased?: boolean;
-            duration?: {
-              /** Format: int64 */
-              seconds?: number;
-              positive?: boolean;
-              negative?: boolean;
-              zero?: boolean;
-              /** Format: int32 */
-              nano?: number;
-            };
-            durationEstimated?: boolean;
-          }[];
-        positive?: boolean;
-        negative?: boolean;
-        zero?: boolean;
-        /** Format: int32 */
-        nano?: number;
-      };
-      /**
-       * @description <P>The idle timeout for the connection pool that will be created.</P>
-       * <P>
-       * After this time has passed the connection will be closed and a new one will be opened by subequent pipelines.
-       * </P>
-       * <P>
-       * The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
-       * The sections have suffixes in ASCII of "D", "H", "M" and "S" for days, hours, minutes and seconds, accepted in upper or lower case.
-       * The suffixes must occur in order.
-       * The ASCII letter "T" must occur before the first occurrence, if any, of an hour, minute or second section.
-       * At least one of the four sections must be present, and if "T" is present there must be at least one section after the "T".
-       * The number part of each section must consist of one or more ASCII digits.
-       * The number of days, hours and minutes must parse to an long.
-       * The number of seconds must parse to an long with optional fraction.
-       * The decimal point may be either a dot or a comma.
-       * The fractional part may have from zero to 9 digits.
-       * </P>
-       * <P>
-       * The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
-       * </P>
-       */
-      connectionTimeout?: {
-        /** Format: int64 */
-        seconds?: number;
-        units?: {
-            timeBased?: boolean;
-            dateBased?: boolean;
-            duration?: {
-              /** Format: int64 */
-              seconds?: number;
-              positive?: boolean;
-              negative?: boolean;
-              zero?: boolean;
-              /** Format: int32 */
-              nano?: number;
-            };
-            durationEstimated?: boolean;
-          }[];
-        positive?: boolean;
-        negative?: boolean;
-        zero?: boolean;
-        /** Format: int32 */
-        nano?: number;
-      };
-      /**
-       * @description <P>If set to true all double quotes in the query will be replaced with the identifier quoting character for the target.</P>
-       * <P>
-       * If the native quoting character is already a double quote no replacement will take place.
-       * </P>
-       * <P>
-       * This enables queries for all database platforms to be defined using double quotes for identifiers, but it is a straight replacement
-       * so if the query needs to contain a double quote that is not quoting an identifier then this must be set to false.
-       * </P>
-       * <P>
-       * This is only useful when it is not known what flavour of database is being queried, which should be rare.
-       * </P>
-       */
-      replaceDoubleQuotes?: boolean;
-    }, "type">;
-    SourceTest: WithRequired<{
-      type: "Test";
-    } & Omit<components["schemas"]["Source"], "type"> & {
-      /** Format: int32 */
-      rowCount?: number;
-      /** Format: int32 */
-      delayMs?: number;
-    }, "type">;
-    DocDir: WithRequired<components["schemas"]["DocNode"] & {
-      children?: components["schemas"]["DocNode"][];
-    }, "children" | "name" | "path">;
-    DocFile: WithRequired<components["schemas"]["DocNode"] & {
-      title?: string;
-    }, "name" | "path" | "title">;
-    DocNode: {
-      name: string;
-      children?: components["schemas"]["DocNode"][];
-      path: string;
-    };
-    Form: unknown;
-    ImmutableListArgument: components["schemas"]["Argument"][];
-    ImmutableListFormat: components["schemas"]["Format"][];
     PipelineDir: WithRequired<components["schemas"]["PipelineNode"] & {
       children?: components["schemas"]["PipelineNode"][];
     }, "children" | "name" | "path">;
@@ -1287,6 +598,10 @@ export interface components {
       name: string;
       children?: components["schemas"]["PipelineNode"][];
       path: string;
+    };
+    Profile: {
+      username?: string;
+      fullname?: string;
     };
   };
   responses: never;
@@ -1302,131 +617,13 @@ export type external = Record<string, never>;
 
 export interface operations {
 
-  /** @description Return the contents of file. */
-  getFile: {
-    parameters: {
-      header?: {
-        accept?: string;
-      };
-      path: {
-        path: string;
-      };
-    };
+  /** @description Return details of the available OAuth providers */
+  get: {
     responses: {
-      /** @description The source of a single pipeline. */
+      /** @description Details of the available OAuth providers. */
       200: {
         content: {
-          "*/*": unknown;
-        };
-      };
-    };
-  };
-  /** @description Create a new file or folder. */
-  putFile: {
-    parameters: {
-      path: {
-        path: string;
-      };
-    };
-    requestBody?: {
-      content: {
-        "inode/directory,application/json,application/yaml,application/yaml+velocity,application/json+velocity,application/jexl": string[];
-      };
-    };
-    responses: {
-      /** @description The list of all directories and files. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["DesignDir"];
-        };
-      };
-    };
-  };
-  /** @description Delete a file or folder. */
-  deleteFile: {
-    parameters: {
-      path: {
-        path: string;
-      };
-    };
-    responses: {
-      /** @description The list of all directories and files. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["DesignDir"];
-        };
-      };
-    };
-  };
-  /** @description Return a list of all files and directories known */
-  getAll: {
-    responses: {
-      /** @description The list of all and directories files. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["DesignDir"];
-        };
-      };
-    };
-  };
-  /** @description Return a single 'true', in order to check whether deisng mode is enabled */
-  getEnabled: {
-    responses: {
-      /** @description Returns 'true'. */
-      200: {
-        content: {
-          "application/json": boolean;
-        };
-      };
-    };
-  };
-  /** @description Return the source of a pipeline. */
-  getPipeline: {
-    parameters: {
-      path: {
-        path: string;
-      };
-    };
-    responses: {
-      /** @description The source of a single pipeline. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Pipeline"];
-        };
-      };
-    };
-  };
-  /** @description Rename a file or folder. */
-  renameFile: {
-    parameters: {
-      query?: {
-        name?: string;
-      };
-      path: {
-        path: string;
-      };
-    };
-    responses: {
-      /** @description The list of all directories and files. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["DesignDir"];
-        };
-      };
-    };
-  };
-  /** @description Validate a pipeline. */
-  validate: {
-    requestBody?: {
-      content: {
-        "application/json,application/yaml": string[];
-      };
-    };
-    responses: {
-      /** @description Text response stating validation state. */
-      200: {
-        content: {
-          "text/plain": unknown;
+          "application/json": unknown;
         };
       };
     };
@@ -1461,6 +658,9 @@ export interface operations {
   /** @description Return a form.io definition for a given document */
   getFormIO: {
     parameters: {
+      query?: {
+        columns?: number;
+      };
       path: {
         path: string;
       };
@@ -1481,6 +681,17 @@ export interface operations {
       200: {
         content: {
           "application/json": unknown;
+        };
+      };
+    };
+  };
+  /** @description Return details of the current user */
+  getProfile: {
+    responses: {
+      /** @description Details of the current user. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Profile"];
         };
       };
     };
