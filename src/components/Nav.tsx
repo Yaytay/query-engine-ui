@@ -46,6 +46,8 @@ interface NavProps {
   , available: components["schemas"]["PipelineDir"]
   , managementEndpoints: ManagementEndpointType[] | null
   , window: Window
+  , profile: components["schemas"]["Profile"] | null
+  , docs: components["schemas"]["DocDir"] | null
 }
 
 function Nav(props : NavProps) {
@@ -109,11 +111,11 @@ function Nav(props : NavProps) {
     setModalIsOpen(true);
   }  
 
-  if (props.available.name === '') {
+  if (props.available && props.available.name === '') {
     props.available.name = 'Data';
   }
 
-  function topMenuItems() : MenuItemData {
+  function topMenuItems() : MenuItemData {    
     const items : MenuItemData[] = []
     if (props.designMode) {
       items.push({ label: 'Design', callback: () => {
@@ -123,7 +125,9 @@ function Nav(props : NavProps) {
     items.push({ label: 'Test', callback: () => {
       navigate('/ui/test')
     }})
-    items.push(dataMenuItems(props.available))
+    if (props.available) {
+      items.push(dataMenuItems(props.available))
+    }
     if (props.managementEndpoints) {
       items.push({ label: 'Manage', callback: () => {
         navigate('/ui/manage')
@@ -230,22 +234,26 @@ function Nav(props : NavProps) {
                     </Button>
                   </Link>
                 }
-                <Link to="/ui/test">
-                  <Button key='Test' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
-                    Test
-                  </Button>
-                </Link>
-                <NestedDropdown
-                  menuItemsData={dataMenuItems(props.available)}
-                  MenuProps={{elevation: 3}}
-                  ButtonProps={
-                    {
-                      variant: 'text'
-                      , sx: { my: 2, color: 'white' }
+                { props.available && 
+                  <Link to="/ui/test">
+                    <Button key='Test' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
+                      Test
+                    </Button>
+                  </Link>
+                }
+                { props.available && 
+                  <NestedDropdown
+                    menuItemsData={dataMenuItems(props.available)}
+                    MenuProps={{elevation: 3}}
+                    ButtonProps={
+                      {
+                        variant: 'text'
+                        , sx: { my: 2, color: 'white' }
+                      }
                     }
-                  }
-                  onClick={() => console.log('Clicked')}
-                /> 
+                    onClick={() => console.log('Clicked')}
+                  /> 
+                }
                 { props.managementEndpoints && 
                   <Link to="/ui/manage">
                     <Button key='Manage' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
@@ -253,11 +261,13 @@ function Nav(props : NavProps) {
                     </Button>
                   </Link>
                 }
-                <Link to="/ui/help">
-                  <Button key='Help' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
-                    Help
-                  </Button>
-                </Link>
+                { props.docs &&
+                  <Link to="/ui/help">
+                    <Button key='Help' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
+                      Help
+                    </Button>
+                  </Link>
+                }
                 <Link to="/ui/api">
                   <Button key='API' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
                     API

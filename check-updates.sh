@@ -1,3 +1,3 @@
 #!/bin/sh
 
-npx npm-check-updates -u -bootstrap
+npx npm-check-updates -u 
