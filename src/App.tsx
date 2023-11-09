@@ -5,7 +5,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Suspense, lazy, useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { useSearchParams, Routes, Route } from 'react-router-dom';
 import Nav from './components/Nav';
 import Login from './components/Login';
 import Home from './Home';
@@ -30,6 +30,7 @@ function App() {
   };
 
   const [baseUrl, _] = useState(buildApiBaseUrl())
+  const [searchParams, setSearchParams] = useSearchParams();
   const [available, setAvailable] = useState(defaultState.available)
   const [designMode, setDesignMode] = useState(defaultState.designMode)
   const [docs, setDocs] = useState(defaultState.docs)
@@ -38,6 +39,9 @@ function App() {
   const [profile, setProfile] = useState(defaultState.profile)
   const [authConfigs, setAuthConfigs] = useState(defaultState.authConfigs)
   const [displayAuthSelection, setDisplayAuthSelection] = useState(false)
+  const [accessToken, setAccessToken] = useState('')
+
+  console.log('Current URL:', window.location.href)
 
   function buildApiBaseUrl() : string {
     var url = ''
@@ -59,7 +63,6 @@ function App() {
   function doLogin(configs: components["schemas"]["AuthConfig"][]): undefined {
     console.log("Doing login with one of", configs)
     setDisplayAuthSelection(true)
-//      window.location.href = baseUrl + "login?provider=" + configs[0].name
   }
 
   useEffect(() => {
@@ -72,9 +75,24 @@ function App() {
       })
     }, [baseUrl]);
 
-  useEffect(() => {
+  useEffect(() => {      
+    if (searchParams.has('access_token')) {
+      var token = searchParams.get('access_token')
+      if (token) {
+        console.log('Setting access token', token)
+        setAccessToken(token)
+        searchParams.delete('access_token')
+        setSearchParams(searchParams)
+      }
+    }
+  }, []);
+
+  useEffect(() => {      
+    console.log('Access token:', accessToken)
+
     let url = new URL(baseUrl + 'api/info/available');
-    fetch(url)
+    const headers = accessToken ? { headers: {Authorization: 'Bearer ' + accessToken} } : {}
+    fetch(url, headers)
       .then(r => {
         if (r.ok) {
           return r.json()
@@ -87,11 +105,12 @@ function App() {
       })
     let profurl = new URL(baseUrl + 'api/session/profile');
     if (authConfigs) {
-      fetch(profurl)
+      fetch(profurl, headers)
         .then(r => {
           if (r.status === 401) {
             doLogin(authConfigs)
           } else {
+            setDisplayAuthSelection(false)
             return r.json()
           }
         })
@@ -100,16 +119,17 @@ function App() {
         })
     } else {
       let authurl = new URL(baseUrl + 'api/auth-config');
-      fetch(authurl)
+      fetch(authurl, headers)
         .then(r => r.json())
         .then(ac => {
           console.log("Setting auth configs to", ac)
           setAuthConfigs(ac)
-          fetch(profurl)
+          fetch(profurl, headers)
           .then(r => {
             if (r.status === 401) {
               doLogin(ac)
             } else {
+              setDisplayAuthSelection(false)
               return r.json()
             }
           })
@@ -118,7 +138,7 @@ function App() {
           })        })
     }
     let docurl = new URL(baseUrl + 'api/docs');
-    fetch(docurl)
+    fetch(docurl, headers)
       .then(r => {
         if (r.ok) {
           return r.json()
@@ -130,12 +150,12 @@ function App() {
         setDocs(j);
       })
     let dmurl = new URL(baseUrl + 'api/design/enabled');
-    fetch(dmurl)
+    fetch(dmurl, headers)
       .then(r => {
         setDesignMode(r.ok)
       })
     let murl = new URL(baseUrl + 'manage');
-    fetch(murl)
+    fetch(murl, headers)
       .then(r => {
         if (r.ok) {
           return r.json()
@@ -145,7 +165,7 @@ function App() {
       })
       .then(j => {
         if (j.location) {
-          fetch(j.location)
+          fetch(j.location, headers)
           .then(r => r.json())
           .then(j => {
             setManagementEndpoints(j);
@@ -154,11 +174,12 @@ function App() {
           setManagementEndpoints(j);
         }
       })
-    }, []);
+    }, [accessToken]);
 
   const refresh = function() {
     let url = new URL(baseUrl + 'api/info/available');
-    fetch(url)
+    const headers = accessToken ? { headers: {Authorization: 'Bearer ' + accessToken} } : {}
+    fetch(url, headers)
       .then(r => r.json())
       .then(j => {
         setAvailable(j);
