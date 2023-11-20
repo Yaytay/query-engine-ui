@@ -30,7 +30,7 @@
     "@fontsource/roboto": "^5.0.8",
     "@mui/icons-material": "^5.14.16",
     "@mui/lab": "^5.0.0-alpha.152",
-    "@mui/material": "^5.14.17",
+    "@mui/material": "^5.14.18",
     "@mui/x-date-pickers": "^6.18.1",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/typography": "^0.5.10",
