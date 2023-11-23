@@ -1,13 +1,10 @@
-import { useState } from 'react';
 import QeIcon from './QeIcon';
 
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import { components } from "../Query-Engine-Schema";
-import { height } from '@mui/system';
 import Modal from 'react-modal';
 
 interface LoginProps {
