@@ -23,7 +23,7 @@
     "vite-plugin-svgr": "^4.1.0"
   },
   "devDependencies": {
-    "@cyclonedx/cyclonedx-npm": "^1.14.2",
+    "@cyclonedx/cyclonedx-npm": "^1.14.3",
     "@date-io/moment": "^2.17.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
