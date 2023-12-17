@@ -14,6 +14,7 @@ interface ParametersProps {
   , values: any
   , columns: number
   , displayUrl: boolean
+  , accessToken: string
 }
 
 function Parameters(props : ParametersProps) {
@@ -39,9 +40,20 @@ function Parameters(props : ParametersProps) {
 
   var webform: any
 
+  function headersWithAcceptAndToken(type : string | null) : Headers {
+    const headers = new Headers() 
+    if (type) {
+      headers.set('Accept', type)
+    }
+    if (props.accessToken) {
+      headers.set('Authorization', 'Bearer ' + props.accessToken)
+    }
+    return headers
+  }
+
   useEffect(() => {
     console.log('Fetching form', url)
-    fetch(url.current)
+    fetch(url.current, {headers: headersWithAcceptAndToken(null)})
       .then((response) => response.json())
       .then((data) => {
         console.log('Setting form', formSet.current, data, form)

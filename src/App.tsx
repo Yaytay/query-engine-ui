@@ -220,10 +220,10 @@ function App() {
           <Route index path='/ui' element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} docs={docs} available={available} />}></Route>
           <Route path='/ui/design' element={
             <Suspense>
-              <Design baseUrl={baseUrl} onChange={refresh} />
+              <Design baseUrl={baseUrl} onChange={refresh} accessToken={accessToken} />
             </Suspense>
             }></Route>
-          <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
+          <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} accessToken={accessToken} />}></Route>
           <Route path='/ui/demo' element={<Demo />}></Route>
           <Route path='/ui/manage' element={<Manage endpoints={managementEndpoints} />}></Route>
           <Route path='/ui/manage/:stub' element={<Manage endpoints={managementEndpoints} />}></Route>
