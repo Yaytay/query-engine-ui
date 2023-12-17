@@ -208,6 +208,7 @@ function App() {
             window={window} 
             docs={docs}
             profile={profile}
+            accessToken={accessToken}
             />
       </div>
       { displayAuthSelection && authConfigs ? 

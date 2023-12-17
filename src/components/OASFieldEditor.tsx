@@ -161,7 +161,7 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
         <label className="px-1 text-blue-500" onClick={onFocus}>{field}:</label>
         <select
           id={id}
-          placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
+          aria-placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
           value={value ? 1 : 0}
           className={bgcol}
           onChange={e => { handleChange(e.target.value ? true : false) }}
@@ -321,7 +321,7 @@ function OASFieldEditor({ id, schema, field, bg, object, visible, onChange, onHe
         <select
           id={id}
           className={bgcol}
-          placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
+          aria-placeholder={fieldSchema['x-prompt'] ?? fieldSchema.title ?? fieldSchema.name}
           value={value}
           onChange={e => handleChange(e.target.value)}
           onFocus={onFocus}
