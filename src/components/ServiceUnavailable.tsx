@@ -3,7 +3,6 @@ import QeIcon from './QeIcon';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Modal from 'react-modal';
 
 interface ServiceUnavailableProps {
