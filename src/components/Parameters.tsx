@@ -14,7 +14,7 @@ interface ParametersProps {
   , values: any
   , columns: number
   , displayUrl: boolean
-  , accessToken: string
+  , accessToken: string | null
 }
 
 function Parameters(props : ParametersProps) {

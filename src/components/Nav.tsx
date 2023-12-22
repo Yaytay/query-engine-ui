@@ -43,12 +43,13 @@ function closeModal() {
 interface NavProps {
   designMode: boolean
   , baseUrl: string
-  , available: components["schemas"]["PipelineDir"]
+  , apiUrl: string | null
+  , available: components["schemas"]["PipelineDir"] | null
   , managementEndpoints: ManagementEndpointType[] | null
   , window: Window
   , profile: components["schemas"]["Profile"] | null
   , docs: components["schemas"]["DocDir"] | null
-  , accessToken: string
+  , accessToken: string | null
 }
 
 function Nav(props : NavProps) {
@@ -228,7 +229,7 @@ function Nav(props : NavProps) {
             >
               Query Engine
             </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+              <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                 { props.designMode && 
                   <Link to="/ui/design">
                     <Button key='Design' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
@@ -270,13 +271,20 @@ function Nav(props : NavProps) {
                     </Button>
                   </Link>
                 }
-                <Link to="/ui/api">
-                  <Button key='API' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
-                    API
-                  </Button>
-                </Link>
+                { props.apiUrl && 
+                  <Link to="/ui/api">
+                    <Button key='API' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
+                      API
+                    </Button>
+                  </Link>
+                }
             </Box>
-
+            {
+              props.profile &&
+              <Box sx={{ 	alignSelf: 'flex-end', my: 2, color: 'white', p: '6px' }}>
+                {props.profile.fullname || props.profile.username}
+              </Box>
+            }
           </Toolbar>
         </Container>
       </AppBar>

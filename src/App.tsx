@@ -16,14 +16,15 @@ import Api from './Api';
 import { Manage, ManagementEndpointType } from './Manage';
 import CssBaseline from '@mui/material/CssBaseline';
 import { components } from "./Query-Engine-Schema";
+import ServiceUnavailable from './components/ServiceUnavailable';
 
 const Design = lazy(() => import('./Design'))
 
 function App() {
 
   var defaultState = {
-    "available":( {name: '', path: '', children: [] } as components["schemas"]["PipelineDir"])
-    , "docs": ( {name: '', path: '', children: [] } as components["schemas"]["DocDir"])
+    "available": null as components["schemas"]["PipelineDir"] | null
+    , "docs": null as components["schemas"]["DocDir"] | null
     , "designMode": false
     , "profile": null as components["schemas"]["Profile"] | null
     , "authConfigs": null as components["schemas"]["AuthConfig"][] | null
@@ -39,11 +40,12 @@ function App() {
   const [profile, setProfile] = useState(defaultState.profile)
   const [authConfigs, setAuthConfigs] = useState(defaultState.authConfigs)
   const [displayAuthSelection, setDisplayAuthSelection] = useState(false)
+  const [displayServiceUnavailable, setDisplayServiceUnavailable] = useState(false)
   const [accessToken, setAccessToken] = useState('')
 
   console.log('Current URL:', window.location.href)
 
-  function buildApiBaseUrl() : string {
+  function buildApiBaseUrl(): string {
     var url = ''
     if (import.meta.env.VITE_API_URL) {
       url = import.meta.env.VITE_API_URL
@@ -51,7 +53,7 @@ function App() {
       url = 'http://localhost:8000/';
     } else {
       url = window.location.href
-      url = url.replace(/\/ui\/?.*$/,'')
+      url = url.replace(/\/ui\/?.*$/, '')
       if (!url.endsWith('/')) {
         url = url + '/'
       }
@@ -66,16 +68,6 @@ function App() {
   }
 
   useEffect(() => {
-    let apidocurl = new URL(baseUrl + 'openapi');
-    fetch(apidocurl)
-      .then(r => {
-        if (r.ok) {
-          setApiUrl(baseUrl + 'openapi');
-        }
-      })
-    }, [baseUrl]);
-
-  useEffect(() => {      
     if (searchParams.has('access_token')) {
       var token = searchParams.get('access_token')
       if (token) {
@@ -87,103 +79,144 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {      
+  useEffect(() => {
     console.log('Access token:', accessToken)
 
-    let url = new URL(baseUrl + 'api/info/available');
-    const headers = accessToken ? { headers: {Authorization: 'Bearer ' + accessToken} } : {}
-    fetch(url, headers)
-      .then(r => {
-        if (r.ok) {
-          return r.json()
-        } else {
-          return ;
+    let failed = false
+    const headers = accessToken ? { headers: { Authorization: 'Bearer ' + accessToken } } : {}
+    getProfile(headers)
+      .then(good => {
+        if (good) {
+          let url = new URL(baseUrl + 'api/info/available')
+          fetch(url, headers)
+            .then(r => {
+              if (r.ok) {
+                return r.json()
+              } else {
+                failed = true
+                return;
+              }
+            })
+            .then(j => {
+              setAvailable(j);
+            })
+          let docurl = new URL(baseUrl + 'api/docs');
+          fetch(docurl, headers)
+            .then(r => {
+              if (r.ok) {
+                return r.json()
+              } else {
+                return;
+              }
+            })
+            .then(j => {
+              setDocs(j);
+            })
+          let dmurl = new URL(baseUrl + 'api/design/enabled');
+          fetch(dmurl, headers)
+            .then(r => {
+              setDesignMode(r.ok)
+            })
+          let murl = new URL(baseUrl + 'manage');
+          fetch(murl, headers)
+            .then(r => {
+              if (r.ok) {
+                return r.json()
+              } else {
+                return;
+              }
+            })
+            .then(j => {
+              if (j.location) {
+                fetch(j.location, headers)
+                  .then(r => r.json())
+                  .then(j => {
+                    setManagementEndpoints(j);
+                  })
+              } else {
+                setManagementEndpoints(j);
+              }
+            })
+          let apidocurl = new URL(baseUrl + 'openapi');
+          fetch(apidocurl)
+            .then(r => {
+              if (r.ok) {
+                setApiUrl(baseUrl + 'openapi');
+              }
+            })
         }
       })
-      .then(j => {
-        setAvailable(j);
-      })
-    let profurl = new URL(baseUrl + 'api/session/profile');
-    if (authConfigs) {
-      fetch(profurl, headers)
-        .then(r => {
-          if (r.status === 401) {
-            doLogin(authConfigs)
-          } else {
-            setDisplayAuthSelection(false)
-            return r.json()
-          }
-        })
-        .then(j => {
-          setProfile(j);
-        })
-    } else {
-      let authurl = new URL(baseUrl + 'api/auth-config');
-      fetch(authurl, headers)
-        .then(r => r.json())
-        .then(ac => {
-          console.log("Setting auth configs to", ac)
-          setAuthConfigs(ac)
-          fetch(profurl, headers)
-          .then(r => {
-            if (r.status === 401) {
-              doLogin(ac)
-            } else {
-              setDisplayAuthSelection(false)
-              return r.json()
-            }
-          })
-          .then(j => {
-            setProfile(j);
-          })        })
-    }
-    let docurl = new URL(baseUrl + 'api/docs');
-    fetch(docurl, headers)
-      .then(r => {
-        if (r.ok) {
-          return r.json()
-        } else {
-          return ;
-        }
-      })
-      .then(j => {
-        setDocs(j);
-      })
-    let dmurl = new URL(baseUrl + 'api/design/enabled');
-    fetch(dmurl, headers)
-      .then(r => {
-        setDesignMode(r.ok)
-      })
-    let murl = new URL(baseUrl + 'manage');
-    fetch(murl, headers)
-      .then(r => {
-        if (r.ok) {
-          return r.json()
-        } else {
-          return ;
-        }
-      })
-      .then(j => {
-        if (j.location) {
-          fetch(j.location, headers)
-          .then(r => r.json())
-          .then(j => {
-            setManagementEndpoints(j);
-          })
-        } else {
-          setManagementEndpoints(j);
-        }
-      })
-    }, [accessToken]);
+  }, [baseUrl, accessToken]);
 
-  const refresh = function() {
+  const refresh = function () {
     let url = new URL(baseUrl + 'api/info/available');
-    const headers = accessToken ? { headers: {Authorization: 'Bearer ' + accessToken} } : {}
+    const headers = accessToken ? { headers: { Authorization: 'Bearer ' + accessToken } } : {}
     fetch(url, headers)
       .then(r => r.json())
       .then(j => {
         setAvailable(j);
       })
+  }
+
+  const getProfile = function (headers: any) {
+    let profurl = new URL(baseUrl + 'api/session/profile')
+    return new Promise(resolve => {
+      if (authConfigs) {
+        fetch(profurl, headers)
+          .then(r => {
+            if (r.status === 401) {
+              doLogin(authConfigs)
+            } else if (r.ok) {
+              setDisplayAuthSelection(false)
+              return r.json()
+            } else {
+              setDisplayServiceUnavailable(true)
+              resolve(false)
+            }
+          })
+          .catch(() => {
+            setDisplayServiceUnavailable(true);
+            resolve(false)
+          })
+          .then(j => {
+            setProfile(j);
+            resolve(true)
+          });
+      } else {
+        let authurl = new URL(baseUrl + 'api/auth-config');
+        fetch(authurl, headers)
+          .then(r => {
+            if (r.ok) {
+              setDisplayServiceUnavailable(false);
+              return r.json();
+            } else {
+              setDisplayServiceUnavailable(true);
+              resolve(false)
+            }
+          })
+          .catch(() => {
+            setDisplayServiceUnavailable(true);
+            resolve(false)
+          })
+          .then(ac => {
+            console.log("Setting auth configs to", ac);
+            setAuthConfigs(ac);
+            fetch(profurl, headers)
+              .then(r => {
+                if (r.status === 401) {
+                  doLogin(ac);
+                } else {
+                  setDisplayAuthSelection(false);
+                  return r.json();
+                }
+              })
+              .then(j => {
+                setProfile(j);
+                resolve(true)
+              });
+          });
+      }
+    })
   }
 
   const theme = createTheme({
@@ -201,38 +234,54 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <div className="flex-none">
-        <Nav baseUrl={baseUrl} 
-            available={available} 
-            designMode={designMode} 
-            managementEndpoints={managementEndpoints} 
-            window={window} 
-            docs={docs}
-            profile={profile}
-            accessToken={accessToken}
-            />
+        <Nav baseUrl={baseUrl}
+          available={available}
+          designMode={designMode}
+          managementEndpoints={managementEndpoints}
+          window={window}
+          docs={docs}
+          apiUrl={apiUrl}
+          profile={profile}
+          accessToken={accessToken}
+        />
       </div>
-      { displayAuthSelection && authConfigs ? 
-        <div style={{width: '100%', height: '100%'}}>
-          <Login baseUrl={baseUrl} authConfigs={authConfigs} />
+      {displayServiceUnavailable ?
+        <div style={{ width: '100%', height: '100%' }}>
+          <ServiceUnavailable baseUrl={baseUrl} />
         </div>
-      :
-        <Routes>
-          <Route index element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} docs={docs} available={available} />}></Route>
-          <Route index path='/ui' element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} docs={docs} available={available} />}></Route>
-          <Route path='/ui/design' element={
-            <Suspense>
-              <Design baseUrl={baseUrl} onChange={refresh} accessToken={accessToken} />
-            </Suspense>
+        :
+        displayAuthSelection && authConfigs ?
+          <div style={{ width: '100%', height: '100%' }}>
+            <Login baseUrl={baseUrl} authConfigs={authConfigs} />
+          </div>
+          :
+          <Routes>
+            <Route index element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} docs={docs} available={available} profile={profile} />}></Route>
+            <Route index path='/ui' element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} docs={docs} available={available} profile={profile} />}></Route>
+            <Route path='/ui/design' element={
+              <Suspense>
+                <Design baseUrl={baseUrl} onChange={refresh} accessToken={accessToken} />
+              </Suspense>
             }></Route>
-          <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} accessToken={accessToken} />}></Route>
-          <Route path='/ui/demo' element={<Demo />}></Route>
-          <Route path='/ui/manage' element={<Manage endpoints={managementEndpoints} />}></Route>
-          <Route path='/ui/manage/:stub' element={<Manage endpoints={managementEndpoints} />}></Route>
-          <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
-          <Route path='/ui/help/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
-          <Route path='/ui/help/:parent/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
-          <Route path='/ui/api' element={<Api url={apiUrl} />}></Route>
-        </Routes>
+            {available &&
+              <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} accessToken={accessToken} />}></Route>
+            }
+            <Route path='/ui/demo' element={<Demo />}></Route>
+            <Route path='/ui/manage' element={<Manage endpoints={managementEndpoints} />}></Route>
+            <Route path='/ui/manage/:stub' element={<Manage endpoints={managementEndpoints} />}></Route>
+            {docs &&
+              <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+            }
+            {docs &&
+              <Route path='/ui/help/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+            }
+            {docs &&
+              <Route path='/ui/help/:parent/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+            }
+            {apiUrl &&
+              <Route path='/ui/api' element={<Api url={apiUrl} />}></Route>
+            }
+          </Routes>
       }
     </ThemeProvider>
   );

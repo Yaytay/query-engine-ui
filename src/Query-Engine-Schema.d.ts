@@ -1054,8 +1054,8 @@ export interface components {
       timeLimit: {
         /** Format: int64 */
         seconds?: number;
-        zero?: boolean;
         negative?: boolean;
+        zero?: boolean;
         positive?: boolean;
         /** Format: int32 */
         nano?: number;
@@ -1180,16 +1180,16 @@ export interface components {
       idleTimeout?: {
         /** Format: int64 */
         seconds?: number;
-        zero?: boolean;
         negative?: boolean;
+        zero?: boolean;
         positive?: boolean;
         units?: {
             durationEstimated?: boolean;
             duration?: {
               /** Format: int64 */
               seconds?: number;
-              zero?: boolean;
               negative?: boolean;
+              zero?: boolean;
               positive?: boolean;
               /** Format: int32 */
               nano?: number;
@@ -1224,16 +1224,16 @@ export interface components {
       connectionTimeout?: {
         /** Format: int64 */
         seconds?: number;
-        zero?: boolean;
         negative?: boolean;
+        zero?: boolean;
         positive?: boolean;
         units?: {
             durationEstimated?: boolean;
             duration?: {
               /** Format: int64 */
               seconds?: number;
-              zero?: boolean;
               negative?: boolean;
+              zero?: boolean;
               positive?: boolean;
               /** Format: int32 */
               nano?: number;
@@ -1298,6 +1298,7 @@ export interface components {
     Profile: {
       username?: string;
       fullname?: string;
+      version?: string;
     };
   };
   responses: never;
