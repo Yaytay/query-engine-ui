@@ -268,13 +268,13 @@ function App() {
             <Route path='/ui/manage' element={<Manage endpoints={managementEndpoints} />}></Route>
             <Route path='/ui/manage/:stub' element={<Manage endpoints={managementEndpoints} />}></Route>
             {docs &&
-              <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+              <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} accessToken={accessToken} />}></Route>
             }
             {docs &&
-              <Route path='/ui/help/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+              <Route path='/ui/help/:stub' element={<Help docs={docs} baseUrl={baseUrl} accessToken={accessToken} />}></Route>
             }
             {docs &&
-              <Route path='/ui/help/:parent/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
+              <Route path='/ui/help/:parent/:stub' element={<Help docs={docs} baseUrl={baseUrl} accessToken={accessToken} />}></Route>
             }
             {apiUrl &&
               <Route path='/ui/api' element={<Api url={apiUrl} />}></Route>
