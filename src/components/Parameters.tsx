@@ -57,7 +57,7 @@ function Parameters(props : ParametersProps) {
       .then((response) => response.json())
       .then((data) => {
         console.log('Setting form', formSet.current, data, form)
-        if (!equal(formSet.current, data)) {
+        if (!equal.apply(formSet.current, data)) {
           console.log("Actually setting form")
           formSet.current = data
           setForm(data)
