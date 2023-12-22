@@ -82,7 +82,6 @@ function App() {
   useEffect(() => {
     console.log('Access token:', accessToken)
 
-    let failed = false
     const headers = accessToken ? { headers: { Authorization: 'Bearer ' + accessToken } } : {}
     getProfile(headers)
       .then(good => {
@@ -93,7 +92,6 @@ function App() {
               if (r.ok) {
                 return r.json()
               } else {
-                failed = true
                 return;
               }
             })
