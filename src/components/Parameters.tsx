@@ -3,7 +3,7 @@ import { Form } from '@formio/react';
 import { Formio }  from 'formiojs';
 import { components } from "../Query-Engine-Schema";
 import { ArgsToArgs } from '../Test';
-import * as equal from 'fast-deep-equal/es6/react';
+import equal from 'fast-deep-equal/es6/react';
 
 interface ParametersProps {
   baseUrl : string
@@ -57,7 +57,7 @@ function Parameters(props : ParametersProps) {
       .then((response) => response.json())
       .then((data) => {
         console.log('Setting form', formSet.current, data, form)
-        if (!equal.apply(formSet.current, data)) {
+        if (!equal(formSet.current, data)) {
           console.log("Actually setting form")
           formSet.current = data
           setForm(data)
