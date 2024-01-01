@@ -171,5 +171,6 @@ export function buildSchema(openapi: any): SchemaMapType {
 
   console.log('OpenAPI schema:', openapi)
   console.log('Built schema:', result)
+  console.log('Built schema:', JSON.stringify(result))
   return result
 }

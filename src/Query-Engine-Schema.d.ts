@@ -77,13 +77,14 @@ export interface components {
        * The name to use in the list of authentication providers.
        * </P>
        */
-      name?: string;
+      name: string;
       /**
+       * Format: uri
        * @description <P>
        * The URL to the logo to use in the list of authentication providers.
        * </P>
        */
-      logo?: string;
+      logo: string;
     };
     /**
      * @description <P>
@@ -443,7 +444,7 @@ export interface components {
      */
     Condition: {
       /** @description The expression that makes up the condition. */
-      expression?: string;
+      expression: string;
     };
     /**
      * @description <P>
@@ -612,6 +613,7 @@ export interface components {
        */
       type: "SQL" | "HTTP";
       /**
+       * Format: uri
        * @description <P>A URL that defines the Endpoint.</P>
        * <P>
        * Invalid if the URL template field is provided.
