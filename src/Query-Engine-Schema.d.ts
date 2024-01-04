@@ -715,17 +715,6 @@ export interface components {
      */
     Format: {
       /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       */
-      mediaType?: string;
-      /**
        * @description <P>The name of the format.</P>
        * <P>
        * The name is used to determine the format based upon the '_fmt' query string argument.
@@ -752,6 +741,17 @@ export interface components {
        * </P>
        */
       extension?: string;
+      /**
+       * @description <P>The media type of the format.</P>
+       * <P>
+       * The media type is used to determine the format based upon the Accept header in the request.
+       * If multiple formats have the same media type the first in the list will be used.
+       * </P>
+       * <P>
+       * The media type will also be set as the Content-Type header in the response.
+       * </P>
+       */
+      mediaType?: string;
     };
     /** @description Configuration for an output format of delimited text. */
     FormatDelimited: WithRequired<{
