@@ -1,11 +1,11 @@
 import OASObjectEditor from './OASObjectEditor';
 
-import { SchemaMapType } from "../SchemaType";
+import { ObjectTypeMap } from "../SchemaType";
 import { components } from "../Query-Engine-Schema";
 
 interface PipelineEditorProps {
   pipeline : components["schemas"]["Pipeline"]
-  , schema : SchemaMapType
+  , schema : ObjectTypeMap
   , onHelpChange : (help : string) => void
   , onChange : (p :  components["schemas"]["Pipeline"]) => void
 }
@@ -21,7 +21,7 @@ function PipelineEditor({ pipeline, schema, onHelpChange, onChange } : PipelineE
         schema={schema}
         onHelpChange={help}
         field='pipeline'
-        type='Pipeline'
+        objectSchema={schema['Pipeline']}
         bg={0}
         index={0}
         defaultVisible={true}

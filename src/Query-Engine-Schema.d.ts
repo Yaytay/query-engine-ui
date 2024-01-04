@@ -606,6 +606,8 @@ export interface components {
      * </P>
      */
     Endpoint: {
+      /** @description <P>The name of the Endpoint, that will be used to refer to it in Sources. */
+      name: string;
       /**
        * @description <P>The type of Endpoint being configured</P>
        *
@@ -713,6 +715,17 @@ export interface components {
      */
     Format: {
       /**
+       * @description <P>The media type of the format.</P>
+       * <P>
+       * The media type is used to determine the format based upon the Accept header in the request.
+       * If multiple formats have the same media type the first in the list will be used.
+       * </P>
+       * <P>
+       * The media type will also be set as the Content-Type header in the response.
+       * </P>
+       */
+      mediaType?: string;
+      /**
        * @description <P>The name of the format.</P>
        * <P>
        * The name is used to determine the format based upon the '_fmt' query string argument.
@@ -739,17 +752,6 @@ export interface components {
        * </P>
        */
       extension?: string;
-      /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       */
-      mediaType?: string;
     };
     /** @description Configuration for an output format of delimited text. */
     FormatDelimited: WithRequired<{
@@ -1064,9 +1066,7 @@ export interface components {
        * The key in this map is the name of the field as it appears in the data rows as they reach the outputter.
        * </P>
        */
-      columns?: {
-        [key: string]: components["schemas"]["FormatXlsxColumn"];
-      };
+      columns?: components["schemas"]["FormatXlsxColumn"][];
     }), "type">;
     /**
      * @description Specification of colours used in XLSX output.
@@ -1126,6 +1126,11 @@ export interface components {
     };
     /** @description Specification of the formatting of a column in XLSX output. */
     FormatXlsxColumn: {
+      /**
+       * @description <P>The the name of the column that this definition applies to.</P>
+       * <P>This should match one of the field names in the output.</P>
+       */
+      name: string;
       /** @description <P>The title to put in the header row instead of the field name.</P> */
       header?: string;
       /**
@@ -1245,9 +1250,7 @@ export interface components {
        * The segregation between Source and Endpoint allows a single Source to work with multiple Endpoints.
        * </P>
        */
-      sourceEndpoints?: {
-        [key: string]: components["schemas"]["Endpoint"];
-      };
+      sourceEndpoints?: components["schemas"]["Endpoint"][];
       /**
        * @description <P>Sub-Pipelines that can be run prior to the main Pipeline in order to generate more SourceEndpoints.</P>
        * <P>

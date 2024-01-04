@@ -2,30 +2,29 @@
 import { useState } from 'react';
 import OASFieldEditor from './OASFieldEditor';
 
-import { SchemaMapType } from "../SchemaType";
+import { ObjectTypeMap, ObjectType } from "../SchemaType";
 
 interface OASObjectEditorProps {
   object : any
-  , schema : SchemaMapType
+  , schema : ObjectTypeMap
   , field : string
   , bg : number // row number for background formatting
   , onHelpChange : (help : string) => void
   , onChange : (changedField : string, value : any) => void
-  , type : string
+  , objectSchema : ObjectType
   , index : number
   , defaultVisible? : boolean
-  , onMoveUp? : any
-  , onMoveDown? : any
-  , onRemove? : any
 }
-function OASObjectEditor({object, schema, field, bg, onHelpChange, onChange, type, index, defaultVisible, onMoveUp, onMoveDown, onRemove} : OASObjectEditorProps) {
+function OASObjectEditor({object, schema, field, bg, onHelpChange, onChange, objectSchema, index, defaultVisible} : OASObjectEditorProps) {
 
   const [visible, setVisible] = useState(defaultVisible)
 
-  var objectSchema = schema[type]
+  if (!object) {
+    object = {}
+  }
 
-  if (!objectSchema) {
-    console.log("No schema for ", type, " @ ", field);
+  if (!objectSchema)   {
+    console.log("No schema", field, object)
     return ;
   }
 
@@ -38,9 +37,12 @@ function OASObjectEditor({object, schema, field, bg, onHelpChange, onChange, typ
   if (objectSchema.discriminator) {
     const d = objectSchema.discriminator;
     if (object && d && object[d.propertyName]) {
-      var newType = d.mapping.get(object[d.propertyName])
+      var newType = d.mapping[object[d.propertyName]]
       if (newType) {
-        type = newType
+        var newSchema = schema[newType]
+        if (newSchema) {
+          objectSchema = newSchema
+        }
       }
     }
   }
@@ -52,18 +54,15 @@ function OASObjectEditor({object, schema, field, bg, onHelpChange, onChange, typ
           id={f}
           key={f}
           bg={bg + (i % 2)}
-          object={object}
+          value={object[f]}
           schema={schema}
+          propertyType={objectSchema.collectedProperties[f]}
           onHelpChange={onHelpChange}
           onChange={handleInputChange}
-          parentType={type}
           visible={visible || !objectSchema.hasRequired}
           field={f}
           index={index}
           onDrop={i === 0 && objectSchema.hasRequired ? () => setVisible(!visible) : null}
-          onMoveUp={i === 0 && onMoveUp ? onMoveUp : null}
-          onMoveDown={i === 0 && onMoveDown ? onMoveDown : null}
-          onRemove={i === 0 && onRemove ? onRemove : null}
           />)
       }) }
     </div>

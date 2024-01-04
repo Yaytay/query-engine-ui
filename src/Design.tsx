@@ -19,7 +19,7 @@ import { TreeView } from '@mui/x-tree-view/TreeView'
 import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { components } from "./Query-Engine-Schema";
-import { SchemaMapType, buildSchema } from "./SchemaType";
+import { ObjectTypeMap, buildSchema } from "./SchemaType";
 
 var onChange = () => {};
 
@@ -42,7 +42,7 @@ function Design(props : DesignProps) {
   const [helpDrawerWidth, setHelpDrawerWidth] = useState(360)
   const [displayHelpDrawer, setDisplayHelpDrawer] = useState(true)
 
-  const [schema, setSchema] = useState(null as SchemaMapType | null)
+  const [schema, setSchema] = useState(null as ObjectTypeMap | null)
   const [openapi, setOpenApi] = useState({} as any)
 
   const [fileContents, setFileContents] = useState(null as components["schemas"]["Pipeline"] | null)

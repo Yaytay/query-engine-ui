@@ -49,3 +49,7 @@ textarea {
 select { 
   border: 0px; 
 }
+::placeholder {
+  opacity: 0.5;
+  font-style: italic;
+}

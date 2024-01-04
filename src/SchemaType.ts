@@ -1,4 +1,4 @@
-0/*
+/*
  * A bunch of overrides for the sorting of fields, these will always come first.
  */
 const fieldOrders = new Map<string, string[]>([
@@ -11,54 +11,57 @@ const fieldOrders = new Map<string, string[]>([
   , ['Source', ['type']]
 ])
 
-export interface RefType {
-  $ref: string
+export interface ExternalDocsType {
+  description: string
+  , url: string
+}
+
+export interface DiscriminatorType {
+  propertyName: string
+  , mapping: {
+    [key: string]: string
+  }
 }
 
 export interface PropertyType {
-  name: string
+  name?: string
   , type: string
-  , description: string
-  , default: string
-  , maxLength: number
-  , $ref: string
-  , required: boolean
-  , minItems: number
-  , title: string
-  , 'x-prompt': string
-  , enum: string[]
-  , items: string
-  , additionalProperties: RefType
-  , pattern: string
+  , ref?: string
+  , description: string | null
+  , externalDocs: ExternalDocsType | null
+  , default: string | null
+  , enum: string[] | null
+  , format: string | null
+  , items?: PropertyType
+  , maxItems: number | null
+  , maxLength: number | null
+  , minItems: number | null
+  , minLength: number | null
+  , pattern: string | null
+  , required?: boolean 
+  , title: string | null
+  , uniqueItems: boolean | null
 }
 
 export interface PropertyMapType {
   [key: string]: PropertyType
 }
 
-
-// Determine type by enum
-export interface DiscriminatorType {
-  propertyName: string
-  , mapping: Map<string, string>
-}
-
-export interface SchemaType {
-
+export interface ObjectType {
   name: string
   , description: string
   , collectedProperties: PropertyMapType
   , sortedProperties: string[]
   , discriminator?: DiscriminatorType
   , hasRequired: boolean
-
 }
 
-export interface SchemaMapType {
-  [key: string]: SchemaType
+export interface ObjectTypeMap {
+  [key: string]: ObjectType
 }
 
-export function buildSchema(openapi: any): SchemaMapType {
+// Convert and openapi specification into an ObjectTypeMap
+export function buildSchema(openapi: any): ObjectTypeMap {
   function typeFromRef(arg : string) {
     var lastPos = arg.lastIndexOf('/')
     if (lastPos > 0) {
@@ -68,42 +71,54 @@ export function buildSchema(openapi: any): SchemaMapType {
     }
   }
 
+  function propertyFromSchema(name: string | null, schema: any, required: boolean) : PropertyType {
+    var result : PropertyType = { 
+      type: schema.$ref ? 'object' : schema.type
+      , description: schema.description
+      , externalDocs: schema.externalDocs
+      , default: schema.default
+      , enum: schema.enum
+      , format: schema.format
+      , maxItems: schema.maxItems
+      , maxLength: schema.maxLength
+      , minItems: schema.minItems
+      , minLength: schema.minLength
+      , pattern: schema.pattern
+      , title: schema.title
+      , uniqueItems: schema.uniqueItems
+    }
+    if (name) {
+      result.name = name
+    }
+    if (schema.$ref) {
+      result.ref = typeFromRef(schema.$ref)
+    }
+    if (schema.type === 'array') {
+      result.items = propertyFromSchema(null, schema.items, schema.minItems && schema.minItems > 0)
+    }
+    if (required) {
+      result.required = true
+    }
+    return result
+  }
+
   function collectProperties(schema : any) {
     var props : PropertyMapType = {}
     if (schema.properties) {
-      props = { ...schema.properties }
+      Object.keys(schema.properties).forEach((f : string) => {
+        props[f] = propertyFromSchema(f, schema.properties[f], schema.required && schema.required.includes(f))
+      })
     }
-    Object.keys(props).forEach(pp => {
-      if (props[pp].type === 'array') {
-        if (props[pp].minItems > 0) {
-          props[pp].required = true
-        }
-        if (schema.properties[pp].items && schema.properties[pp].items.$ref) {
-          props[pp].items = typeFromRef(schema.properties[pp].items.$ref)
-        }
-      }
-      if (props[pp].type === 'array' && props[pp].minItems > 0) {
-        props[pp].required = true
-      }
-    })
     if (schema.allOf) {
       schema.allOf.forEach((ao : any) => {
         if (ao.$ref) {
           var parentProps = collectProperties(openapi.components.schemas[typeFromRef(ao.$ref)])
           Object.keys(parentProps).forEach(pp => {
-            if (props[pp]) {
-              Object.assign(props[pp], parentProps[pp])
-            } else {
-              props[pp] = { ...parentProps[pp] }
-            }
+            props[pp] = { ...parentProps[pp] }
           })
         } else if (ao.properties) {
           Object.keys(ao.properties).forEach(pp => {
-            if (props[pp]) {
-              Object.assign(props[pp], ao.properties[pp])
-            } else {
-              props[pp] = { ...ao.properties[pp] }
-            }
+            props[pp] = propertyFromSchema(pp, ao.properties[pp], schema.required && schema.required.includes(pp))
           })
         }
       })
@@ -141,23 +156,27 @@ export function buildSchema(openapi: any): SchemaMapType {
 
   function buildDiscriminator(schema : any) : DiscriminatorType | undefined {
     if (schema.discriminator) {
-      var discriminator : DiscriminatorType
-      discriminator = { propertyName: schema.discriminator.propertyName, mapping: new Map<string, string>() }
-      Object.keys(schema.discriminator.mapping).forEach(dk => {
-        discriminator.mapping.set(dk, typeFromRef(schema.discriminator.mapping[dk]))
+      const m : {[key: string]: string} = {}
+      Object.keys(schema.discriminator.mapping).forEach((k : string) => {
+        m[k] = typeFromRef(schema.discriminator.mapping[k])
       })
-      return discriminator
+
+      const disc : DiscriminatorType = {
+        propertyName: schema.discriminator.propertyName
+        , mapping: m
+      }
+      return disc
     }
   }
 
-  var result = {} as SchemaMapType
+  var result = {} as ObjectTypeMap
   Object.keys(openapi.components.schemas).forEach(k => {
     const schema = openapi.components.schemas[k]
-    var simpleSchema: SchemaType;
+    var objectType: ObjectType;
 
     var collectedProperties: PropertyMapType = collectProperties(schema)
 
-    simpleSchema = { 
+    objectType = { 
       description: schema.description ?? ''
       , name: k 
       , collectedProperties: collectedProperties
@@ -166,11 +185,10 @@ export function buildSchema(openapi: any): SchemaMapType {
       , discriminator: buildDiscriminator(schema)
     }
 
-    result[k] = simpleSchema
+    result[k] = objectType
   })
 
   console.log('OpenAPI schema:', openapi)
   console.log('Built schema:', result)
-  console.log('Built schema:', JSON.stringify(result))
   return result
 }
