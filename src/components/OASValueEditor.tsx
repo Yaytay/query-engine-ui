@@ -20,10 +20,8 @@ interface OASValueEditorProps {
   , onChange : (newValue : any) => void
   , onFocus : (e : React.SyntheticEvent<any>) => void
   , index : number
-  , visible : boolean
-  , onDrop? : any
 }
-function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange, onFocus, field, propertyType } : OASValueEditorProps) {
+function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus, field, propertyType } : OASValueEditorProps) {
 
   const colours = [' bg-white', ' bg-slate-50', ' bg-slate-100', ' bg-slate-200', ' bg-slate-300']
 
@@ -39,15 +37,6 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
 
   const classes = "grow bg-transobject appearance-none px-1 text-gray-700 leading-tight font-mono overflow-wrap resize";
 
-  var hidden = ''// ' hidden'
-  if (
-    visible
-    || (propertyType && propertyType.required)
-    || (value !== propertyType.default)
-  ) {
-    hidden = ''
-  }
-
   if (propertyType.enum) {
     // Enum/select field
     return (
@@ -55,7 +44,7 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
         id={id}
         className={bgcol}
         aria-placeholder={propertyType.title ?? propertyType.name}
-        value={value}
+        defaultValue={value}
         onChange={e => handleChange(e.target.value)}
         onFocus={onFocus}
         ref={input}
@@ -73,7 +62,7 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
       <select
         id={id}
         aria-placeholder={propertyType.title ?? propertyType.name}
-        value={value ? 1 : 0}
+        defaultValue={value ? 1 : 0}
         className={bgcol}
         onChange={e => { handleChange(e.target.value ? true : false) }}
         onFocus={onFocus}
@@ -86,12 +75,16 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
     )
   } else if (propertyType.type === 'integer') {
     // Integer field
+    var placeholder = (propertyType.title ?? propertyType.name)
+    if (placeholder && propertyType.default) {
+      placeholder = placeholder + ' (default ' + propertyType.default + ')'
+    }
     return (
       <input className={classes + bgcol}
         id={id}
         type='text'
-        placeholder={propertyType.title ?? propertyType.name}
-        value={value}
+        placeholder={placeholder}
+        defaultValue={value}
         onChange={e => handleChange(e.target.value)}
         onKeyUp={(e => {
           if (e.key === 'Enter') {
@@ -104,13 +97,17 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
       />
     )
   } else if (propertyType.type === 'string') {
+    var placeholder = (propertyType.title ?? propertyType.name)
+    if (placeholder && propertyType.default) {
+      placeholder = placeholder + ' (default ' + propertyType.default + ')'
+    }
     if (propertyType.maxLength && propertyType.maxLength <= 1000) {
       // Short text field
       return (
         <input className={classes + bgcol}
           id={id}
           type='text'
-          value={value}
+          defaultValue={value}
           onChange={e => handleChange(e.target.value)}
           onKeyUp={(e => {
             if (e.key === 'Enter') {
@@ -120,7 +117,7 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
           })}
           onFocus={onFocus}
           ref={input}
-          placeholder={propertyType.title ?? propertyType.name}
+          placeholder={placeholder}
         />
       )
     } else {
@@ -129,7 +126,7 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
         <Textarea className={classes + ' h-6' + bgcol}
           id={id}
           placeholder={propertyType.title ?? propertyType.name}
-          value={value}
+          defaultValue={value}
           onChange={e => handleChange(e.target.value)}
           onFocus={onFocus}
           ref={input}
@@ -141,7 +138,7 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
     const itemType : PropertyType = propertyType.items
     const itemTypeLabel = itemType.ref || itemType.type
     return (
-      <div className={hidden + bgcol}>
+      <div className={bgcol}>
         {value && value.map((v : any, i : number) => {
           return (
             <div className="flex grow" key={field + i}>
@@ -150,7 +147,6 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
               </div>
               <OASValueEditor
                 id={field + i}
-                visible={visible}
                 value={v}
                 propertyType={itemType}
                 schema={schema}
@@ -159,7 +155,7 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
                 bg={bg}
                 index={i}
                 onChange={(v) => {
-                  var newArr = [...value[field]];
+                  var newArr = [...value];
                   newArr[i] = v;
                   handleChange(newArr);
                 }}
@@ -230,7 +226,7 @@ function OASValueEditor({ id, schema, bg, value, visible, onChange, onHelpChange
     }
 
     return (
-      <div className={"flex grow flex-col" + hidden + bgcol}>
+      <div className={"flex grow flex-col" + bgcol}>
         <div className="flex">
           <div className="">
             &nbsp;&nbsp;

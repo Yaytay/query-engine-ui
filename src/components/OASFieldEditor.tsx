@@ -18,9 +18,8 @@ interface OASFieldEditorProps {
   , index: number
   , visible: boolean
   , propertyType: PropertyType
-  , onDrop?: any
 }
-function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHelpChange, propertyType, onDrop, index }: OASFieldEditorProps) {
+function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHelpChange, propertyType, index }: OASFieldEditorProps) {
 
   const colours = [' bg-white', ' bg-slate-50', ' bg-slate-100', ' bg-slate-200', ' bg-slate-300']
 
@@ -51,19 +50,18 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
     e.preventDefault()
   }
 
-
-  var hidden = '' //' hidden'
-  if (visible
-    || (propertyType && propertyType.required)
-    || (value && value[field] && value[field] !== (propertyType.default))
+  if (
+    !visible
+    && !(propertyType && propertyType.required)
+    && !(value !== propertyType.default)
   ) {
-    hidden = ''
+    return (<div className='hidden'></div>)
   }
 
   if (propertyType.type === 'object') {
     // Single value
     return (
-      <div className={"align-top" + hidden + bgcol}>
+      <div className={"align-top" + bgcol}>
         <label className="px-1 text-blue-500 reflabel" onClick={onFocus}>{field}:</label>
         <div className="grow flex flex-col">
           <OASValueEditor
@@ -76,28 +74,32 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
             onHelpChange={onHelpChange}
             onChange={(v) => { onChange(field, v) }}
             onFocus={onFocus}
-            visible={visible}
             field={field}
             index={index}
-            onDrop={onDrop}
           />
         </div>
       </div>
     )
-  } else if (propertyType.type === 'array') {
+  } else if (propertyType.type === 'array' && propertyType.items) {
     // Array
+    const itemType : PropertyType = propertyType.items
+    const itemTypeLabel = itemType.ref || itemType.type
     return (
-      <div className={"align-top" + hidden + bgcol}>
+      <div className={"align-top" + bgcol}>
         <div className='flex'>
           <label className="px-1 text-blue-500 flex" onClick={onFocus}>{field}:</label>
           <div className='grow'></div>
           <div className=''>
             <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
               var newArr = value ? [...value] : [];
-              newArr.push({});
+              if (itemType.ref) {
+                newArr.push({});
+              } else {
+                newArr.push('');
+              }
               onChange(field, newArr);
             }}>
-              <Tooltip title={'Create a new ' + (propertyType.items?.ref ? propertyType.items?.ref : propertyType.items?.type)}>
+              <Tooltip title={'Create a new ' + itemTypeLabel}>
                 <AddIcon fontSize="inherit" />
               </Tooltip>
             </IconButton>
@@ -113,17 +115,15 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
           onHelpChange={onHelpChange}
           onChange={(v) => { onChange(field, v) }}
           onFocus={onFocus}
-          visible={visible}
           field={field}
           index={index}
-          onDrop={onDrop}
         />
       </div>
     )
   } else {
     // Primitive
     return (
-      <div className={"flex align-top" + hidden + bgcol}>
+      <div className={"flex align-top" + bgcol}>
         <label className="px-1 text-blue-500 stdlabel" onClick={onFocus}>{field}:</label>
         <OASValueEditor
           id={id}
@@ -135,10 +135,8 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
           onHelpChange={onHelpChange}
           onChange={(v) => { onChange(field, v) }}
           onFocus={onFocus}
-          visible={visible}
           field={field}
           index={index}
-          onDrop={onDrop}
         />
       </div>
     )
