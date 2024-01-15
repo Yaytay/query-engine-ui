@@ -24,7 +24,7 @@
     "vite-plugin-svgr": "^4.2.0"
   },
   "devDependencies": {
-    "@cyclonedx/cyclonedx-npm": "^1.16.0",
+    "@cyclonedx/cyclonedx-npm": "^1.16.1",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
