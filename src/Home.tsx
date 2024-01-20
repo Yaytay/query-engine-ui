@@ -34,6 +34,14 @@ function Home(props : HomeProps) {
                         </div>
                     </Link>
                 }
+                { props.profile && 
+                    <Link to="/ui/history">
+                        <div className="w-80 h-60 bg-zinc-100 p-4 m-10 float-left text-center">
+                            <h2>History</h2>
+                            See the pipelines that you have run before.
+                        </div>
+                    </Link>
+                }
                 { props.managementEndpoints && 
                     <Link to="/ui/manage">
                         <div className="w-80 h-60 bg-zinc-100 p-4 m-10 float-left text-center">

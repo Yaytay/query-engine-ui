@@ -49,9 +49,10 @@ function ServiceUnavailable(props: ServiceUnavailableProps) {
         display: 'grid',
         placeItems: 'center',
         paddingTop: '10px',
-        paddingBottom: '20px',        
+        paddingBottom: '20px',      
+        textAlign: 'center'  
         }}>
-        <h3>Service Unavailable</h3>
+        <h3>Service Unavailable</h3>        
         The service is not available at {props.baseUrl}.          
         <br/>
         Please make the service available and refresh this page.

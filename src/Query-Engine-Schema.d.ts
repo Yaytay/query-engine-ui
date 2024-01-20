@@ -52,6 +52,10 @@ export interface paths {
     /** @description Return a form.io definition for a given document */
     get: operations["getFormIO"];
   };
+  "/api/history": {
+    /** @description Return details of the current user */
+    get: operations["getHistory"];
+  };
   "/api/info/available": {
     /** @description Return a list of available pipelines */
     get: operations["getAvailable_1"];
@@ -1769,6 +1773,74 @@ export interface components {
        */
       path: string;
     };
+    /** @description Information about requests made to the query engine by a single user. */
+    AuditHistory: {
+      /**
+       * Format: int64
+       * @description <P>The index of the first row (out of all those for the current user) present in this dataset.</P>
+       * <P>This shhould equal the skipsRows argument passed in the request for history.</P>
+       */
+      firstRow: number;
+      /**
+       * Format: int64
+       * @description <P>The total number of history records that the current user has.</P>
+       */
+      totalRows: number;
+      /**
+       * @description <P>Details of specific requests to the query engine for the current user.</P>
+       * <P>The number of entries in this array should be no greater than the maxRows argument passed in the request for history.</P>
+       */
+      rows: components["schemas"]["AuditHistoryRow"][];
+    };
+    /** @description Record of a request made against the Query Engine. */
+    AuditHistoryRow: {
+      /**
+       * Format: date-time
+       * @description Timestamp of the request.
+       */
+      timestamp: string;
+      /** @description Unique ID for the request. */
+      id: string;
+      /** @description Path to the pipeline. */
+      path: string;
+      /** @description Arguments passed to the pipeline. */
+      arguments: Record<string, never>;
+      /** @description The host from the request. */
+      host: string;
+      /** @description The issuer of the token used to authenticate the user. */
+      issuer: string;
+      /** @description The subject from the token (unique ID for the user within the issuer). */
+      subject: string;
+      /** @description The user name of the user making the request. */
+      username: string;
+      /** @description The human name of the user making the request. */
+      name: string;
+      /**
+       * Format: int32
+       * @description The HTTP response code that the request generated.
+       */
+      responseCode: number;
+      /**
+       * Format: int64
+       * @description The number of rows returned by the request.
+       */
+      responseRows: number;
+      /**
+       * Format: int64
+       * @description The number of bytes returned by the request.
+       */
+      responseSize: number;
+      /**
+       * Format: double
+       * @description The time between the request being made and the first row being returned.
+       */
+      responseStreamStart: number;
+      /**
+       * Format: double
+       * @description The time between the request being made and the final row being returned.
+       */
+      responseDuration: number;
+    };
     /**
      * @description <P>
      * A directory containing pipelines.
@@ -2106,6 +2178,23 @@ export interface operations {
       200: {
         content: {
           "application/json": unknown;
+        };
+      };
+    };
+  };
+  /** @description Return details of the current user */
+  getHistory: {
+    parameters: {
+      query?: {
+        skipRows?: number;
+        maxRows?: number;
+      };
+    };
+    responses: {
+      /** @description Details of the current user. */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AuditHistory"];
         };
       };
     };

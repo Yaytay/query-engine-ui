@@ -257,6 +257,13 @@ function Nav(props : NavProps) {
                     onClick={() => console.log('Clicked')}
                   /> 
                 }
+                { props.profile && 
+                  <Link to="/ui/history">
+                    <Button key='History' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>
+                      History
+                    </Button>
+                  </Link>
+                }
                 { props.managementEndpoints && 
                   <Link to="/ui/manage">
                     <Button key='Manage' sx={{ my: 2, color: 'white' }} onClick={handleCloseMenu}>

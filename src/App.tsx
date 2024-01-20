@@ -10,6 +10,7 @@ import Nav from './components/Nav';
 import Login from './components/Login';
 import Home from './Home';
 import Demo from './Demo';
+import History from './History';
 import Test from './Test';
 import Help from './Help';
 import Api from './Api';
@@ -157,8 +158,10 @@ function App() {
   }
 
   const getProfile = function (headers: any) {
+    console.log('Getting profile')
     let profurl = new URL(baseUrl + 'api/session/profile')
     return new Promise(resolve => {
+      console.log("authConfigs: ", authConfigs)
       if (authConfigs) {
         fetch(profurl, headers)
           .then(r => {
@@ -265,6 +268,7 @@ function App() {
               <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} accessToken={accessToken} />}></Route>
             }
             <Route path='/ui/demo' element={<Demo />}></Route>
+            <Route path='/ui/history' element={<History baseUrl={baseUrl} accessToken={accessToken} />}></Route>
             <Route path='/ui/manage' element={<Manage endpoints={managementEndpoints} />}></Route>
             <Route path='/ui/manage/:stub' element={<Manage endpoints={managementEndpoints} />}></Route>
             {docs &&
