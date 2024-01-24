@@ -19,7 +19,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 interface HelpProps {
   docs: components["schemas"]["DocDir"]
   , baseUrl: string
-  , accessToken: string | null
 }
 
 function Help(props : HelpProps) {

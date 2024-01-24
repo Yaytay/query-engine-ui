@@ -1516,7 +1516,7 @@ export interface components {
        * @description <P>The scope of the rate limit rule.</P>
        * <P>At least one value must be provided.</P>
        */
-      scope: ("host" | "path" | "clientip" | "username")[];
+      scope: ("host" | "path" | "clientip" | "issuer" | "subject" | "username")[];
       /**
        * @description <P>The duration of the rate limit.</P>
        * <P>Expressions in ISO8601 time period notication (e.g. PT10M for ten minutes).</P>
@@ -2188,6 +2188,8 @@ export interface operations {
       query?: {
         skipRows?: number;
         maxRows?: number;
+        sort?: "timestamp" | "id" | "path" | "host" | "issuer" | "subject" | "username" | "name" | "responseCode" | "responseRows" | "responseSize" | "responseStreamStart" | "responseDuration";
+        desc?: boolean;
       };
     };
     responses: {

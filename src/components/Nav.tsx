@@ -49,7 +49,6 @@ interface NavProps {
   , window: Window
   , profile: components["schemas"]["Profile"] | null
   , docs: components["schemas"]["DocDir"] | null
-  , accessToken: string | null
 }
 
 function Nav(props : NavProps) {
@@ -181,7 +180,6 @@ function Nav(props : NavProps) {
             closeable={true} 
             columns={columns}
             displayUrl={true}
-            accessToken={props.accessToken}
             />
       </Modal>
       <AppBar position="static">

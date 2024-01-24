@@ -21,7 +21,6 @@ interface TestProps {
   available: components["schemas"]["PipelineDir"]
   , baseUrl: string
   , window: Window
-  , accessToken: string
 }
 
 export function ArgsToArgs(pipeline: components["schemas"]["PipelineFile"], args : any) {
@@ -156,17 +155,6 @@ function Test(props : TestProps) {
     return null;
   }
 
-  function headersWithAcceptAndToken(type : string | null) : Headers {
-    const headers = new Headers() 
-    if (type) {
-      headers.set('Accept', type)
-    }
-    if (props.accessToken) {
-      headers.set('Authorization', 'Bearer ' + props.accessToken)
-    }
-    return headers
-  }
-
   function submit(values: any) : Promise<void> {
     if (!currentFile) {
       return Promise.resolve()
@@ -186,7 +174,7 @@ function Test(props : TestProps) {
       return Promise.resolve()
     } else {
 
-      return fetch(url, {headers: headersWithAcceptAndToken(null)})
+      return fetch(url, {credentials: 'include'})
         .then(r => {
           if (r.ok) {
             const type = r.headers.get('Content-Type');
@@ -283,7 +271,6 @@ function Test(props : TestProps) {
                   values={args} 
                   columns={1} 
                   displayUrl={true} 
-                  accessToken={props.accessToken}
                   />) }
             </TabPanel>
           </div>

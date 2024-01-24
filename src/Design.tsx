@@ -26,7 +26,6 @@ var onChange = () => {};
 interface DesignProps {
   onChange :  () => void
   , baseUrl : string
-  , accessToken : string
 }
 function Design(props : DesignProps) {
 
@@ -71,28 +70,6 @@ function Design(props : DesignProps) {
         setParents(n)
       }
     })
-  }
-
-  function headersWithTypeAndToken(type : string | null) : Headers {
-    const headers = new Headers() 
-    if (type) {
-      headers.set('Content-Type', type)
-    }
-    if (props.accessToken) {
-      headers.set('Authorization', 'Bearer ' + props.accessToken)
-    }
-    return headers
-  }
-
-  function headersWithAcceptAndToken(type : string | null) : Headers {
-    const headers = new Headers() 
-    if (type) {
-      headers.set('Accept', type)
-    }
-    if (props.accessToken) {
-      headers.set('Authorization', 'Bearer ' + props.accessToken)
-    }
-    return headers
   }
 
   const getAllDirs = useCallback((root : components["schemas"]["DesignDir"]) => {
@@ -149,12 +126,12 @@ function Design(props : DesignProps) {
 
   useEffect(() => {
     let url = new URL(props.baseUrl + 'api/design/all');
-    handleResponse(fetch(url, {headers: headersWithTypeAndToken(null)}))
+    handleResponse(fetch(url, {credentials: 'include'}))
       .then(j => {
         setExpanded(getAllDirs(j));
       })
     let openApiUrl = new URL(props.baseUrl + 'openapi.json');
-    fetch(openApiUrl, {headers: headersWithTypeAndToken(null)})
+    fetch(openApiUrl, {credentials: 'include'})
       .then(r => {
         if (!r.ok) {
           return r.text().then(t => {
@@ -182,7 +159,7 @@ function Design(props : DesignProps) {
     const url = new URL(props.baseUrl + 'api/design/validate');
     console.log(fileContents)
 
-    fetch(url, { method: 'POST', body: JSON.stringify(fileContents), headers: headersWithTypeAndToken('application/json') })
+    fetch(url, { method: 'POST', body: JSON.stringify(fileContents), credentials: 'include', headers: {'Content-Type': 'application/json'} })
       .then(r => {
         if (!r.ok) {
           return r.text().then(t => {
@@ -208,16 +185,13 @@ function Design(props : DesignProps) {
       return
     }    
     const url = new URL(props.baseUrl + 'api/design/file/' + currentFile.path)
-    var type : string;
     var contents : string;
     if (currentFile.path.endsWith('.jexl')) {
-      type = 'application/jexl'
       contents = fileContentsString || ''
     } else {
-      type = 'application/json'
       contents = JSON.stringify(fileContents)
     }
-    fetch(url, { method: 'PUT', body: contents, headers: headersWithTypeAndToken(type) })
+    fetch(url, { method: 'PUT', body: contents, credentials: 'include', headers: {'Content-Type': 'application/json'} })
       .then(r => {
         if (!r.ok) {
           return r.text().then(t => {
@@ -241,7 +215,7 @@ function Design(props : DesignProps) {
       setCurrentFile(node);
       setHelpText('');
       let nodeUrl = new URL(props.baseUrl + 'api/design/file/' + node.path);
-      fetch(nodeUrl, { headers: headersWithAcceptAndToken('application/json, */*;q=0.8') })
+      fetch(nodeUrl, { credentials: 'include', headers: { 'Accept' : 'application/json, */*;q=0.8' } })
         .then(r => {
           if (!r.ok) {
             return r.text().then(t => {
@@ -281,7 +255,7 @@ function Design(props : DesignProps) {
     const newPath = node.path.substring(0, node.path.lastIndexOf("/") + 1) + newName;
     console.log("Rename from " + oldPath + " to " + newPath)
     let url = new URL(props.baseUrl + 'api/design/rename/' + node.path + '?name=' + encodeURIComponent(newName));
-    handleResponse(fetch(url, { method: 'POST', headers: headersWithTypeAndToken(null) }))
+    handleResponse(fetch(url, { method: 'POST', credentials: 'include' }))
       .then((_ : any) => {
         const idx = expanded.findIndex(p => p === oldPath);
         if (idx >= 0) {
@@ -304,7 +278,7 @@ function Design(props : DesignProps) {
     if (expanded.find(n => n === node.path) === undefined) {
       expanded.push(node.path);
     }
-    handleResponse(fetch(url, { method: 'PUT', headers: headersWithTypeAndToken( 'inode/directory' )}));
+    handleResponse(fetch(url, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'inode/directory' }}));
   }
 
   function onNewPipeline(node : components["schemas"]["DesignDir"]) {
@@ -316,7 +290,7 @@ function Design(props : DesignProps) {
     if (expanded.find(n => n === node.path) === undefined) {
       expanded.push(node.path);
     }
-    handleResponse(fetch(url, { method: 'PUT', headers: headersWithTypeAndToken( 'application/yaml' ) }));
+    handleResponse(fetch(url, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/yaml' } }));
   }
 
   function onNewPermissions(node : components["schemas"]["DesignDir"]) {
@@ -326,12 +300,12 @@ function Design(props : DesignProps) {
     if (expanded.find(n => n === node.path) === undefined) {
       expanded.push(node.path);
     }
-    handleResponse(fetch(url, { method: 'PUT', headers: headersWithTypeAndToken( 'application/jexl' ), body: '' }));
+    handleResponse(fetch(url, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/jexl' }, body: '' }));
   }
 
   function onDelete(node: components["schemas"]["DesignNode"]) {
     const url = new URL(props.baseUrl + 'api/design/file/' + node.path);
-    handleResponse(fetch(url, { method: 'DELETE', headers: headersWithTypeAndToken( null ) }));
+    handleResponse(fetch(url, { method: 'DELETE', credentials: 'include' }));
   }
 
   const [expanded, setExpanded] = useState([] as string[])

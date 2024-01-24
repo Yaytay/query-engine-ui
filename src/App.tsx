@@ -5,7 +5,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Suspense, lazy, useState, useEffect } from 'react';
-import { useSearchParams, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Nav from './components/Nav';
 import Login from './components/Login';
 import Home from './Home';
@@ -28,11 +28,10 @@ function App() {
     , "docs": null as components["schemas"]["DocDir"] | null
     , "designMode": false
     , "profile": null as components["schemas"]["Profile"] | null
-    , "authConfigs": null as components["schemas"]["AuthConfig"][] | null
+    , "authConfigs": [] as components["schemas"]["AuthConfig"][] 
   };
 
   const [baseUrl, _] = useState(buildApiBaseUrl())
-  const [searchParams, setSearchParams] = useSearchParams();
   const [available, setAvailable] = useState(defaultState.available)
   const [designMode, setDesignMode] = useState(defaultState.designMode)
   const [docs, setDocs] = useState(defaultState.docs)
@@ -42,9 +41,8 @@ function App() {
   const [authConfigs, setAuthConfigs] = useState(defaultState.authConfigs)
   const [displayAuthSelection, setDisplayAuthSelection] = useState(false)
   const [displayServiceUnavailable, setDisplayServiceUnavailable] = useState(false)
-  const [accessToken, setAccessToken] = useState('')
 
-  console.log('Current URL:', window.location.href)
+  const fetchConfig = {credentials: 'include' as RequestCredentials}
 
   function buildApiBaseUrl(): string {
     var url = ''
@@ -59,7 +57,6 @@ function App() {
         url = url + '/'
       }
     }
-    console.log("API URL: ", url)
     return url
   }
 
@@ -69,26 +66,11 @@ function App() {
   }
 
   useEffect(() => {
-    if (searchParams.has('access_token')) {
-      var token = searchParams.get('access_token')
-      if (token) {
-        console.log('Setting access token', token)
-        setAccessToken(token)
-        searchParams.delete('access_token')
-        setSearchParams(searchParams)
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    console.log('Access token:', accessToken)
-
-    const headers = accessToken ? { headers: { Authorization: 'Bearer ' + accessToken } } : {}
-    getProfile(headers)
+    getProfile()
       .then(good => {
         if (good) {
           let url = new URL(baseUrl + 'api/info/available')
-          fetch(url, headers)
+          fetch(url, fetchConfig)
             .then(r => {
               if (r.ok) {
                 return r.json()
@@ -100,7 +82,7 @@ function App() {
               setAvailable(j);
             })
           let docurl = new URL(baseUrl + 'api/docs');
-          fetch(docurl, headers)
+          fetch(docurl, fetchConfig)
             .then(r => {
               if (r.ok) {
                 return r.json()
@@ -112,12 +94,12 @@ function App() {
               setDocs(j);
             })
           let dmurl = new URL(baseUrl + 'api/design/enabled');
-          fetch(dmurl, headers)
+          fetch(dmurl, fetchConfig)
             .then(r => {
               setDesignMode(r.ok)
             })
           let murl = new URL(baseUrl + 'manage');
-          fetch(murl, headers)
+          fetch(murl, fetchConfig)
             .then(r => {
               if (r.ok) {
                 return r.json()
@@ -127,7 +109,7 @@ function App() {
             })
             .then(j => {
               if (j.location) {
-                fetch(j.location, headers)
+                fetch(j.location, fetchConfig)
                   .then(r => r.json())
                   .then(j => {
                     setManagementEndpoints(j);
@@ -137,7 +119,7 @@ function App() {
               }
             })
           let apidocurl = new URL(baseUrl + 'openapi');
-          fetch(apidocurl)
+          fetch(apidocurl, fetchConfig)
             .then(r => {
               if (r.ok) {
                 setApiUrl(baseUrl + 'openapi');
@@ -145,47 +127,52 @@ function App() {
             })
         }
       })
-  }, [baseUrl, accessToken]);
+  }, [baseUrl]);
 
   const refresh = function () {
     let url = new URL(baseUrl + 'api/info/available');
-    const headers = accessToken ? { headers: { Authorization: 'Bearer ' + accessToken } } : {}
-    fetch(url, headers)
+    fetch(url, fetchConfig)
       .then(r => r.json())
       .then(j => {
         setAvailable(j);
       })
   }
 
-  const getProfile = function (headers: any) {
+  function performProfileFetch(profurl: URL, resolve: (value: unknown) => void) {
+    fetch(profurl, fetchConfig)
+      .then(r => {
+        console.log('Profile fetch result: ', r);
+        if (r.status === 401) {
+          doLogin(authConfigs);
+        } else if (r.ok) {
+          setDisplayAuthSelection(false);
+          return r.json();
+        } else {
+          setDisplayServiceUnavailable(true);
+          resolve(false);
+        }
+      })
+      .catch(() => {
+        setDisplayServiceUnavailable(true);
+        resolve(false);
+      })
+      .then(j => {
+        console.log('Got profile: ', j);
+        setProfile(j);
+        resolve(true);
+      });
+  }
+
+  const getProfile = function () {
     console.log('Getting profile')
     let profurl = new URL(baseUrl + 'api/session/profile')
     return new Promise(resolve => {
       console.log("authConfigs: ", authConfigs)
-      if (authConfigs) {
-        fetch(profurl, headers)
-          .then(r => {
-            if (r.status === 401) {
-              doLogin(authConfigs)
-            } else if (r.ok) {
-              setDisplayAuthSelection(false)
-              return r.json()
-            } else {
-              setDisplayServiceUnavailable(true)
-              resolve(false)
-            }
-          })
-          .catch(() => {
-            setDisplayServiceUnavailable(true);
-            resolve(false)
-          })
-          .then(j => {
-            setProfile(j);
-            resolve(true)
-          });
+      if (authConfigs.length) {
+        performProfileFetch(profurl, resolve);
       } else {
         let authurl = new URL(baseUrl + 'api/auth-config');
-        fetch(authurl, headers)
+        fetch(authurl, fetchConfig)
           .then(r => {
             if (r.ok) {
               setDisplayServiceUnavailable(false);
@@ -202,19 +189,7 @@ function App() {
           .then(ac => {
             console.log("Setting auth configs to", ac);
             setAuthConfigs(ac);
-            fetch(profurl, headers)
-              .then(r => {
-                if (r.status === 401) {
-                  doLogin(ac);
-                } else {
-                  setDisplayAuthSelection(false);
-                  return r.json();
-                }
-              })
-              .then(j => {
-                setProfile(j);
-                resolve(true)
-              });
+            performProfileFetch(profurl, resolve);
           });
       }
     })
@@ -243,7 +218,6 @@ function App() {
           docs={docs}
           apiUrl={apiUrl}
           profile={profile}
-          accessToken={accessToken}
         />
       </div>
       {displayServiceUnavailable ?
@@ -261,24 +235,24 @@ function App() {
             <Route index path='/ui' element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} docs={docs} available={available} profile={profile} />}></Route>
             <Route path='/ui/design' element={
               <Suspense>
-                <Design baseUrl={baseUrl} onChange={refresh} accessToken={accessToken} />
+                <Design baseUrl={baseUrl} onChange={refresh} />
               </Suspense>
             }></Route>
             {available &&
-              <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} accessToken={accessToken} />}></Route>
+              <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
             }
             <Route path='/ui/demo' element={<Demo />}></Route>
-            <Route path='/ui/history' element={<History baseUrl={baseUrl} accessToken={accessToken} />}></Route>
+            <Route path='/ui/history' element={<History baseUrl={baseUrl} />}></Route>
             <Route path='/ui/manage' element={<Manage endpoints={managementEndpoints} />}></Route>
             <Route path='/ui/manage/:stub' element={<Manage endpoints={managementEndpoints} />}></Route>
             {docs &&
-              <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} accessToken={accessToken} />}></Route>
+              <Route path='/ui/help' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
             }
             {docs &&
-              <Route path='/ui/help/:stub' element={<Help docs={docs} baseUrl={baseUrl} accessToken={accessToken} />}></Route>
+              <Route path='/ui/help/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
             }
             {docs &&
-              <Route path='/ui/help/:parent/:stub' element={<Help docs={docs} baseUrl={baseUrl} accessToken={accessToken} />}></Route>
+              <Route path='/ui/help/:parent/:stub' element={<Help docs={docs} baseUrl={baseUrl} />}></Route>
             }
             {apiUrl &&
               <Route path='/ui/api' element={<Api url={apiUrl} />}></Route>
