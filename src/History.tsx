@@ -23,7 +23,7 @@ interface HistoryProps {
 
 function History(props: HistoryProps) {
 
-  const [history, setHistory] = useState(null as components["schemas"]["AuditHistory"] | null)
+  const [history, setHistory] = useState(null as components["schemas"]["AuditHistoryRow"] | null)
   const [rowsPerPage, setRowsPerPage] = useState(25)
   const [firstRow, setFirstRow] = useState(0)
   const [sortDesc, setSortDesc] = useState(true)
