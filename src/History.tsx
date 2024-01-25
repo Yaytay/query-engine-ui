@@ -23,14 +23,14 @@ interface HistoryProps {
 
 function History(props: HistoryProps) {
 
-  const [history, setHistory] = useState(null as components["schemas"]["AuditHistoryRow"] | null)
+  const [history, setHistory] = useState(null as components["schemas"]["AuditHistory"] | null)
   const [rowsPerPage, setRowsPerPage] = useState(25)
   const [firstRow, setFirstRow] = useState(0)
   const [sortDesc, setSortDesc] = useState(true)
   const [sortField, setSortField] = useState('timestamp')
 
   interface HeadCell {
-    id: keyof components["schemas"]["AuditHistory"];
+    id: keyof components["schemas"]["AuditHistoryRow"];
     label: string;
     sortable: boolean;
   }
