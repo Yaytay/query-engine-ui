@@ -30,7 +30,7 @@ function History(props: HistoryProps) {
   const [sortField, setSortField] = useState('timestamp')
 
   interface HeadCell {
-    id: string;
+    id: keyof components["schemas"]["AuditHistory"];
     label: string;
     sortable: boolean;
   }
