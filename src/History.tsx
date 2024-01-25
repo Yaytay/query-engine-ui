@@ -14,7 +14,7 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import LastPageIcon from '@mui/icons-material/LastPage';
 
-import { components, operations } from "./Query-Engine-Schema";
+import { components } from "./Query-Engine-Schema";
 import TableFooter from '@mui/material/TableFooter';
 
 interface HistoryProps {
