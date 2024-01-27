@@ -31,16 +31,3 @@ body {
   75% { transform: translateX(5px) }
   100% { transform: translateX(0) }
 }
-
-.formio-component-form .qe-arguments .fieldset-body .formio-component {
-  break-inside: avoid-column;
-}
-
-.formio-component-form .qe-arguments .fieldset-body .formio-component .form-text {
-  font-size: 0.8rem;
-}
-
-div.qe-test .qe_formio_cancel_button {
-  display: none;
-}
-

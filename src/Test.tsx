@@ -34,6 +34,13 @@ export function ArgsToArgs(pipeline: components["schemas"]["PipelineFile"], args
       result.push(arg + '=' + encodeURIComponent(args[arg]));
     }
   }
+  if (args['_filters']) {
+    for (var i = 0; i < args['_filters'].length; ++i) {
+      if (args['_filters'][i]['filter'] && args['_filters'][i]['value']) {
+        result.push(args['_filters'][i]['filter'] + '=' + encodeURIComponent(args['_filters'][i]['value']));
+      }
+    }
+  }
   if (args['_fmt']) {
     result.push('_fmt=' + encodeURIComponent(args['_fmt']));
   }

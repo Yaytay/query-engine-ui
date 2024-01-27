@@ -4,6 +4,7 @@ import { Formio }  from 'formiojs';
 import { components } from "../Query-Engine-Schema";
 import { ArgsToArgs } from '../Test';
 import equal from 'fast-deep-equal/es6/react';
+import './Parameters.css';
 
 interface ParametersProps {
   baseUrl : string

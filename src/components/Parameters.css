@@ -1,0 +1,36 @@
+.Required {
+  color: red;
+}
+
+div.qe-filters-datagrid table.datagrid-table, div.qe-filters-datagrid table.datagrid-table td, div.qe-filters-datagrid table.datagrid-table th  {
+  border: none !important;
+  padding: 0px;
+}
+
+div.qe-filters-datagrid .table-bordered, div.qe-filters-datagrid .table-bordered tr {
+  border: none !important;
+}
+
+.formio-component-form .qe-arguments .fieldset-body .formio-component {
+  break-inside: avoid-column;
+}
+
+.formio-component-form .qe-arguments .fieldset-body .formio-component .form-text {
+  font-size: 0.8rem;
+}
+
+div.qe-test .qe_formio_cancel_button {
+  display: none;
+}
+
+.choices__item.choices__item--selectable {
+  overflow: visible;
+}
+
+.qe-filter-select {
+  width: 8em;
+}
+
+.formio-component-datagrid {
+  overflow: unset;
+}
