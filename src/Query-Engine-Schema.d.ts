@@ -438,11 +438,11 @@ export interface components {
      * <P>
      * Some examples Conditions are
      * <UL>
-     * <LI><pre>req != null</pre>
+     * <LI><pre>requestContext != null</pre>
      * Checks that the request context is not null, pretty useless in a live environment.
-     * <LI><PRE>req.clientIpIsIn('127.0.0.1/32','172.17.0.1/16','0:0:0:0:0:0:0:1')</PRE>
+     * <LI><PRE>requestContext.clientIpIsIn('127.0.0.1/32','172.17.0.1/16','0:0:0:0:0:0:0:1')</PRE>
      * Checks that the client IP address is either localhost or in "172.17.0.0/16".
-     * <LI><PRE>req.host == 'localhost'</PRE>
+     * <LI><PRE>requestContext.host == 'localhost'</PRE>
      * Checks that the host on the request is localhost.
      * </UL>
      */
@@ -631,7 +631,7 @@ export interface components {
        */
       url?: string;
       /**
-       * @description <P>A StringTemplate that will be evaluated as the URL that defines the Endpoint.</P>
+       * @description <P>A StringTemplate that will be rendered as the URL that defines the Endpoint.</P>
        * <P>
        * Invalid if the URL field is provided.
        * </P>
@@ -1318,7 +1318,9 @@ export interface components {
        *
        * @enum {string}
        */
-      type: "LIMIT" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "SCRIPT";
+      type: "LIMIT" | "OFFSET" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "SCRIPT" | "WITHOUT" | "QUERY" | "RELABEL";
+      /** @description <P>Optional condition that controls whether the processor will be run.</P> */
+      condition?: components["schemas"]["Condition"];
     };
     /**
      * @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
@@ -1604,6 +1606,13 @@ export interface components {
        * </P>
        */
       query?: string;
+      /**
+       * @description <P>The query to run against the Endpoint, as a <A href="https://github.com/antlr/stringtemplate4/blob/master/doc/introduction.md">StringTemplate</A> that will be rendered first.</P>
+       * <P>
+       * A StringTemplate that results in a SQL statement.
+       * </P>
+       */
+      queryTemplate?: string;
       /**
        * Format: int32
        * @description <P>The number of rows to get from the Source at a time.</P>
