@@ -42,7 +42,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "mui-nested-menu": "^3.3.0",
-    "postcss": "^8.4.33",
+    "postcss": "^8.4.36",
     "react-expanding-textarea": "^2.3.6",
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.22.0",
