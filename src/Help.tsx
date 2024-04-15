@@ -163,7 +163,7 @@ function Help(props : HelpProps) {
                   selectedItems={selected}
                   onExpandedItemsChange={handleToggle}
                   onSelectedItemsChange={handleSelect}
-                    sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                  sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                 >
                   {props.docs.children && props.docs.children.map((node) => renderTree(node))}
                 </SimpleTreeView>
