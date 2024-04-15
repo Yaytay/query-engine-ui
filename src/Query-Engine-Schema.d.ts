@@ -8,10 +8,6 @@
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 export interface paths {
-  "/api/auth-config": {
-    /** @description Return details of the available OAuth providers */
-    get: operations["get"];
-  };
   "/api/design/file/{path}": {
     /** @description Return the contents of file. */
     get: operations["getFile"];
@@ -52,17 +48,9 @@ export interface paths {
     /** @description Return a form.io definition for a given document */
     get: operations["getFormIO"];
   };
-  "/api/history": {
-    /** @description Return details of the current user */
-    get: operations["getHistory"];
-  };
   "/api/info/available": {
     /** @description Return a list of available pipelines */
     get: operations["getAvailable_1"];
-  };
-  "/api/session/profile": {
-    /** @description Return details of the current user */
-    get: operations["getProfile"];
   };
 }
 
@@ -70,114 +58,22 @@ export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
-    /**
-     * @description <P>
-     * Configuration data for the display of authentication selection.
-     * </P>
-     */
-    AuthConfig: {
-      /**
-       * @description <P>
-       * The name to use in the list of authentication providers.
-       * </P>
-       */
-      name: string;
-      /**
-       * Format: uri
-       * @description <P>
-       * The URL to the logo to use in the list of authentication providers.
-       * </P>
-       */
-      logo: string;
-    };
-    /**
-     * @description <P>
-     * A directory containing pipeline files.
-     * </P>
-     */
     DesignDir: {
-      /**
-       * @description <P>
-       * The leaf name of the node.
-       * </P>
-       */
       name: string;
-      /**
-       * @description <P>
-       * The children of the node.
-       * </P>
-       * <P>
-       * If this is null then the node is a file, otherwise it is a directory.
-       * </P>
-       */
       children: components["schemas"]["DesignNode"][];
-      /**
-       * @description <P>
-       * The relative path to the node from the root.
-       * </P>
-       */
       path: string;
-      /**
-       * Format: date-time
-       * @description <P>
-       * The time that the design file was last modified, as reported by the underlying filesystem.
-       * </P>
-       * <P>
-       * Design files must be stored on a filesystem that supports a last-modified timestamp.
-       * </P>
-       */
+      /** Format: date-time */
       modified: string;
     };
-    /**
-     * @description <P>
-     * A pipeline definition file.
-     * </P>
-     */
     DesignFile: WithRequired<components["schemas"]["DesignNode"] & {
-      /**
-       * Format: int64
-       * @description <P>
-       * The size of the file on disc, in bytes.
-       * </P>
-       */
+      /** Format: int64 */
       size?: number;
     }, "modified" | "name" | "path" | "size">;
-    /**
-     * @description <P>
-     * Base class for pipeline design files and the directories that contain them.
-     * </P>
-     */
     DesignNode: {
-      /**
-       * @description <P>
-       * The leaf name of the node.
-       * </P>
-       */
       name: string;
-      /**
-       * @description <P>
-       * The children of the node.
-       * </P>
-       * <P>
-       * If this is null then the node is a file, otherwise it is a directory.
-       * </P>
-       */
       children?: components["schemas"]["DesignNode"][];
-      /**
-       * @description <P>
-       * The relative path to the node from the root.
-       * </P>
-       */
       path: string;
-      /**
-       * Format: date-time
-       * @description <P>
-       * The time that the design file was last modified, as reported by the underlying filesystem.
-       * </P>
-       * <P>
-       * Design files must be stored on a filesystem that supports a last-modified timestamp.
-       * </P>
-       */
+      /** Format: date-time */
       modified: string;
     };
     /**
@@ -321,17 +217,7 @@ export interface components {
        * </P>
        */
       maximumValue?: string;
-      /**
-       * @description <P>A list of possible values that the argument may have.</P>
-       * <P>
-       * The possible values are not validated, if an invalid value is provided the pipeline will still
-       * attempt to run with it.
-       * </P>
-       * <P>
-       * If more than a few values are possible the possibleValuesUrl should be used instead.
-       * </P>
-       */
-      possibleValues?: components["schemas"]["ArgumentValue"][];
+      possibleValues?: unknown[];
       /**
        * @description <P>A URL that will provide a list of possible values that the argument may have.</P>
        * <P>
@@ -438,17 +324,16 @@ export interface components {
      * <P>
      * Some examples Conditions are
      * <UL>
-     * <LI><pre>requestContext != null</pre>
+     * <LI><pre>req != null</pre>
      * Checks that the request context is not null, pretty useless in a live environment.
-     * <LI><PRE>requestContext.clientIpIsIn('127.0.0.1/32','172.17.0.1/16','0:0:0:0:0:0:0:1')</PRE>
+     * <LI><PRE>req.clientIpIsIn('127.0.0.1/32','172.17.0.1/16','0:0:0:0:0:0:0:1')</PRE>
      * Checks that the client IP address is either localhost or in "172.17.0.0/16".
-     * <LI><PRE>requestContext.host == 'localhost'</PRE>
+     * <LI><PRE>req.host == 'localhost'</PRE>
      * Checks that the host on the request is localhost.
      * </UL>
      */
     Condition: {
-      /** @description The expression that makes up the condition. */
-      expression: string;
+      expression?: string;
     };
     /**
      * @description <P>
@@ -610,8 +495,6 @@ export interface components {
      * </P>
      */
     Endpoint: {
-      /** @description <P>The name of the Endpoint, that will be used to refer to it in Sources. */
-      name: string;
       /**
        * @description <P>The type of Endpoint being configured</P>
        *
@@ -619,7 +502,6 @@ export interface components {
        */
       type: "SQL" | "HTTP";
       /**
-       * Format: uri
        * @description <P>A URL that defines the Endpoint.</P>
        * <P>
        * Invalid if the URL template field is provided.
@@ -631,7 +513,7 @@ export interface components {
        */
       url?: string;
       /**
-       * @description <P>A StringTemplate that will be rendered as the URL that defines the Endpoint.</P>
+       * @description <P>A StringTemplate that will be evaluated as the URL that defines the Endpoint.</P>
        * <P>
        * Invalid if the URL field is provided.
        * </P>
@@ -719,6 +601,25 @@ export interface components {
      */
     Format: {
       /**
+       * @description <P>The media type of the format.</P>
+       * <P>
+       * The media type is used to determine the format based upon the Accept header in the request.
+       * If multiple formats have the same media type the first in the list will be used.
+       * </P>
+       * <P>
+       * The media type will also be set as the Content-Type header in the response.
+       * </P>
+       */
+      mediaType?: unknown;
+      /**
+       * @description <P>The extension of the format.</P>
+       * <P>
+       * The extension is only used to determine the format based upon the URL path.
+       * If multiple formats have the same extension the first in the list will be used.
+       * </P>
+       */
+      extension?: string;
+      /**
        * @description <P>The name of the format.</P>
        * <P>
        * The name is used to determine the format based upon the '_fmt' query string argument.
@@ -737,87 +638,22 @@ export interface components {
        * @enum {string}
        */
       type: "JSON" | "XLSX" | "Delimited" | "HTML";
-      /**
-       * @description <P>The extension of the format.</P>
-       * <P>
-       * The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-       * If multiple formats have the same extension the first in the list will be used.
-       * </P>
-       */
-      extension?: string;
-      /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       */
-      mediaType?: string;
     };
-    /** @description Configuration for an output format of delimited text. */
     FormatDelimited: WithRequired<{
       type: "Delimited";
     } & Omit<components["schemas"]["Format"], "type"> & {
-      /**
-       * @description <P>The name of the format.</P>
-       * <P>
-       * The name is used to determine the format based upon the '_fmt' query string argument.
-       * </P>
-       * <P>
-       * It is an error for two Formats to have the same name.
-       * This is different from the other Format determinators which can be repeated, the name is the
-       * ultimate arbiter and must be unique.
-       * This ensures that all configured Formats can be used.
-       * </P>
-       *
-       * @default csv
-       */
+      /** @default csv */
       name?: string;
-      /**
-       * @description <P>The extension of the format.</P>
-       * <P>
-       * The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-       * If multiple formats have the same extension the first in the list will be used.
-       * </P>
-       *
-       * @default csv
-       */
+      /** @default csv */
       extension?: string;
-      /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       *
-       * @default text/csv
-       */
-      mediaType?: string;
-      /**
-       * @description The delimiter between field values in the output.
-       *
-       * @default ,
-       */
+      /** @default text/csv */
+      mediaType?: unknown;
+      /** @default , */
       delimiter?: string;
-      /**
-       * @description Any string values in the output will be prefixed by this value.
-       *
-       * @default "
-       */
+      /** @default " */
       openQuote?: string;
-      /**
-       * @description Any string values in the output will be suffixed by this value.
-       *
-       * @default "
-       */
+      /** @default " */
       closeQuote?: string;
-      /** @description Each row in the output will be suffixed by this value. */
       newline?: string;
     }, "type">;
     /**
@@ -847,133 +683,32 @@ export interface components {
     FormatHtml: WithRequired<{
       type: "HTML";
     } & Omit<components["schemas"]["Format"], "type"> & {
-      /**
-       * @description <P>The name of the format.</P>
-       * <P>
-       * The name is used to determine the format based upon the '_fmt' query string argument.
-       * </P>
-       * <P>
-       * It is an error for two Formats to have the same name.
-       * This is different from the other Format determinators which can be repeated, the name is the
-       * ultimate arbiter and must be unique.
-       * This ensures that all configured Formats can be used.
-       * </P>
-       *
-       * @default html
-       */
+      /** @default html */
       name?: string;
-      /**
-       * @description <P>The extension of the format.</P>
-       * <P>
-       * The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-       * If multiple formats have the same extension the first in the list will be used.
-       * </P>
-       *
-       * @default html
-       */
+      /** @default html */
       extension?: string;
-      /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       *
-       * @default text/html
-       */
-      mediaType?: string;
+      /** @default text/html */
+      mediaType?: unknown;
     }, "type">;
-    /**
-     * @description Configuration for an output format of JSON.
-     * There are no formatting options for JSON output.
-     */
     FormatJson: WithRequired<{
       type: "JSON";
     } & Omit<components["schemas"]["Format"], "type"> & {
-      /**
-       * @description <P>The name of the format.</P>
-       * <P>
-       * The name is used to determine the format based upon the '_fmt' query string argument.
-       * </P>
-       * <P>
-       * It is an error for two Formats to have the same name.
-       * This is different from the other Format determinators which can be repeated, the name is the
-       * ultimate arbiter and must be unique.
-       * This ensures that all configured Formats can be used.
-       * </P>
-       *
-       * @default json
-       */
+      /** @default json */
       name?: string;
-      /**
-       * @description <P>The extension of the format.</P>
-       * <P>
-       * The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-       * If multiple formats have the same extension the first in the list will be used.
-       * </P>
-       *
-       * @default json
-       */
+      /** @default json */
       extension?: string;
-      /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       *
-       * @default application/json
-       */
-      mediaType?: string;
+      /** @default application/json */
+      mediaType?: unknown;
     }, "type">;
-    /** @description Configuration for an output format of XLSX. */
     FormatXlsx: WithRequired<{
       type: "XLSX";
     } & Omit<components["schemas"]["Format"], "type"> & ({
-      /**
-       * @description <P>The name of the format.</P>
-       * <P>
-       * The name is used to determine the format based upon the '_fmt' query string argument.
-       * </P>
-       * <P>
-       * It is an error for two Formats to have the same name.
-       * This is different from the other Format determinators which can be repeated, the name is the
-       * ultimate arbiter and must be unique.
-       * This ensures that all configured Formats can be used.
-       * </P>
-       *
-       * @default xlsx
-       */
+      /** @default xlsx */
       name?: string;
-      /**
-       * @description <P>The extension of the format.</P>
-       * <P>
-       * The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-       * If multiple formats have the same extension the first in the list will be used.
-       * </P>
-       *
-       * @default xlsx
-       */
+      /** @default xlsx */
       extension?: string;
-      /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       *
-       * @default application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-       */
-      mediaType?: string;
+      /** @default application/vnd.openxmlformats-officedocument.spreadsheetml.sheet */
+      mediaType?: unknown;
       /**
        * @description <P>The name of the sheet that will contain the data in the Excel Workbook.</P>
        *
@@ -1070,24 +805,10 @@ export interface components {
        * The key in this map is the name of the field as it appears in the data rows as they reach the outputter.
        * </P>
        */
-      columns?: components["schemas"]["FormatXlsxColumn"][];
+      columns?: {
+        [key: string]: components["schemas"]["FormatXlsxColumn"];
+      };
     }), "type">;
-    /**
-     * @description Specification of colours used in XLSX output.
-     * <P>
-     * Colours should be specified as 3 or 4 pairs of hexadecimal digits.
-     * <P>
-     * A colour specification consists of two colours - a foreground colour and a background colour.
-     * <P>
-     * Some examples:
-     * <UL>
-     * <LI>FFFFFF: White
-     * <LI>999999: Grey
-     * <LI>990000: Red
-     * <LI>000099: Blue
-     * <LI>0A5F42: I hope to get around to making these colours more descriptive!
-     * </UL>
-     */
     FormatXlsxColours: {
       /**
        * @description <P>The foreground colour to use.</P>
@@ -1128,13 +849,7 @@ export interface components {
        */
       bgColour?: string;
     };
-    /** @description Specification of the formatting of a column in XLSX output. */
     FormatXlsxColumn: {
-      /**
-       * @description <P>The the name of the column that this definition applies to.</P>
-       * <P>This should match one of the field names in the output.</P>
-       */
-      name: string;
       /** @description <P>The title to put in the header row instead of the field name.</P> */
       header?: string;
       /**
@@ -1153,7 +868,6 @@ export interface components {
        */
       width?: number;
     };
-    /** @description Specification of a font to use in XLSX output. */
     FormatXlsxFont: {
       /** @description <P>The name of the font.</P> */
       fontName?: string;
@@ -1166,6 +880,10 @@ export interface components {
        */
       fontSize?: number;
     };
+    ImmutableMapStringFormatXlsxColumn: {
+      [key: string]: components["schemas"]["FormatXlsxColumn"];
+    };
+    MediaType: unknown;
     /**
      * @description <P>The Pipeline is the fundamental unit of processing in QueryEngine.</P>
      * <P>
@@ -1193,7 +911,6 @@ export interface components {
        * </P>
        */
       source: components["schemas"]["Source"];
-      /** @description <P>Processors to run on the data as it flows from the Source.</P> */
       processors?: components["schemas"]["Processor"][];
       /**
        * @description <P>
@@ -1228,22 +945,6 @@ export interface components {
        * </P>
        */
       rateLimitRules?: components["schemas"]["RateLimitRule"][];
-      /**
-       * @description <P>Declared arguments to the Pipeline.</P>
-       * <P>
-       * Pipelines can receive arguments via the HTTP query string.
-       * Any arguments may be provided and may be processed by the templates of the pipeline, even if they are not
-       * declared here.
-       * Declare all arguments here, otherwise no-one will know that they exist unless they read the pipeline definition.
-       * </P>
-       * <P>
-       * The order in which Arguments are defined here is relevant as it affects the order in which they will be displayed for
-       * Interactive Pipelines.
-       * The order in which Arguments are provided in the query string is only relevant if an Argument can take multiple values (in which
-       * case they will be presented to the query in the order that they appear in the query string, regardless of any other arguments appearing
-       * between them).
-       * </P>
-       */
       arguments?: components["schemas"]["Argument"][];
       /**
        * @description <P>
@@ -1254,61 +955,10 @@ export interface components {
        * The segregation between Source and Endpoint allows a single Source to work with multiple Endpoints.
        * </P>
        */
-      sourceEndpoints?: components["schemas"]["Endpoint"][];
-      /**
-       * @description <P>Sub-Pipelines that can be run prior to the main Pipeline in order to generate more SourceEndpoints.</P>
-       * <P>
-       * The expected use is for the source to query a database that contains connection strings (in vertx format, not JDBC format)
-       * based on information contained in the request (usually extracted from a JWT).
-       * In this way a single pipeline can support multiple databases based upon request content.
-       * </P>
-       * <P>
-       * Most of the properties of the DynamicEndpointSource have default values and any fields that do not exist in the
-       * results stream from the source pipeline will be silently ignored, so the DynamicEndpointSource usually requires minimal configuration.
-       * </P>
-       * <P>
-       * If generated endpoints have a condition they will be silently dropped unless the condition is met.
-       * All remaining endpoints generated by the DynamicEndpointSource will be added to the endpoints usable by the outer query in the order they are returned by the source.
-       * If endpoints do not have unique keys this does mean that later ones will overwrite earlier ones.
-       * </P>
-       * <P>
-       * The original endpoints that existed before the DynamicEndpointSource do not have special protection
-       * , if the DynamicEndpointSource generates endpoints with the same key as existing endpoints they will be overwritten.
-       * </P>
-       */
+      sourceEndpoints?: {
+        [key: string]: components["schemas"]["Endpoint"];
+      };
       dynamicEndpoints?: components["schemas"]["DynamicEndpoint"][];
-      /**
-       * @description <P>The outputs that this Pipeline supports.</P>
-       * <P>
-       * The format to use for a pipeline is chosen by according to the following rules:
-       * <ol>
-       *
-       * <li><pre>_fmt</pre> query string.<br>
-       * If the HTTP request includes a <pre>_fmt</pre> query string argument each Format specified in the Pipeline will be checked (in order)
-       * for a matching response from the {@link uk.co.spudsoft.query.defn.Format#getName()} method.
-       * The first matching Format will be returned.
-       * If no matching Format is found an error will be returned.
-       *
-       * <li>Path extension.<br>
-       * If the path in the HTTP request includes a '.' (U+002E, Unicode FULL STOP) after the last '/' (U+002F, Unicode SOLIDUS) character everything following that
-       * character will be considered to be the extension, furthermore the extension (and full stop character) will be removed from the filename being sought.
-       * If an extension is found each Format specified in the Pipeline will be checked (in order)
-       * for a matching response from the {@link uk.co.spudsoft.query.defn.Format#getExtension()} method.
-       * The first matching Format will be returned.
-       * If no matching Format is found an error will be returned.
-       *
-       * <li>Accept header.<br>
-       * If the HTTP request includes an 'Accept' header each Format specified in the Pipeline will be checked (in order)
-       * for a matching response from the {@link uk.co.spudsoft.query.defn.Format#getMediaType() ()} method.
-       * Note that most web browsers include "*\/*" in their default Accept headers, which will match any Format that specifies a MediaType.
-       * The first matching Format will be returned.
-       * If no matching Format is found an error will be returned.
-       *
-       * <li>Default<br>
-       * If the request does not use any of these mechanisms then the first Format specified in the Pipeline will be used.
-       * </ol>
-       * <p>
-       */
       formats?: components["schemas"]["Format"][];
     };
     /** @description Processors modify the data stream in flight. */
@@ -1318,9 +968,7 @@ export interface components {
        *
        * @enum {string}
        */
-      type: "LIMIT" | "OFFSET" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "SCRIPT" | "WITHOUT" | "QUERY" | "RELABEL";
-      /** @description <P>Optional condition that controls whether the processor will be run.</P> */
-      condition?: components["schemas"]["Condition"];
+      type: "LIMIT" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "SCRIPT";
     };
     /**
      * @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
@@ -1330,171 +978,43 @@ export interface components {
      * <li>The definition  pipeline, that is queried in its entirety at the beginning and that defines the columns that will be found.
      * <li>The values pipeline, that is queried in parallel with the main stream and the supplies the data for the dynamic columns.
      * </il>
-     * The definition pipeline must provide four fields:
-     * <ul>
-     * <li>The ID for the dynamic column to be added - this value must correspond to the ID from the values pipeline.
-     * <li>The name for the dynamic column - this will be the name of the newly created field.
-     * <li>The type for the dynamic column - one of the{@link uk.co.spudsoft.query.defn.DataType} values.
-     * <li>The name of the column in the values stream that will contain the actual value.
-     * </ul>
-     * The names of these four fields can be controlled using the field*Column properties on this processor (though they have sensible defaults).
-     *
-     * The values pipeline must provide at least three fields:
-     * <ul>
-     * <li>The parent ID, that matches the ID of the data row in the main pipeline.
-     * <li>The field ID, that matches one of the rows returned from the definition pipeline.
-     * <li>The value field, whose name must match that defined for the selected field.
-     * </ul>
-     *
-     * As a streaming processor this processor requires the main pipeline and the values pipeline to be sorted by the same ID (the parent ID from the point of view of this processor).
-     *
-     * The processor works by:
-     * <ol>
-     * <li>If the parent ID is greater than the values ID, skip through values until it isn't.
-     * <li>If the values ID is greater than the parent ID, skip through parent rows until it isn't.
-     * <li>While the two IDs match:
-     * <ol>
-     * <li>Find the definition for the current value.
-     * <li>Get the name of the value field from the field definition.
-     * <li>Add a new field to the parent data row with the name from the field definition and the value from the value field of the value row.
-     * </ol>
-     * </ol>
      */
     ProcessorDynamicField: WithRequired<{
       type: "DYNAMIC_FIELD";
     } & Omit<components["schemas"]["Processor"], "type"> & {
-      /**
-       * @description The inner join flag.
-       * <P>
-       * If set to true the parent row will only be output if the child feed has at least one matching row.
-       */
       innerJoin?: boolean;
-      /** @description The name of the column in the field defns feed that is used to identify the extra column. */
       fieldIdColumn?: string;
-      /** @description The name of the column in the field defns feed that is used to name the extra column. */
       fieldNameColumn?: string;
-      /** @description The name of the column in the field defns feed that is used to determine the type of the extra column. */
       fieldTypeColumn?: string;
-      /** @description The name of the column in the field defns feed that is used to find the name of the field in the values feed that contains the actual value. */
       fieldColumnColumn?: string;
-      /**
-       * @description The parent ID column.
-       * <P>
-       * This is the name of the field in the main stream that is to be used to match against child rows.
-       * The main stream must be sorted by this field.
-       */
       parentIdColumn?: string;
-      /**
-       * @description The name of the column in the values feed that contains the ID to match to the parent feed.
-       * <P>
-       * The values feed must be sorted by this column.
-       */
       valuesParentIdColumn?: string;
-      /** @description The name of the column in the values feed that contains the ID of the field represented by that row. */
       valuesFieldIdColumn?: string;
-      /**
-       * @description Get the feed for the field definitions.
-       *
-       * This data feed should result in four columns:
-       * <ul>
-       * <li>fieldIdColumn - The ID value that will be used to refer to the field from the values feed.
-       * <li>fieldNameColumn - The name that the resultant field will be given.
-       * <li>fieldTypeColumn - The type of the resultant field (will be processed using {@link uk.co.spudsoft.query.defn.DataType#valueOf(java.lang.String)}/
-       * <li>fieldColumnColumn - The column in the field values feed that contains the actual value for this field.
-       * </ul>
-       * The fields will be added to the parent feed in the order of the rows returned by this query (regardless of the ordering in the fieldValues feed).
-       */
       fieldDefns?: components["schemas"]["SourcePipeline"];
-      /**
-       * @description The feed for the field values.
-       * <P>
-       * This data feed should result in at least three columns:
-       * <ul>
-       * <li>valuesParentIdColumn - ID of the parent row that is gaining a field value.
-       * <li>valuesFieldIdColumn - ID of the field that this row relates to (used to define the type and name of the resulting field).
-       * <li>Values - One or more fields that contain values, identified from the Column value in the FieldDefns feed.
-       * </ul>
-       */
       fieldValues?: components["schemas"]["SourcePipeline"];
     }, "type">;
-    /** @description Processor that combines multiple values from a child query into a single concatenated string value. */
     ProcessorGroupConcat: WithRequired<{
       type: "GROUP_CONCAT";
     } & Omit<components["schemas"]["Processor"], "type"> & {
-      /**
-       * @description The data feed.
-       * <P>
-       * This data feed should result in two columns childIdColumn and childValueColumn (any other columns will be ignored).
-       * The data should be sorted by childIdColumn (and the parent feed should be sorted by parentIdColumn).
-       * <P>
-       * The values in childValueColumn for each value of childIdColumn will be concatenated together using delimiter as a delimiter and the result will be set as parentValueColumn in the parent feed.
-       */
       input?: components["schemas"]["SourcePipeline"];
-      /**
-       * @description The inner join flag.
-       * <P>
-       * If set to true the parent row will only be output if the child feed has at least one matching row.
-       */
       innerJoin?: boolean;
-      /**
-       * @description The parent ID column.
-       * <P>
-       * This is the name of the field in the main stream that is to be used to match against child rows.
-       * The main stream must be sorted by this field.
-       */
       parentIdColumn?: string;
-      /**
-       * @description The child ID column.
-       * <P>
-       * This is the name of the field in the child stream that is to be used to match against parent rows.
-       * The child stream must be sorted by this field.
-       */
       childIdColumn?: string;
-      /**
-       * @description The child value column.
-       * <P>
-       * This is the name of the field in the child stream that contains the data to be extracted.
-       */
       childValueColumn?: string;
-      /**
-       * @description The parent value column.
-       * <P>
-       * This is the name of the field that will be created in the parent stream to contain the data from the child stream.
-       */
       parentValueColumn?: string;
-      /** @description The delimiter to place between each value returned. */
       delimiter?: string;
     }, "type">;
-    /** @description Processor that curtails the output after the configured number of rows. */
     ProcessorLimit: WithRequired<{
       type: "LIMIT";
     } & Omit<components["schemas"]["Processor"], "type"> & {
-      /**
-       * Format: int32
-       * @description The limit on the number of rows that will be output by this processor.
-       */
+      /** Format: int32 */
       limit?: number;
     }, "type">;
-    /** @description Run a custom script on each row of the output. */
     ProcessorScript: WithRequired<{
       type: "SCRIPT";
     } & Omit<components["schemas"]["Processor"], "type"> & {
-      /**
-       * @description The language to use, as understood by GraalVM.
-       * <P>
-       * By default the only acceptable value is "js", but custom builds can use other lanaguages.
-       */
       language?: string;
-      /**
-       * @description A predicate script is used to determine whether or not the row should be discarded.
-       * <P>
-       * The script should return a value that is either true or false, if the value is false the row will be discarded.
-       */
       predicate?: string;
-      /**
-       * @description A process script can manipulate the row in any way it wants.
-       * <P>
-       */
       process?: string;
     }, "type">;
     /**
@@ -1511,30 +1031,34 @@ export interface components {
      * </p>
      * <p>
      * Refused requests result in an HTTP status code 429 ("Too Many Requests").
+     * The body of the response will indicate whether the failure was caused by a RateLimit or a ConcurrencyRule but will not give further details.
      * </p>
      */
     RateLimitRule: {
-      /**
-       * @description <P>The scope of the rate limit rule.</P>
-       * <P>At least one value must be provided.</P>
-       */
-      scope: ("host" | "path" | "clientip" | "issuer" | "subject" | "username")[];
+      scope?: ("host" | "path" | "clientip" | "username")[];
       /**
        * @description <P>The duration of the rate limit.</P>
        * <P>Expressions in ISO8601 time period notication (e.g. PT10M for ten minutes).</P>
        */
-      timeLimit: string;
-      /** @description <P>The limit on the number of pipeline runs matching the scope that may be initiated.</P> */
+      timeLimit: {
+        /** Format: int64 */
+        seconds?: number;
+        positive?: boolean;
+        negative?: boolean;
+        zero?: boolean;
+        /** Format: int32 */
+        nano?: number;
+      };
       runLimit?: string;
       /** @description <P>The limit on the number of bytes that may be been sent by previous runs.</P> */
-      byteLimit?: string;
-      /**
-       * Format: int32
-       * @description <P>The limit on the number of runs matching the scope that may have been started but not completed within the time limit.</P>
-       */
+      byteLimit: string;
+      /** Format: int32 */
       concurrencyLimit?: number;
+      /** Format: int64 */
+      parsedRunLimit?: number;
+      /** Format: int64 */
+      parsedByteLimit?: number;
     };
-    /** @description A Source is the source of data for a pipeline. */
     Source: {
       /**
        * @description <P>Get the name of the Source, that will be used in logging.</P>
@@ -1566,14 +1090,8 @@ export interface components {
        * </P>
        */
       source: components["schemas"]["Source"];
-      /** @description <P>Processors to run on the data as it flows from the Source.</P> */
-      processors?: components["schemas"]["Processor"][];
+      processors?: unknown;
     };
-    /**
-     * @description Pipeline data source that gets data from a SQL database.
-     * <P>
-     * This is the standard source of data for pipelines.
-     */
     SourceSql: WithRequired<{
       type: "SQL";
     } & Omit<components["schemas"]["Source"], "type"> & {
@@ -1606,13 +1124,6 @@ export interface components {
        * </P>
        */
       query?: string;
-      /**
-       * @description <P>The query to run against the Endpoint, as a <A href="https://github.com/antlr/stringtemplate4/blob/master/doc/introduction.md">StringTemplate</A> that will be rendered first.</P>
-       * <P>
-       * A StringTemplate that results in a SQL statement.
-       * </P>
-       */
-      queryTemplate?: string;
       /**
        * Format: int32
        * @description <P>The number of rows to get from the Source at a time.</P>
@@ -1659,7 +1170,29 @@ export interface components {
        * The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
        * </P>
        */
-      idleTimeout?: string;
+      idleTimeout?: {
+        /** Format: int64 */
+        seconds?: number;
+        units?: {
+            timeBased?: boolean;
+            dateBased?: boolean;
+            duration?: {
+              /** Format: int64 */
+              seconds?: number;
+              positive?: boolean;
+              negative?: boolean;
+              zero?: boolean;
+              /** Format: int32 */
+              nano?: number;
+            };
+            durationEstimated?: boolean;
+          }[];
+        positive?: boolean;
+        negative?: boolean;
+        zero?: boolean;
+        /** Format: int32 */
+        nano?: number;
+      };
       /**
        * @description <P>The idle timeout for the connection pool that will be created.</P>
        * <P>
@@ -1681,7 +1214,29 @@ export interface components {
        * The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
        * </P>
        */
-      connectionTimeout?: string;
+      connectionTimeout?: {
+        /** Format: int64 */
+        seconds?: number;
+        units?: {
+            timeBased?: boolean;
+            dateBased?: boolean;
+            duration?: {
+              /** Format: int64 */
+              seconds?: number;
+              positive?: boolean;
+              negative?: boolean;
+              zero?: boolean;
+              /** Format: int32 */
+              nano?: number;
+            };
+            durationEstimated?: boolean;
+          }[];
+        positive?: boolean;
+        negative?: boolean;
+        zero?: boolean;
+        /** Format: int32 */
+        nano?: number;
+      };
       /**
        * @description <P>If set to true all double quotes in the query will be replaced with the identifier quoting character for the target.</P>
        * <P>
@@ -1697,299 +1252,41 @@ export interface components {
        */
       replaceDoubleQuotes?: boolean;
     }, "type">;
-    /**
-     * @description Source producing a fixed set of data without any need to communicate with a database.
-     * <P>
-     * The data stream will have two fields:
-     * <UL>
-     * <LI>value
-     * A monotonically increasing integer.
-     * <LI>name
-     * The name of the source.
-     * </UL>
-     * The number of rows to be returned can be configured, as can a delay between each row returned.
-     */
     SourceTest: WithRequired<{
       type: "Test";
     } & Omit<components["schemas"]["Source"], "type"> & {
-      /**
-       * Format: int32
-       * @description The number of rows that the source will return.
-       */
+      /** Format: int32 */
       rowCount?: number;
-      /**
-       * Format: int32
-       * @description Get the number of milliseconds to delay between production of each data row.
-       * <P>
-       * Note that 0 explicitly outputs all rows in a single thread and any non-zero value will use a periodic timer to output rows.
-       */
+      /** Format: int32 */
       delayMs?: number;
     }, "type">;
-    /**
-     * @description <P>
-     * A directory containing documentation files.
-     * </P>
-     */
     DocDir: WithRequired<components["schemas"]["DocNode"] & {
-      /**
-       * @description <P>
-       * The children of the node.
-       * </P>
-       */
       children?: components["schemas"]["DocNode"][];
     }, "children" | "name" | "path">;
-    /**
-     * @description <P>
-     * A documentation file.
-     * </P>
-     */
     DocFile: WithRequired<components["schemas"]["DocNode"] & {
-      /**
-       * @description <P>
-       * The title of the document.
-       * </P>
-       * <P>
-       * The title is what should be displayed in any UI.
-       * </P>
-       */
       title?: string;
     }, "name" | "path" | "title">;
-    /**
-     * @description <P>
-     * Base class for documentation files and the directories that contain them.
-     * </P>
-     */
     DocNode: {
-      /**
-       * @description <P>
-       * The leaf name of the node.
-       * </P>
-       */
       name: string;
-      /**
-       * @description <P>
-       * The children of the node.
-       * </P>
-       * <P>
-       * If this is null then the node is a file, otherwise it is a directory.
-       * </P>
-       */
       children?: components["schemas"]["DocNode"][];
-      /**
-       * @description <P>
-       * The relative path to the node from the root.
-       * </P>
-       */
       path: string;
     };
-    /** @description Information about requests made to the query engine by a single user. */
-    AuditHistory: {
-      /**
-       * Format: int64
-       * @description <P>The index of the first row (out of all those for the current user) present in this dataset.</P>
-       * <P>This shhould equal the skipsRows argument passed in the request for history.</P>
-       */
-      firstRow: number;
-      /**
-       * Format: int64
-       * @description <P>The total number of history records that the current user has.</P>
-       */
-      totalRows: number;
-      /**
-       * @description <P>Details of specific requests to the query engine for the current user.</P>
-       * <P>The number of entries in this array should be no greater than the maxRows argument passed in the request for history.</P>
-       */
-      rows: components["schemas"]["AuditHistoryRow"][];
-    };
-    /** @description Record of a request made against the Query Engine. */
-    AuditHistoryRow: {
-      /**
-       * Format: date-time
-       * @description Timestamp of the request.
-       */
-      timestamp: string;
-      /** @description Unique ID for the request. */
-      id: string;
-      /** @description Path to the pipeline. */
-      path: string;
-      /** @description Arguments passed to the pipeline. */
-      arguments: Record<string, never>;
-      /** @description The host from the request. */
-      host: string;
-      /** @description The issuer of the token used to authenticate the user. */
-      issuer: string;
-      /** @description The subject from the token (unique ID for the user within the issuer). */
-      subject: string;
-      /** @description The user name of the user making the request. */
-      username: string;
-      /** @description The human name of the user making the request. */
-      name: string;
-      /**
-       * Format: int32
-       * @description The HTTP response code that the request generated.
-       */
-      responseCode: number;
-      /**
-       * Format: int64
-       * @description The number of rows returned by the request.
-       */
-      responseRows: number;
-      /**
-       * Format: int64
-       * @description The number of bytes returned by the request.
-       */
-      responseSize: number;
-      /**
-       * Format: double
-       * @description The time between the request being made and the first row being returned.
-       */
-      responseStreamStart: number;
-      /**
-       * Format: double
-       * @description The time between the request being made and the final row being returned.
-       */
-      responseDuration: number;
-    };
-    /**
-     * @description <P>
-     * A directory containing pipelines.
-     * </P>
-     */
+    Form: unknown;
+    ImmutableListArgument: components["schemas"]["Argument"][];
+    ImmutableListFormat: components["schemas"]["Format"][];
     PipelineDir: WithRequired<components["schemas"]["PipelineNode"] & {
-      /**
-       * @description <P>
-       * The children of the directory.
-       * </P>
-       */
       children?: components["schemas"]["PipelineNode"][];
     }, "children" | "name" | "path">;
-    /**
-     * @description <P>
-     * A pipeline.
-     * </P>
-     */
     PipelineFile: WithRequired<components["schemas"]["PipelineNode"] & {
-      /**
-       * @description <P>
-       * The title of the pipeline, to be displayed in the UI.
-       * </P>
-       */
       title?: string;
-      /**
-       * @description <P>
-       * The description of the pipeline.
-       * </P>
-       */
       description?: string;
-      /**
-       * @description <P>Declared arguments to the Pipeline.</P>
-       * <P>
-       * Pipelines can receive arguments via the HTTP query string.
-       * Any arguments may be provided and may be processed by the templates of the pipeline, even if they are not
-       * declared here.
-       * Declare all arguments here, otherwise no-one will know that they exist unless they read the pipeline definition.
-       * </P>
-       * <P>
-       * The order in which Arguments are defined here is relevant as it affects the order in which they will be displayed for
-       * Interactive Pipelines.
-       * The order in which Arguments are provided in the query string is only relevant if an Argument can take multiple values (in which
-       * case they will be presented to the query in the order that they appear in the query string, regardless of any other arguments appearing
-       * between them).
-       * </P>
-       */
       arguments?: components["schemas"]["Argument"][];
-      /**
-       * @description <P>The outputs that this Pipeline supports.</P>
-       * <P>
-       * The format to use for a pipeline is chosen by according to the following rules:
-       * <ol>
-       *
-       * <li><pre>_fmt</pre> query string.<br>
-       * If the HTTP request includes a <pre>_fmt</pre> query string argument each Format specified in the Pipeline will be checked (in order)
-       * for a matching response from the {@link uk.co.spudsoft.query.defn.Format#getName()} method.
-       * The first matching Format will be returned.
-       * If no matching Format is found an error will be returned.
-       *
-       * <li>Path extension.<br>
-       * If the path in the HTTP request includes a '.' (U+002E, Unicode FULL STOP) after the last '/' (U+002F, Unicode SOLIDUS) character everything following that
-       * character will be considered to be the extension, furthermore the extension (and full stop character) will be removed from the filename being sought.
-       * If an extension is found each Format specified in the Pipeline will be checked (in order)
-       * for a matching response from the {@link uk.co.spudsoft.query.defn.Format#getExtension()} method.
-       * The first matching Format will be returned.
-       * If no matching Format is found an error will be returned.
-       *
-       * <li>Accept header.<br>
-       * If the HTTP request includes an 'Accept' header each Format specified in the Pipeline will be checked (in order)
-       * for a matching response from the {@link uk.co.spudsoft.query.defn.Format#getMediaType() ()} method.
-       * Note that most web browsers include "*\/*" in their default Accept headers, which will match any Format that specifies a MediaType.
-       * The first matching Format will be returned.
-       * If no matching Format is found an error will be returned.
-       *
-       * <li>Default<br>
-       * If the request does not use any of these mechanisms then the first Format specified in the Pipeline will be used.
-       * </ol>
-       * <p>
-       */
       destinations?: components["schemas"]["Format"][];
     }, "name" | "path">;
-    /**
-     * @description <P>
-     * Base class for pipelines and the directories that contain them.
-     * </P>
-     */
     PipelineNode: {
-      /**
-       * @description <P>
-       * The leaf name of the node.
-       * </P>
-       */
       name: string;
-      /**
-       * @description <P>
-       * The children of the node.
-       * </P>
-       * <P>
-       * If this is null then the node is a file, otherwise it is a directory.
-       * </P>
-       */
       children?: components["schemas"]["PipelineNode"][];
-      /**
-       * @description <P>
-       * The relative path to the node from the root.
-       * </P>
-       */
       path: string;
-    };
-    /**
-     * @description Information about the current user and environment.
-     * <P>
-     * This information is pulled from the access token and is only available if present there.
-     */
-    Profile: {
-      /**
-       * @description The username from the token.
-       * <P>
-       * This is taken from the first of the following claims to have a value:
-       * <UL>
-       * <LI>preferred_username
-       * <LI>sub
-       * </UL>
-       */
-      username?: string;
-      /**
-       * @description The users full name from the token.
-       * <P>
-       * This is taken from the first of the following claims to have a value:
-       * <UL>
-       * <LI>name
-       * <LI>given_name & family_name (either or both)
-       * <LI>preferred_username
-       * <LI>sub
-       * </UL>
-       */
-      fullname?: string;
-      /** @description The version of the Query Engine backend. */
-      version?: string;
     };
   };
   responses: never;
@@ -2005,17 +1302,6 @@ export type external = Record<string, never>;
 
 export interface operations {
 
-  /** @description Return details of the available OAuth providers */
-  get: {
-    responses: {
-      /** @description Details of the available OAuth providers. */
-      200: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
   /** @description Return the contents of file. */
   getFile: {
     parameters: {
@@ -2175,9 +1461,6 @@ export interface operations {
   /** @description Return a form.io definition for a given document */
   getFormIO: {
     parameters: {
-      query?: {
-        columns?: number;
-      };
       path: {
         path: string;
       };
@@ -2186,26 +1469,7 @@ export interface operations {
       /** @description A form.io definition for a given document. */
       200: {
         content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  /** @description Return details of the current user */
-  getHistory: {
-    parameters: {
-      query?: {
-        skipRows?: number;
-        maxRows?: number;
-        sort?: "timestamp" | "id" | "path" | "host" | "issuer" | "subject" | "username" | "name" | "responseCode" | "responseRows" | "responseSize" | "responseStreamStart" | "responseDuration";
-        desc?: boolean;
-      };
-    };
-    responses: {
-      /** @description Details of the current user. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["AuditHistory"];
+          "application/json": components["schemas"]["Form"];
         };
       };
     };
@@ -2217,17 +1481,6 @@ export interface operations {
       200: {
         content: {
           "application/json": unknown;
-        };
-      };
-    };
-  };
-  /** @description Return details of the current user */
-  getProfile: {
-    responses: {
-      /** @description Details of the current user. */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Profile"];
         };
       };
     };

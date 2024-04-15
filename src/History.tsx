@@ -152,16 +152,16 @@ function History(props: HistoryProps) {
                     &nbsp;
                   </div>
                   <div className='text-sm inline-block relative'>
-                    <IconButton disabled={firstRow == 0} onClick={_ => { setFirstRow(0) }}>
+                    <IconButton disabled={firstRow == 0} onClick={(_: any) => { setFirstRow(0) }}>
                       <FirstPageIcon />
                     </IconButton>
-                    <IconButton disabled={firstRow == 0} onClick={_ => { setFirstRow(firstRow - rowsPerPage) }}>
+                    <IconButton disabled={firstRow == 0} onClick={(_: any) => { setFirstRow(firstRow - rowsPerPage) }}>
                       <NavigateBeforeIcon />
                     </IconButton>
-                    <IconButton disabled={firstRow + rowsPerPage > history.totalRows} onClick={_ => { setFirstRow(firstRow + rowsPerPage) }}>
+                    <IconButton disabled={firstRow + rowsPerPage > history.totalRows} onClick={(_: any) => { setFirstRow(firstRow + rowsPerPage) }}>
                       <NavigateNextIcon />
                     </IconButton>
-                    <IconButton disabled={firstRow + rowsPerPage > history.totalRows} onClick={_ => { setFirstRow(rowsPerPage * Math.floor(history.totalRows / rowsPerPage)) }}>
+                    <IconButton disabled={firstRow + rowsPerPage > history.totalRows} onClick={(_: any) => { setFirstRow(rowsPerPage * Math.floor(history.totalRows / rowsPerPage)) }}>
                       <LastPageIcon />
                     </IconButton>
                   </div>
