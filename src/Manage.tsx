@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import { TreeView } from '@mui/x-tree-view/TreeView'
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { useParams, useNavigate } from 'react-router-dom'
@@ -56,7 +56,7 @@ export function Manage(props : ManagementProps) {
         })
       }
     }
-  }, [path])
+  }, [path, props.endpoints])
 
   interface TabPanelProps {
     children: any
@@ -84,13 +84,15 @@ export function Manage(props : ManagementProps) {
     );
   }
 
-  function fileSelected(_ : any, name : string) {
-    navigate('/ui/manage/' + name);
+  function fileSelected(_ : any, name : string | null) {
+    if (name) {
+      navigate('/ui/manage/' + name);
+    }
   }
 
   const renderTree = (node : ManagementEndpointType) => {
       return (
-        <TreeItem key={node.name} nodeId={node.name} label={node.name} />
+        <TreeItem key={node.name} itemId={node.name} label={node.name} />
       )
     }
 
@@ -117,16 +119,18 @@ export function Manage(props : ManagementProps) {
             </Box>
             <TabPanel value={0} index={0}>
               <Box>
-                <TreeView
+                <SimpleTreeView
                   aria-label="file system navigator"
-                  defaultCollapseIcon={<FolderOpen />}
-                  defaultExpandIcon={<Folder />}
-                  defaultEndIcon={<Article />}
-                  onNodeSelect={fileSelected}
+                  slots={{
+                    collapseIcon: FolderOpen
+                    , expandIcon: Folder
+                    , endIcon: Article
+                  }}
+                  onSelectedItemsChange={fileSelected}
                   sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                 >
                   {props.endpoints && props.endpoints.map((node) => renderTree(node))}
-                </TreeView>
+                </SimpleTreeView>
               </Box>
             </TabPanel>
           </div>

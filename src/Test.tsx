@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import { TreeView } from '@mui/x-tree-view/TreeView'
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import DOMPurify from 'dompurify';
@@ -27,15 +27,15 @@ export function ArgsToArgs(pipeline: components["schemas"]["PipelineFile"], args
   if (args == null || !pipeline || !pipeline.arguments) {
     return null;
   }
-  var result = [] as any[];
-  for (var i = 0; i < pipeline.arguments.length; ++i) {
+  const result = [] as any[];
+  for (let i = 0; i < pipeline.arguments.length; ++i) {
     const arg = pipeline.arguments[i].name
     if (args[arg]) {
       result.push(arg + '=' + encodeURIComponent(args[arg]));
     }
   }
   if (args['_filters']) {
-    for (var i = 0; i < args['_filters'].length; ++i) {
+    for (let i = 0; i < args['_filters'].length; ++i) {
       if (args['_filters'][i]['filter'] && args['_filters'][i]['value']) {
         result.push(args['_filters'][i]['filter'] + '=' + encodeURIComponent(args['_filters'][i]['value']));
       }
@@ -105,33 +105,39 @@ function Test(props : TestProps) {
     setTabPanel(newTabIndex);
   };
 
-  const nodeMap = {} as any
-  const allDirs = [] as string[]
-
-  function AddToNodeMap(node : components["schemas"]["PipelineNode"]) {
-    if (Array.isArray(node.children)) {
-      node.children.forEach(n => AddToNodeMap(n));
-      allDirs.push(node.path);
-    } else {
-      nodeMap[node.path] = node;
-    }
-  }
-  AddToNodeMap(props.available);
+  const [nodeMap, setNodeMap] = useState({} as any)
 
   const [expanded, setExpanded] = useState([] as string[])
   const [selected, setSelected] = useState('')
 
   useEffect(() => {
-    setExpanded(allDirs) 
+    function AddToNodeMap(nm: any, dirs: string[], node : components["schemas"]["PipelineNode"]) {
+      if (Array.isArray(node.children)) {
+        node.children.forEach(n => AddToNodeMap(nm, dirs, n));
+        dirs.push(node.path)
+      } else {
+        nm[node.path] = node;
+      }
+    }
+    const nm = {}
+    const dirs = [] as string[]
+    AddToNodeMap(nm, dirs, props.available);
+    setNodeMap(nm)
+    setExpanded(dirs) 
   }, [props.available])
 
-  const handleToggle = (_: React.SyntheticEvent, nodeIds: string[]) => {
-    setExpanded(nodeIds)
+  const handleToggle = (_: React.SyntheticEvent, itemIds: string[]) => {
+    setExpanded(itemIds)
   };
 
-  const handleSelect = (_: React.SyntheticEvent, nodeId: string) => {
-    setSelected(nodeId)
-    fileSelected(nodeId)
+  const handleSelect = (_: React.SyntheticEvent, itemId: string | null) => {
+    if (itemId) {
+      setSelected(itemId)
+      fileSelected(itemId)
+    } else {
+      setSelected('')
+      fileSelected('')
+    }
   };
 
   function fileSelected(path : string) {
@@ -153,7 +159,7 @@ function Test(props : TestProps) {
 
   function findDestination(fmt : string) : components["schemas"]["Format"] | null{
     if (currentFile && currentFile.destinations) {
-      for (var i of currentFile.destinations) {
+      for (const i of currentFile.destinations) {
         if (i.name === fmt) {
           return i;
         }
@@ -166,8 +172,8 @@ function Test(props : TestProps) {
     if (!currentFile) {
       return Promise.resolve()
     }
-    var query = ArgsToArgs(currentFile, values);
-    var url = props.baseUrl + 'query/' + currentFile.path + (query == null ? '' : ('?' + query))
+    const query = ArgsToArgs(currentFile, values);
+    const url = props.baseUrl + 'query/' + currentFile.path + (query == null ? '' : ('?' + query))
     console.log(url)
 
     if (!values) {
@@ -175,7 +181,7 @@ function Test(props : TestProps) {
     }
     console.log('submit', values)
     setArgs(values)
-    var dest = findDestination(values._fmt);
+    const dest = findDestination(values._fmt);
     if (dest && (dest.type === 'XLSX')) {
       props.window.open(url, "_blank");
       return Promise.resolve()
@@ -219,10 +225,10 @@ function Test(props : TestProps) {
 
   const renderTree = (node : components["schemas"]["PipelineNode"]) => {
     if (isPipelineFile(node)) {
-      return (<TreeItem key={node.name} nodeId={node.path} label={node.title ?? node.name}/>)
+      return (<TreeItem key={node.name} itemId={node.path} label={node.title ?? node.name}/>)
     } else {
       return (
-        <TreeItem key={node.name} nodeId={node.path} label={node.name} >
+        <TreeItem key={node.name} itemId={node.path} label={node.name} >
           {node.children && node.children.map((child) => renderTree(child))}
         </TreeItem>
       )
@@ -254,19 +260,21 @@ function Test(props : TestProps) {
             </Box>
             <TabPanel value={tabPanel} index={0}>
               <Box>
-                <TreeView
+                <SimpleTreeView
                   aria-label="file system navigator"
-                  defaultCollapseIcon={<FolderOpen />}
-                  defaultExpandIcon={<Folder />}
-                  defaultEndIcon={<Article />}
-                  expanded={expanded}
-                  selected={selected}
-                  onNodeToggle={handleToggle}
-                  onNodeSelect={handleSelect}
+                  slots={{
+                    collapseIcon: FolderOpen
+                    , expandIcon: Folder
+                    , endIcon: Article
+                  }}
+                  expandedItems={expanded}
+                  selectedItems={selected}
+                  onExpandedItemsChange={handleToggle}
+                  onSelectedItemsChange={handleSelect}
                   sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                 >
                   {props.available.children.map((node) => renderTree(node))}
-                </TreeView>
+                </SimpleTreeView>
               </Box>
             </TabPanel>
             <TabPanel value={tabPanel} index={1} >

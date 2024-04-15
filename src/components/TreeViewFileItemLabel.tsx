@@ -28,10 +28,10 @@ interface TreeViewFileItemLabelProps {
 }
 function TreeViewFileItemLabel(props : TreeViewFileItemLabelProps) {
 
-  var [name, setName] = useState(props.node.name);
-  var [disabled, setDisabled] = useState(true);
+  const [name, setName] = useState(props.node.name);
+  const [disabled, setDisabled] = useState(true);
 
-  var [anchorMenu, setAnchorMenu] = useState(null as Element | null);
+  const [anchorMenu, setAnchorMenu] = useState(null as Element | null);
   const menuOpen = Boolean(anchorMenu);
 
   const input = React.useRef<HTMLInputElement>(null)
@@ -79,7 +79,6 @@ function TreeViewFileItemLabel(props : TreeViewFileItemLabelProps) {
     if (e.code === '\r') {
       input && input.current && input.current.blur();
     } else if (e.code === '\t') {
-      name = props.node.name
       setName(props.node.name);
       input && input.current && input.current.blur();
     }
@@ -167,8 +166,9 @@ function TreeViewFileItemLabel(props : TreeViewFileItemLabelProps) {
           }}
           open={menuOpen}
           onClose={handleCloseNavMenu}
-          children={menuItems}
-        />
+        >
+          {menuItems}
+        </Menu>
       </Box>
     </Box>
 

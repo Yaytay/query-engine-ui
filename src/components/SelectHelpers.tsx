@@ -1,7 +1,7 @@
 
 
 export function mapPossibleValues(input : any) {
-  var result = []
+  let result = []
   if (Array.isArray(input)) {
     result = input.map(i => {
       if (i.value) {
@@ -29,7 +29,7 @@ export function getOption(possibleValues : any, multi : boolean | undefined, val
     }
   }
 
-  var result = [];
+  let result = [];
   if (value) {
     if (Array.isArray(value)) {
       result = value.map(element => lookupValue(element))

@@ -33,12 +33,12 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
   }
 
   function onFocus(e: React.SyntheticEvent<any>) {
-    var text
+    let text
     if (propertyType.description) {
       text = '<h3>' + field + '</h3>' + propertyType.description
     }
     if (propertyType.ref) {
-      var s = schema[propertyType.ref]
+      const s = schema[propertyType.ref]
       if (s) {
         text = '<h3>' + s.name + '</h3>' + s.description
       }
@@ -91,7 +91,7 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
           <div className='grow'></div>
           <div className=''>
             <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
-              var newArr = value ? [...value] : [];
+              const newArr = value ? [...value] : [];
               if (itemType.ref) {
                 newArr.push({});
               } else {

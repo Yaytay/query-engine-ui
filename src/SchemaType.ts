@@ -63,7 +63,7 @@ export interface ObjectTypeMap {
 // Convert and openapi specification into an ObjectTypeMap
 export function buildSchema(openapi: any): ObjectTypeMap {
   function typeFromRef(arg : string) {
-    var lastPos = arg.lastIndexOf('/')
+    const lastPos = arg.lastIndexOf('/')
     if (lastPos > 0) {
       return arg.substring(lastPos + 1);
     } else {
@@ -72,7 +72,7 @@ export function buildSchema(openapi: any): ObjectTypeMap {
   }
 
   function propertyFromSchema(name: string | null, schema: any, required: boolean) : PropertyType {
-    var result : PropertyType = { 
+    const result : PropertyType = { 
       type: schema.$ref ? 'object' : schema.type
       , description: schema.description
       , externalDocs: schema.externalDocs
@@ -103,7 +103,7 @@ export function buildSchema(openapi: any): ObjectTypeMap {
   }
 
   function collectProperties(schema : any) {
-    var props : PropertyMapType = {}
+    const props : PropertyMapType = {}
     if (schema.properties) {
       Object.keys(schema.properties).forEach((f : string) => {
         props[f] = propertyFromSchema(f, schema.properties[f], schema.required && schema.required.includes(f))
@@ -112,7 +112,7 @@ export function buildSchema(openapi: any): ObjectTypeMap {
     if (schema.allOf) {
       schema.allOf.forEach((ao : any) => {
         if (ao.$ref) {
-          var parentProps = collectProperties(openapi.components.schemas[typeFromRef(ao.$ref)])
+          const parentProps = collectProperties(openapi.components.schemas[typeFromRef(ao.$ref)])
           Object.keys(parentProps).forEach(pp => {
             props[pp] = { ...parentProps[pp] }
           })
@@ -132,8 +132,8 @@ export function buildSchema(openapi: any): ObjectTypeMap {
   }
 
   function sortProperties(name : string, collectedProperties: PropertyMapType) : string[] {
-    var sortedProperties : string[] = []
-    var fieldsOrdersFields = fieldOrders.get(name)
+    const sortedProperties : string[] = []
+    const fieldsOrdersFields = fieldOrders.get(name)
     if (fieldsOrdersFields) {
       fieldsOrdersFields.forEach(f => {
         if (collectedProperties[f]) {
@@ -169,14 +169,13 @@ export function buildSchema(openapi: any): ObjectTypeMap {
     }
   }
 
-  var result = {} as ObjectTypeMap
+  const result = {} as ObjectTypeMap
   Object.keys(openapi.components.schemas).forEach(k => {
     const schema = openapi.components.schemas[k]
-    var objectType: ObjectType;
 
-    var collectedProperties: PropertyMapType = collectProperties(schema)
+    const collectedProperties: PropertyMapType = collectProperties(schema)
 
-    objectType = { 
+    const objectType = { 
       description: schema.description ?? ''
       , name: k 
       , collectedProperties: collectedProperties

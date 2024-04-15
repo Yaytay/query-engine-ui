@@ -15,13 +15,13 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import SaveIcon from '@mui/icons-material/Save';
 import Snackbar from '@mui/material/Snackbar';
 import Tooltip from '@mui/material/Tooltip';
-import { TreeView } from '@mui/x-tree-view/TreeView'
+import { SimpleTreeView } from '@mui/x-tree-view//SimpleTreeView'
 import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { components } from "./Query-Engine-Schema";
 import { ObjectTypeMap, buildSchema } from "./SchemaType";
 
-var onChange = () => {};
+let onChange = () => {};
 
 interface DesignProps {
   onChange :  () => void
@@ -63,30 +63,8 @@ function Design(props : DesignProps) {
     return ! Array.isArray(n.children);
   }
 
-  function setParents(node : any) {
-    node.children.forEach((n : any) => {
-      n.parent = node
-      if (Array.isArray(n.children)) {
-        setParents(n)
-      }
-    })
-  }
-
-  const getAllDirs = useCallback((root : components["schemas"]["DesignDir"]) => {
-    var arr : string[] = []
-
-    function addToDirs(node : components["schemas"]["DesignNode"]) {
-      if (isDirectory(node)) {
-        arr.push(node.path)
-        node.children.forEach((n) => addToDirs(n))
-      }
-    }
-    addToDirs(root)
-    return arr
-  }, [])
-
   const buildNodeMap = useCallback((root : components["schemas"]["DesignDir"]) => {
-    var nm = new Map<string, components["schemas"]["DesignNode"]>();
+    const nm = new Map<string, components["schemas"]["DesignNode"]>();
     function addToNodeMap(node : components["schemas"]["DesignNode"] ) {
       if (Array.isArray(node.children)) {
         nm.set(node.path, node)
@@ -100,6 +78,15 @@ function Design(props : DesignProps) {
   }, [])
 
   const handleResponse = useCallback((p : Promise<Response>) => {
+    function setParents(node : any) {
+      node.children.forEach((n : any) => {
+        n.parent = node
+        if (Array.isArray(n.children)) {
+          setParents(n)
+        }
+      })
+    }
+      
     return p
       .then((r : Response) => {
         if (!r.ok) {
@@ -122,15 +109,28 @@ function Design(props : DesignProps) {
         setSnackMessage(e.message)
         setSnackOpen(true)
       })
-  }, [setFiles, setParents, setNodeMap, buildNodeMap])
+  }, [setFiles, setNodeMap, buildNodeMap])
 
   useEffect(() => {
-    let url = new URL(props.baseUrl + 'api/design/all');
+    const getAllDirs = (root : components["schemas"]["DesignDir"]) => {
+      const arr : string[] = []
+  
+      function addToDirs(node : components["schemas"]["DesignNode"]) {
+        if (isDirectory(node)) {
+          arr.push(node.path)
+          node.children.forEach((n) => addToDirs(n))
+        }
+      }
+      addToDirs(root)
+      return arr
+    }
+    
+    const url = new URL(props.baseUrl + 'api/design/all');
     handleResponse(fetch(url, {credentials: 'include'}))
       .then(j => {
         setExpanded(getAllDirs(j));
       })
-    let openApiUrl = new URL(props.baseUrl + 'openapi.json');
+    const openApiUrl = new URL(props.baseUrl + 'openapi.json');
     fetch(openApiUrl, {credentials: 'include'})
       .then(r => {
         if (!r.ok) {
@@ -151,7 +151,7 @@ function Design(props : DesignProps) {
         setSnackOpen(true)
       })
 
-  }, [props.baseUrl])
+  }, [props.baseUrl, handleResponse])
 
   const [currentFile, setCurrentFile] = useState(null as  components["schemas"]["DesignFile"] | null);
 
@@ -185,7 +185,7 @@ function Design(props : DesignProps) {
       return
     }    
     const url = new URL(props.baseUrl + 'api/design/file/' + currentFile.path)
-    var contents : string;
+    let contents : string;
     if (currentFile.path.endsWith('.jexl')) {
       contents = fileContentsString || ''
     } else {
@@ -210,11 +210,11 @@ function Design(props : DesignProps) {
   }
 
   function fileSelected(nodeId : string) {
-    var node = nodeMap && nodeMap.get(nodeId)
+    const node = nodeMap && nodeMap.get(nodeId)
     if (node && isFile(node)) {
       setCurrentFile(node);
       setHelpText('');
-      let nodeUrl = new URL(props.baseUrl + 'api/design/file/' + node.path);
+      const nodeUrl = new URL(props.baseUrl + 'api/design/file/' + node.path);
       fetch(nodeUrl, { credentials: 'include', headers: { 'Accept' : 'application/json, */*;q=0.8' } })
         .then(r => {
           if (!r.ok) {
@@ -231,7 +231,7 @@ function Design(props : DesignProps) {
             setFileContents(null)
             setFileContentsString(j)
           } else {
-            var p = JSON.parse(j)
+            let p = JSON.parse(j)
             if (!p) {
               p = {}
             }
@@ -254,7 +254,7 @@ function Design(props : DesignProps) {
     const oldPath = node.path;
     const newPath = node.path.substring(0, node.path.lastIndexOf("/") + 1) + newName;
     console.log("Rename from " + oldPath + " to " + newPath)
-    let url = new URL(props.baseUrl + 'api/design/rename/' + node.path + '?name=' + encodeURIComponent(newName));
+    const url = new URL(props.baseUrl + 'api/design/rename/' + node.path + '?name=' + encodeURIComponent(newName));
     handleResponse(fetch(url, { method: 'POST', credentials: 'include' }))
       .then((_ : any) => {
         const idx = expanded.findIndex(p => p === oldPath);
@@ -270,9 +270,9 @@ function Design(props : DesignProps) {
   }
 
   function onNewFolder(node : components["schemas"]["DesignDir"]) {
-    var name;
-    for (var i = 1; (name = 'NewFolder' + i) && childExists(node, name) && i < 10; ++i) {
-    }
+    let name;
+    for (let i = 1; (name = 'NewFolder' + i) && childExists(node, name) && i < 10; ++i)
+      ;
     const parentPath = node.path === '' ? '' : node.path + '/'
     const url = new URL(props.baseUrl + 'api/design/file/' + parentPath + name);
     if (expanded.find(n => n === node.path) === undefined) {
@@ -282,9 +282,9 @@ function Design(props : DesignProps) {
   }
 
   function onNewPipeline(node : components["schemas"]["DesignDir"]) {
-    var name;
-    for (var i = 1; (name = 'NewPipeline' + i + '.yaml') && childExists(node, name) && i < 10; ++i) {
-    }
+    let name;
+    for (let i = 1; (name = 'NewPipeline' + i + '.yaml') && childExists(node, name) && i < 10; ++i)
+      ;
     const parentPath = node.path === '' ? '' : node.path + '/'
     const url = new URL(props.baseUrl + 'api/design/file/' + parentPath + name);
     if (expanded.find(n => n === node.path) === undefined) {
@@ -294,7 +294,7 @@ function Design(props : DesignProps) {
   }
 
   function onNewPermissions(node : components["schemas"]["DesignDir"]) {
-    var name = 'permissions.jexl';
+    const name = 'permissions.jexl';
     const parentPath = node.path === '' ? '' : node.path + '/'
     const url = new URL(props.baseUrl + 'api/design/file/' + parentPath + name);
     if (expanded.find(n => n === node.path) === undefined) {
@@ -315,9 +315,14 @@ function Design(props : DesignProps) {
     setExpanded(nodeIds)
   };
 
-  const handleSelect = (_: React.SyntheticEvent, nodeId: string) => {
-    setSelected(nodeId)
-    fileSelected(nodeId)
+  const handleSelect = (_: React.SyntheticEvent, itemId: string | null) => {
+    if (itemId) {
+      setSelected(itemId)
+      fileSelected(itemId)
+    } else {
+      setSelected('')
+      fileSelected('')
+    }
   };
 
   function fileDrawerWidthChange(w : number) {
@@ -349,7 +354,6 @@ function Design(props : DesignProps) {
   };
 
   const renderTree = (node : components["schemas"]["DesignNode"]) => {
-    const icon = Array.isArray(node.children) && node.children.length === 0 ? (<FolderOpen />) : null
     const label = (
       <TreeViewFileItemLabel
         id={'lbl_' + node.path}
@@ -363,7 +367,9 @@ function Design(props : DesignProps) {
     )
     const children = Array.isArray(node.children) ? node.children.map((child) => renderTree(child)) : null
     return (
-      <TreeItem key={node.name} nodeId={node.path} icon={icon} label={label} children={children} />
+      <TreeItem key={node.name} itemId={node.path} label={label}>
+        {children}
+      </TreeItem>
     )
   };
 
@@ -383,19 +389,21 @@ function Design(props : DesignProps) {
               </div>
             </div>
             <div className="grow flex flex-col">
-              <TreeView
+              <SimpleTreeView
                 aria-label="file system navigator"
-                defaultCollapseIcon={<FolderOpen />}
-                defaultExpandIcon={<Folder />}
-                defaultEndIcon={<Article />}
-                expanded={expanded}
-                selected={selected}
-                onNodeToggle={handleToggle}
-                onNodeSelect={handleSelect}
+                slots={{
+                  collapseIcon: FolderOpen
+                  , expandIcon: Folder
+                  , endIcon: Article
+                }}
+                expandedItems={expanded}
+                selectedItems={selected}
+                onExpandedItemsChange={handleToggle}
+                onSelectedItemsChange={handleSelect}
                 sx={{ height: '100%', flexGrow: 1, maxWidth: '100%', overflowY: 'auto' }}
               >
                 {files && renderTree(files)}
-              </TreeView>
+              </SimpleTreeView>
             </div>
           </div>
           <DragBar onChange={fileDrawerWidthChange} />

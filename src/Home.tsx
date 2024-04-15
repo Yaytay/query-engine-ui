@@ -30,7 +30,7 @@ function Home(props : HomeProps) {
                             <h2>Test</h2>
                             Run a pipeline repeatedly and see the results immediately.
                             <br/>
-                            See also the "Data" menu, which simulates the Query Engine embedded in a SAAS system.
+                            See also the &quot;Data&quot; menu, which simulates the Query Engine embedded in a SAAS system.
                         </div>
                     </Link>
                 }

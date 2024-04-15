@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import { TreeView } from '@mui/x-tree-view/TreeView'
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { components } from "./Query-Engine-Schema"
@@ -47,7 +47,7 @@ function Help(props : HelpProps) {
     if (path) {
       setHelpUrl(props.baseUrl + 'api/docs/' + path)
     }
-  }, [path])
+  }, [path, props.baseUrl])
 
   interface TabPanelProps {
     children: any
@@ -95,9 +95,14 @@ function Help(props : HelpProps) {
     setExpanded(nodeIds)
   };
 
-  const handleSelect = (_: React.SyntheticEvent, nodeId: string) => {
-    setSelected(nodeId)
-    fileSelected(nodeId)
+  const handleSelect = (_: React.SyntheticEvent, itemId: string | null) => {
+    if (itemId) {
+      setSelected(itemId)
+      fileSelected(itemId)
+    } else {
+      setSelected('')
+      fileSelected('')
+    }
   };
 
   function fileSelected(path : string) {
@@ -112,12 +117,12 @@ function Help(props : HelpProps) {
     if (isDocFile(node)) {
       if (node.title) {
         return (
-          <TreeItem key={node.name} nodeId={node.path} label={node.title ?? node.name} />
+          <TreeItem key={node.name} itemId={node.path} label={node.title ?? node.name} />
         )
       }
     } else {
       return (
-        <TreeItem key={node.name} nodeId={node.path} label={node.name} >
+        <TreeItem key={node.name} itemId={node.path} label={node.name} >
           { node.children && node.children.map((child) => renderTree(child)) }
         </TreeItem>
       )
@@ -147,19 +152,21 @@ function Help(props : HelpProps) {
             </Box>
             <TabPanel value={0} index={0}>
               <Box>
-                <TreeView
+                <SimpleTreeView
                   aria-label="file system navigator"
-                  defaultCollapseIcon={<FolderOpen />}
-                  defaultExpandIcon={<Folder />}
-                  defaultEndIcon={<Article />}
-                  expanded={expanded}
-                  selected={selected}
-                  onNodeToggle={handleToggle}
-                  onNodeSelect={handleSelect}
-                  sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+                  slots={{
+                    collapseIcon: FolderOpen
+                    , expandIcon: Folder
+                    , endIcon: Article
+                  }}
+                  expandedItems={expanded}
+                  selectedItems={selected}
+                  onExpandedItemsChange={handleToggle}
+                  onSelectedItemsChange={handleSelect}
+                    sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                 >
                   {props.docs.children && props.docs.children.map((node) => renderTree(node))}
-                </TreeView>
+                </SimpleTreeView>
               </Box>
             </TabPanel>
           </div>

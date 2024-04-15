@@ -50,7 +50,7 @@ function History(props: HistoryProps) {
   ]  
 
   useEffect(() => {
-    let url = new URL(props.baseUrl + 'api/history?skipRows=' + firstRow + '&maxRows=' + rowsPerPage + '&sort=' + sortField + '&desc=' + sortDesc);
+    const url = new URL(props.baseUrl + 'api/history?skipRows=' + firstRow + '&maxRows=' + rowsPerPage + '&sort=' + sortField + '&desc=' + sortDesc);
     fetch(url, { credentials: 'include' })
       .then((r: Response) => {
         if (!r.ok) {
@@ -73,7 +73,7 @@ function History(props: HistoryProps) {
           <TableHead>
             <TableRow>
               {headCells.map((hc) => (
-                <TableCell>
+                <TableCell key={hc.id}>
                   {hc.sortable ? (
                   <TableSortLabel
                     active={sortField === hc.id}

@@ -11,8 +11,8 @@ interface InlineEditProps {
 } 
 function InlineEdit(props : InlineEditProps) {
 
-  var [_, setValue] = useState(props.value);
-  var input = useRef(null);
+  const [_, setValue] = useState(props.value);
+  const input = useRef(null);
 
   function handleInputChange(e : (React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>)) {    
     console.log('InputString: ' + e.target.value);

@@ -34,7 +34,7 @@ function OASObjectEditor({ object, schema, field, bg, onHelpChange, onChange, ob
 
   function handleInputChange(changedField: string, value: any) {
     // console.log('Changed ' + objectSchema.name + '[' + changedField + '] = ' + JSON.stringify(value))
-    var rep = { ...object }
+    const rep = { ...object }
     rep[changedField] = value
     onChange(field, rep)
   }
@@ -42,9 +42,9 @@ function OASObjectEditor({ object, schema, field, bg, onHelpChange, onChange, ob
   if (objectSchema.discriminator) {
     const d = objectSchema.discriminator;
     if (object && d && object[d.propertyName]) {
-      var newType = d.mapping[object[d.propertyName]]
+      const newType = d.mapping[object[d.propertyName]]
       if (newType) {
-        var newSchema = schema[newType]
+        const newSchema = schema[newType]
         if (newSchema) {
           objectSchema = newSchema
         }

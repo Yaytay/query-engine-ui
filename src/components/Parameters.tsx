@@ -28,8 +28,8 @@ function Parameters(props : ParametersProps) {
 
   Formio.requireLibrary('flatpickr-formio', 'flatpickr-formio', 'https://cdn.jsdelivr.net/npm/flatpickr');
 
-  var [urlStr, setUrlStr] = useState('')
-  var [sub, _] = useState({data: props.values})
+  const [urlStr, setUrlStr] = useState('')
+  const [sub, _] = useState({data: props.values})
   const [form, setForm] = useState({})
   
   console.log('Props: ', props)
@@ -38,14 +38,14 @@ function Parameters(props : ParametersProps) {
   const url = useRef(props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns);
   const formSet = useRef({})
 
-  var webform: any
+  let webform: any
 
   useEffect(() => {
     console.log('Fetching form', url)
     fetch(url.current, {credentials: 'include'})
       .then((response) => response.json())
       .then((data) => {
-        console.log('Setting form', formSet.current, data, form)
+        console.log('Setting form', formSet.current, data)
         if (!equal(formSet.current, data)) {
           console.log("Actually setting form")
           formSet.current = data
@@ -125,7 +125,7 @@ function Parameters(props : ParametersProps) {
         {
           props.displayUrl && (
             <div>
-              <a href={urlStr} target="_blank">Direct Link</a>
+              <a href={urlStr} target="_blank" rel="noreferrer">Direct Link</a>
             </div>
           )
         }

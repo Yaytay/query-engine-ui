@@ -18,10 +18,10 @@ import { NestedDropdown, MenuItemData } from 'mui-nested-menu';
 import { ManagementEndpointType } from '../Manage';
 import { ArgsToArgs } from '../Test';
 
-var [modalIsOpen, setModalIsOpen] = [null as boolean | null, (_ : any) => {}]
-var [args, setArgs] = [null, (_ : any) => {}]
+let [modalIsOpen, setModalIsOpen] = [null as boolean | null, (_ : any) => {}]
+let [args, setArgs] = [null, (_ : any) => {}]
 
-var pipeline : components["schemas"]["PipelineFile"]
+let pipeline : components["schemas"]["PipelineFile"]
 
 const customStyles = {
   content: {
@@ -66,8 +66,8 @@ function Nav(props : NavProps) {
     if (!pipeline) {
       return Promise.resolve()
     }
-    var query = ArgsToArgs(pipeline, values);
-    var url = props.baseUrl + 'query/' + pipeline.path + (query == null ? '' : ('?' + query))
+    const query = ArgsToArgs(pipeline, values);
+    const url = props.baseUrl + 'query/' + pipeline.path + (query == null ? '' : ('?' + query))
     console.log(url)
   
     if (!values) {
@@ -75,7 +75,7 @@ function Nav(props : NavProps) {
     }
     console.log('submit', values)
     setArgs(values)
-    var w = props.window.open(url, pipeline.path)
+    const w = props.window.open(url, pipeline.path)
     if (window.location.href.startsWith(props.baseUrl)) {
       return new Promise(function(resolve, _) {
         if (w) {
@@ -100,7 +100,7 @@ function Nav(props : NavProps) {
     console.log(item);
     pipeline = item;
   
-    var ta : any = {
+    const ta : any = {
       '_fmt': (Array.isArray(pipeline.destinations) ? pipeline.destinations[0].name : null)
     }
     if (pipeline.arguments) {
@@ -146,7 +146,7 @@ function Nav(props : NavProps) {
   function dataMenuItems(node: components["schemas"]["PipelineNode"]) : MenuItemData {    
     if (node.children) {
       const items : MenuItemData[] = []
-      for (var idx in node.children) {
+      for (const idx in node.children) {
         items.push(dataMenuItems(node.children[idx]))
       }
       return { label: node.name, callback: (event, item) => console.log('Data clicked', event, item), items: items}
@@ -157,7 +157,7 @@ function Nav(props : NavProps) {
     }
   }
 
-  var columns = 1
+  let columns = 1
   if (pipeline && pipeline.arguments) {
     if (pipeline.arguments.length > 9) {
       columns = 4;

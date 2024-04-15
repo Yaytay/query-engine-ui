@@ -5,7 +5,7 @@ interface DragBarProps {
 }
 function DragBar(props : DragBarProps) {
 
-  var [dragging, setDragging] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   function dragStart(e : React.PointerEvent<HTMLDivElement>) {
     e.currentTarget.setPointerCapture(e.pointerId);

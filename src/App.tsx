@@ -21,9 +21,11 @@ import ServiceUnavailable from './components/ServiceUnavailable';
 
 const Design = lazy(() => import('./Design'))
 
+const fetchConfig = {credentials: 'include' as RequestCredentials}
+
 function App() {
 
-  var defaultState = {
+  const defaultState = {
     "available": null as components["schemas"]["PipelineDir"] | null
     , "docs": null as components["schemas"]["DocDir"] | null
     , "designMode": false
@@ -42,10 +44,8 @@ function App() {
   const [displayAuthSelection, setDisplayAuthSelection] = useState(false)
   const [displayServiceUnavailable, setDisplayServiceUnavailable] = useState(false)
 
-  const fetchConfig = {credentials: 'include' as RequestCredentials}
-
   function buildApiBaseUrl(): string {
-    var url = ''
+    let url = ''
     if (import.meta.env.VITE_API_URL) {
       url = import.meta.env.VITE_API_URL
     } else if (import.meta.env.MODE == 'development') {
@@ -66,112 +66,40 @@ function App() {
   }
 
   useEffect(() => {
-    getProfile()
-      .then(good => {
-        if (good) {
-          let url = new URL(baseUrl + 'api/info/available')
-          fetch(url, fetchConfig)
-            .then(r => {
-              if (r.ok) {
-                return r.json()
-              } else {
-                return;
-              }
-            })
-            .then(j => {
-              setAvailable(j);
-            })
-          let docurl = new URL(baseUrl + 'api/docs');
-          fetch(docurl, fetchConfig)
-            .then(r => {
-              if (r.ok) {
-                return r.json()
-              } else {
-                return;
-              }
-            })
-            .then(j => {
-              setDocs(j);
-            })
-          let dmurl = new URL(baseUrl + 'api/design/enabled');
-          fetch(dmurl, fetchConfig)
-            .then(r => {
-              setDesignMode(r.ok)
-            })
-          let murl = new URL(baseUrl + 'manage');
-          fetch(murl, fetchConfig)
-            .then(r => {
-              if (r.ok) {
-                return r.json()
-              } else {
-                return;
-              }
-            })
-            .then(j => {
-              if (j.location) {
-                fetch(j.location, fetchConfig)
-                  .then(r => r.json())
-                  .then(j => {
-                    setManagementEndpoints(j);
-                  })
-              } else {
-                setManagementEndpoints(j);
-              }
-            })
-          let apidocurl = new URL(baseUrl + 'openapi');
-          fetch(apidocurl, fetchConfig)
-            .then(r => {
-              if (r.ok) {
-                setApiUrl(baseUrl + 'openapi');
-              }
-            })
-        }
-      })
-  }, [baseUrl]);
-
-  const refresh = function () {
-    let url = new URL(baseUrl + 'api/info/available');
-    fetch(url, fetchConfig)
-      .then(r => r.json())
-      .then(j => {
-        setAvailable(j);
-      })
-  }
-
-  function performProfileFetch(profurl: URL, resolve: (value: unknown) => void) {
-    fetch(profurl, fetchConfig)
-      .then(r => {
-        console.log('Profile fetch result: ', r);
-        if (r.status === 401) {
-          doLogin(authConfigs);
-        } else if (r.ok) {
-          setDisplayAuthSelection(false);
-          return r.json();
-        } else {
+    function performProfileFetch(profurl: URL, resolve: (value: unknown) => void) {
+      fetch(profurl, fetchConfig)
+        .then(r => {
+          console.log('Profile fetch result: ', r);
+          if (r.status === 401) {
+            doLogin(authConfigs);
+          } else if (r.ok) {
+            setDisplayAuthSelection(false);
+            return r.json();
+          } else {
+            setDisplayServiceUnavailable(true);
+            resolve(false);
+          }
+        })
+        .catch(() => {
           setDisplayServiceUnavailable(true);
           resolve(false);
-        }
-      })
-      .catch(() => {
-        setDisplayServiceUnavailable(true);
-        resolve(false);
-      })
-      .then(j => {
-        console.log('Got profile: ', j);
-        setProfile(j);
-        resolve(true);
-      });
-  }
+        })
+        .then(j => {
+          console.log('Got profile: ', j);
+          setProfile(j);
+          resolve(true);
+        });
+    }
 
-  const getProfile = function () {
+    const profurl = new URL(baseUrl + 'api/session/profile')
     console.log('Getting profile')
-    let profurl = new URL(baseUrl + 'api/session/profile')
-    return new Promise(resolve => {
+
+    new Promise(resolve => {
       console.log("authConfigs: ", authConfigs)
       if (authConfigs.length) {
         performProfileFetch(profurl, resolve);
       } else {
-        let authurl = new URL(baseUrl + 'api/auth-config');
+        const authurl = new URL(baseUrl + 'api/auth-config');
         fetch(authurl, fetchConfig)
           .then(r => {
             if (r.ok) {
@@ -193,6 +121,75 @@ function App() {
           });
       }
     })
+    .then(good => {
+        if (good) {
+          const url = new URL(baseUrl + 'api/info/available')
+          fetch(url, fetchConfig)
+            .then(r => {
+              if (r.ok) {
+                return r.json()
+              } else {
+                return;
+              }
+            })
+            .then(j => {
+              setAvailable(j);
+            })
+          const docurl = new URL(baseUrl + 'api/docs');
+          fetch(docurl, fetchConfig)
+            .then(r => {
+              if (r.ok) {
+                return r.json()
+              } else {
+                return;
+              }
+            })
+            .then(j => {
+              setDocs(j);
+            })
+          const dmurl = new URL(baseUrl + 'api/design/enabled');
+          fetch(dmurl, fetchConfig)
+            .then(r => {
+              setDesignMode(r.ok)
+            })
+          const murl = new URL(baseUrl + 'manage');
+          fetch(murl, fetchConfig)
+            .then(r => {
+              if (r.ok) {
+                return r.json()
+              } else {
+                return;
+              }
+            })
+            .then(j => {
+              if (j.location) {
+                fetch(j.location, fetchConfig)
+                  .then(r => r.json())
+                  .then(j => {
+                    setManagementEndpoints(j);
+                  })
+              } else {
+                setManagementEndpoints(j);
+              }
+            })
+          const apidocurl = new URL(baseUrl + 'openapi');
+          fetch(apidocurl, fetchConfig)
+            .then(r => {
+              if (r.ok) {
+                setApiUrl(baseUrl + 'openapi');
+              }
+            })
+        }
+      })
+  }, [baseUrl, authConfigs]);
+
+  const refresh = function () {
+    const url = new URL(baseUrl + 'api/info/available');
+    fetch(url, fetchConfig)
+      .then(r => r.json())
+      .then(j => {
+        setAvailable(j);
+      })
   }
 
   const theme = createTheme({

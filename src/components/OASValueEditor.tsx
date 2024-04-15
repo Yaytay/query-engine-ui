@@ -27,7 +27,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
 
   const help = onHelpChange ?? function () { }
 
-  var input = useRef(null);
+  const input = useRef(null);
 
   const bgcol = (bg < colours.length) ? colours[bg] : colours[0]
 
@@ -75,7 +75,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
     )
   } else if (propertyType.type === 'integer') {
     // Integer field
-    var placeholder = (propertyType.title ?? propertyType.name)
+    let placeholder = (propertyType.title ?? propertyType.name)
     if (placeholder && propertyType.default) {
       placeholder = placeholder + ' (default ' + propertyType.default + ')'
     }
@@ -97,7 +97,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
       />
     )
   } else if (propertyType.type === 'string') {
-    var placeholder = (propertyType.title ?? propertyType.name)
+    let placeholder = (propertyType.title ?? propertyType.name)
     if (placeholder && propertyType.default) {
       placeholder = placeholder + ' (default ' + propertyType.default + ')'
     }
@@ -155,7 +155,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
                 bg={bg}
                 index={i}
                 onChange={(v) => {
-                  var newArr = [...value];
+                  const newArr = [...value];
                   newArr[i] = v;
                   handleChange(newArr);
                 }}
@@ -165,8 +165,8 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
                 { i > 0 && 
                   <div className="inline-block">
                     <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
-                      var newArr = [...value];
-                      var item = newArr.splice(i, 1);
+                      const newArr = [...value];
+                      const item = newArr.splice(i, 1);
                       newArr.splice(i - 1, 0, item[0]);
                       onChange(newArr);
                     }}>
@@ -179,8 +179,8 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
                 { i < value.length - 1 && 
                   <div className="inline-block">
                     <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
-                      var newArr = [...value];
-                      var item = newArr.splice(i, 1);
+                      const newArr = [...value];
+                      const item = newArr.splice(i, 1);
                       newArr.splice(i + 1, 0, item[0]);
                       onChange(newArr);
                     }}>
@@ -192,7 +192,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
                 }
                 <div className="inline-block">
                   <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
-                    var newArr = [...value];
+                    const newArr = [...value];
                     newArr.splice(i, 1);
                     handleChange(newArr);
                   }}>
@@ -209,14 +209,14 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
     )
   } else if (propertyType.type === 'object' && propertyType.ref) {
     // Single object field
-    var ref = propertyType.ref
+    let ref = propertyType.ref
     if (propertyType.ref && schema[propertyType.ref].discriminator) {
-      var discriminatorProperty = schema[propertyType.ref].discriminator?.propertyName
-      var discriminatorMapping = schema[propertyType.ref].discriminator?.mapping
+      const discriminatorProperty = schema[propertyType.ref].discriminator?.propertyName
+      const discriminatorMapping = schema[propertyType.ref].discriminator?.mapping
       if (discriminatorProperty && discriminatorMapping) {
-        var discriminatorValue = value[discriminatorProperty]
+        const discriminatorValue = value[discriminatorProperty]
         if (discriminatorValue) {
-          var subRef = discriminatorMapping[discriminatorValue]
+          const subRef = discriminatorMapping[discriminatorValue]
           if (subRef) {
             // Change the type to the sub type indicated by the discriminator
             ref = subRef

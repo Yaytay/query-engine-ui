@@ -5,7 +5,7 @@ import { SxProps } from '@mui/material';
 
 interface QeIconProps {
   sx: SxProps<any>
-};
+}
 
 function QeIcon(props : QeIconProps) {
 
