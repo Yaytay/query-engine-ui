@@ -26,7 +26,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: |        
+    - run: |
+        sed -i 's#<meta name="version" content="" />#<meta name="version" content="${{ env.CI_COMMIT_REF_SLUG }}: ${{ env.CI_COMMIT_SHORT_SHA }}" />#' index.html
         npm ci
         npx tsc --noEmit
         npm run build --if-present
