@@ -27,7 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: |
-        sed -i 's#<meta name="version" content="" />#<meta name="version" content="${{ env.GITHUB_REF }}" />#' index.html
+        sed -i 's#<meta name="version" content="" />#<meta name="version" content="$GITHUB_REF" />#' index.html
         npm ci
         npx tsc --noEmit
         npm run build --if-present
