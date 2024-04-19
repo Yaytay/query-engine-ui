@@ -1,1 +1,1 @@
-npx npm-check-updates -u 
+npx npm-check-updates -u !eslint
