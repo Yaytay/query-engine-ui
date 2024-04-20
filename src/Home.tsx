@@ -68,7 +68,7 @@ function Home(props : HomeProps) {
                 }
             </div>
             <div className="fixed bottom-0 right-0">
-                { props.profile && props.profile.version }
+                { props.profile && props.profile.version } (UI )
             </div>
         </div>
     );
