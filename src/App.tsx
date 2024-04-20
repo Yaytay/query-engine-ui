@@ -18,6 +18,7 @@ import { Manage, ManagementEndpointType } from './Manage';
 import CssBaseline from '@mui/material/CssBaseline';
 import { components } from "./Query-Engine-Schema";
 import ServiceUnavailable from './components/ServiceUnavailable';
+import equal from 'fast-deep-equal/es6/react';
 
 const Design = lazy(() => import('./Design'))
 
@@ -115,8 +116,10 @@ function App() {
             resolve(false)
           })
           .then(ac => {
-            console.log("Setting auth configs to", ac);
-            setAuthConfigs(ac);
+            if (!equal(ac, authConfigs)) {
+              console.log("Setting auth configs to", ac);
+              setAuthConfigs(ac);
+            }
             performProfileFetch(profurl, resolve);
           });
       }
