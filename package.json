@@ -28,7 +28,7 @@
     "@cyclonedx/cyclonedx-npm": "^1.16.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@fontsource/roboto": "^5.0.12",
+    "@fontsource/roboto": "^5.0.13",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
     "@tailwindcss/typography": "^0.5.12",
