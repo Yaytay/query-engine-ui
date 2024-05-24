@@ -154,14 +154,14 @@ export function buildSchema(openapi: any): ObjectTypeMap {
     return sortedProperties
   }
 
-  function findDiscriminator(name : string, schema : any) : any {
+  function findDiscriminator(schema : any) : any {
     if (schema.discriminator) {
       return schema.discriminator
     } else if (schema.allOf) {
       for (let i = 0; i < schema.allOf.length; ++i) {
         const ao = schema.allOf[i]
         if (ao.$ref) {
-          const parentDisc = findDiscriminator(typeFromRef(ao.$ref), openapi.components.schemas[typeFromRef(ao.$ref)])
+          const parentDisc = findDiscriminator(openapi.components.schemas[typeFromRef(ao.$ref)])
           if (parentDisc) {
             return parentDisc
           }
@@ -171,8 +171,8 @@ export function buildSchema(openapi: any): ObjectTypeMap {
     return null
   }
 
-  function buildDiscriminator(name : string, schema : any) : DiscriminatorType | undefined {
-    const srcdisc = findDiscriminator(name, schema)
+  function buildDiscriminator(schema : any) : DiscriminatorType | undefined {
+    const srcdisc = findDiscriminator(schema)
 
     if (srcdisc) {
       const m : {[key: string]: string} = {}
@@ -200,7 +200,7 @@ export function buildSchema(openapi: any): ObjectTypeMap {
       , collectedProperties: collectedProperties
       , sortedProperties: sortProperties(k, collectedProperties)
       , hasRequired: schema.required && schema.required.length > 0
-      , discriminator: buildDiscriminator(k, schema)
+      , discriminator: buildDiscriminator(schema)
     }
 
     result[k] = objectType
