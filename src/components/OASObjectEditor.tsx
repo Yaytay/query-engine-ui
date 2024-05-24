@@ -36,6 +36,11 @@ function OASObjectEditor({ object, schema, field, bg, onHelpChange, onChange, ob
     // console.log('Changed ' + objectSchema.name + '[' + changedField + '] = ' + JSON.stringify(value))
     const rep = { ...object }
     rep[changedField] = value
+    if (objectSchema.discriminator) {
+      if (changedField === objectSchema.discriminator.propertyName) {
+        setDropped(true)
+      }
+    }
     onChange(field, rep)
   }
 

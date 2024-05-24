@@ -197,7 +197,7 @@ export interface components {
        *
        * @enum {string}
        */
-      type: "String" | "Integer" | "Long" | "Double" | "Date" | "Time" | "DateTime";
+      type: "String" | "Integer" | "Long" | "Double" | "Boolean" | "Date" | "Time" | "DateTime";
       /**
        * @description <P>The name of the argument.</P>
        * <P>No two arguments in a single pipeline should have the same name.</P>
@@ -271,6 +271,20 @@ export interface components {
        * @default false
        */
       ignored?: boolean;
+      /**
+       * @description <P>If set to true the argument will be validated.</P>
+       * <P>
+       * Validation can only check:
+       * <ul>
+       * <li>Possible values specified directly (not via possibleValuesUrl).
+       * <li>Minimum and maximum values.
+       * <li>Permitted values regex.
+       * </ul>
+       * </P>
+       *
+       * @default true
+       */
+      validate?: boolean;
       /**
        * @description <P>
        * A list of the name(s) of another argument(s) that this argument requires.
@@ -719,25 +733,6 @@ export interface components {
      */
     Format: {
       /**
-       * @description <P>The name of the format.</P>
-       * <P>
-       * The name is used to determine the format based upon the '_fmt' query string argument.
-       * </P>
-       * <P>
-       * It is an error for two Formats to have the same name.
-       * This is different from the other Format determinators which can be repeated, the name is the
-       * ultimate arbiter and must be unique.
-       * This ensures that all configured Formats can be used.
-       * </P>
-       */
-      name?: string;
-      /**
-       * @description <P>The type of Format being configured.<P>
-       *
-       * @enum {string}
-       */
-      type: "JSON" | "XLSX" | "Delimited" | "HTML";
-      /**
        * @description <P>The extension of the format.</P>
        * <P>
        * The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
@@ -756,6 +751,25 @@ export interface components {
        * </P>
        */
       mediaType?: string;
+      /**
+       * @description <P>The name of the format.</P>
+       * <P>
+       * The name is used to determine the format based upon the '_fmt' query string argument.
+       * </P>
+       * <P>
+       * It is an error for two Formats to have the same name.
+       * This is different from the other Format determinators which can be repeated, the name is the
+       * ultimate arbiter and must be unique.
+       * This ensures that all configured Formats can be used.
+       * </P>
+       */
+      name?: string;
+      /**
+       * @description <P>The type of Format being configured.<P>
+       *
+       * @enum {string}
+       */
+      type: "JSON" | "XLSX" | "Delimited" | "HTML";
     };
     /** @description Configuration for an output format of delimited text. */
     FormatDelimited: WithRequired<{
@@ -1072,9 +1086,6 @@ export interface components {
        * <P>
        * There is no capability for changing the order of output columns, this will always be set as the order they appear in the data.
        * </P>
-       * <P>
-       * The key in this map is the name of the field as it appears in the data rows as they reach the outputter.
-       * </P>
        */
       columns?: components["schemas"]["FormatXlsxColumn"][];
     }), "type">;
@@ -1215,10 +1226,10 @@ export interface components {
        * A description of the Pipeline that will be used in the UI to provide information to the user.
        * </P>
        * <P>
-       * The description is optional, but should always be provided.
+       * The description is optional, but should always be provided for the sanity of your users.
        * </P>
        * <P>
-       * The description is optional should be kept relatively short as it will be included, in full, in the parameter gathering form for Interactive Pipelines.
+       * The description should be kept relatively short as it will be included, in full, in the parameter gathering form for Interactive Pipelines.
        * </P>
        */
       description?: string;
@@ -1258,7 +1269,7 @@ export interface components {
       cacheDuration?: string;
       /**
        * @description <P>
-       * A rate limit rule constrains how frequently pipelines can be run.
+       * Rate limit rules that constrain how frequently pipelines can be run.
        * </P>
        */
       rateLimitRules?: components["schemas"]["RateLimitRule"][];
@@ -1281,6 +1292,9 @@ export interface components {
       arguments?: components["schemas"]["Argument"][];
       /**
        * @description <P>
+       * The endpoints used by the sources in the pipeline.
+       * </P>
+       * <P>
        * Endpoints are the actual providers of data to the Pipeline.
        * Most Sources (all except the TestSource) work through an Endpoint.
        * </P>
@@ -1347,6 +1361,8 @@ export interface components {
     };
     /** @description Processors modify the data stream in flight. */
     Processor: {
+      /** @description <P>Optional condition that controls whether the processor will be run.</P> */
+      condition?: components["schemas"]["Condition"];
       /** @description <P>ID that uniquely idenfities this processor within the pipeline.</P> */
       id: string;
       /**
@@ -1354,9 +1370,7 @@ export interface components {
        *
        * @enum {string}
        */
-      type: "LIMIT" | "OFFSET" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "SCRIPT" | "WITHOUT" | "QUERY" | "RELABEL" | "SORT";
-      /** @description <P>Optional condition that controls whether the processor will be run.</P> */
-      condition?: components["schemas"]["Condition"];
+      type: "LIMIT" | "OFFSET" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "QUERY" | "MAP" | "SORT";
     };
     /**
      * @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
@@ -1511,6 +1525,83 @@ export interface components {
        */
       limit?: number;
     }, "id" | "type">;
+    /**
+     * @description <p>
+     * Processor that runs an initial query to generate a map of key/value pairs, and then updates fields based on that map.
+     * </p><p>
+     * In most cases this processor is a bad idea, but in a few specific situations it can be a lot quicker to
+     * find lookup values in memory rather than in SQL.
+     * Consider using this processor with large datasets that access the same lookup data in multiple fields.
+     * </p><p>
+     * A child pipeline must be defined to generate the map.
+     * This pipeline must result in two fields (additional fields will be ignored).
+     * </p><p>
+     * As there can only be a single value field in the initial query, all the field generated by this processor will be of the same type.
+     * </p><p>
+     * It is possible to specify an existing field to be the destination for the looked up value, but this cannot result in a change of the
+     * field's type.
+     * It is thus not usually possible to replace the key with the value and it us usually necessary to add an additional field.
+     * If this is undesireable use the Map processor to remove the key field.
+     * </p>
+     */
+    ProcessorLookup: WithRequired<{
+      type: "LOOKUP";
+    } & Omit<components["schemas"]["Processor"], "type"> & {
+      /** @description The name of the field in the lookupSource that provides the keys for the map. */
+      lookupKeyField?: string;
+      /** @description The name of the field in the lookupSource that provides the values for the map. */
+      lookupValueField?: string;
+      /** @description The fields in the main stream that are to be looked up and the fields that are to be created in the main stream for the values found. */
+      lookupFields?: components["schemas"]["ProcessorLookupField"][];
+      /**
+       * @description Get the feed for the lookup key/value pairs.
+       *
+       * This data feed should result in two columns:
+       * <ul>
+       * <li>lookupKeyField - The key that will be used to find values in the map.
+       * <li>lookupValueField - The value that will be take from the map and put into the main feed.
+       * </ul>
+       */
+      map?: components["schemas"]["SourcePipeline"];
+    }, "id" | "lookupKeyField" | "lookupValueField" | "type">;
+    /** @description Argument to the LookupProcessor that specifies the field containing the key to be looked up and the field that the value will be written to. */
+    ProcessorLookupField: {
+      /** @description The name of the field in the primary stream that is to be looked up in the map. */
+      keyField: string;
+      /** @description The name of the field to be created in the stream that is to be set by the value from the map. */
+      valueField: string;
+    };
+    /** @description Processor that renames or removes fields in the output. */
+    ProcessorMap: WithRequired<{
+      type: "MAP";
+    } & Omit<components["schemas"]["Processor"], "type"> & {
+      /** @description The fields that will be renamed by this processor. */
+      relabels?: components["schemas"]["ProcessorMapLabel"][];
+    }, "id" | "relabels" | "type">;
+    /** @description Argument to the MapProcessor that renames or removes fields in the output. */
+    ProcessorMapLabel: {
+      /** @description The name of the field to be renamed. */
+      sourceLabel: string;
+      /** @description The new name of the field, may be blank to remove a field. */
+      newLabel: string;
+    };
+    /** @description Processor that curtails the output after the configured number of rows. */
+    ProcessorOffset: WithRequired<{
+      type: "OFFSET";
+    } & Omit<components["schemas"]["Processor"], "type"> & {
+      /**
+       * Format: int32
+       * @description The number of rows that will be skipped by this processor.
+       */
+      offset?: number;
+    }, "id" | "type">;
+    /** @description Processor that filters output rows. */
+    ProcessorQuery: WithRequired<{
+      type: "QUERY";
+    } & Omit<components["schemas"]["Processor"], "type"> & {
+      /** @description A valid FIQL expression that will be evaluated on each row. */
+      expression?: string;
+    }, "expression" | "id" | "type">;
     /** @description Run a custom script on each row of the output. */
     ProcessorScript: WithRequired<{
       type: "SCRIPT";
@@ -1532,6 +1623,22 @@ export interface components {
        * <P>
        */
       process?: string;
+    }, "id" | "type">;
+    /**
+     * @description Processor that sorts the data stream.
+     * <P>
+     * Note that this pipeline, unlike most others, has to buffer the entire stream before it can sort it.
+     * Additionally, if the data consists of too many rows it will be sorted on disc.
+     * </P>
+     * <P>
+     * This processor is inherently slow, if you need to use it please discuss options with the pipeline designer.
+     * </P>
+     */
+    ProcessorSort: WithRequired<{
+      type: "SORT";
+    } & Omit<components["schemas"]["Processor"], "type"> & {
+      /** @description The fields by which this processor will sort the data. */
+      fields?: string[];
     }, "id" | "type">;
     /**
      * @description <p>A definition of a rule that prevents a pipeline from running if previous runs that match the scope and time limit exceed the byte count.</p>
@@ -1560,9 +1667,21 @@ export interface components {
        * <P>Expressions in ISO8601 time period notication (e.g. PT10M for ten minutes).</P>
        */
       timeLimit: string;
-      /** @description <P>The limit on the number of pipeline runs matching the scope that may be initiated.</P> */
+      /**
+       * @description <P>The limit on the number of pipeline runs matching the scope that may be initiated.</P>
+       * <P>
+       * This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
+       * No other non-numeric characters are permitted.
+       * </P>
+       */
       runLimit?: string;
-      /** @description <P>The limit on the number of bytes that may be been sent by previous runs.</P> */
+      /**
+       * @description <P>The limit on the number of bytes that may be been sent by previous runs.</P>
+       * <P>
+       * This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
+       * No other non-numeric characters are permitted.
+       * </P>
+       */
       byteLimit?: string;
       /**
        * Format: int32
@@ -1616,7 +1735,7 @@ export interface components {
       /**
        * @description <P>The name of the endpoint that provides the data for the Source.</P>
        * <P>
-       * The endpoint represents with the HTTP endpoint or the SQL database that contains the actual data.
+       * The endpoint represents the SQL database that contains the actual data.
        * </P>
        * <P>
        * The endpoint must be specified as either a straight name (this field) or as a template value (endpointEmplate).
@@ -1625,9 +1744,9 @@ export interface components {
        */
       endpoint?: string;
       /**
-       * @description <P>A templated version of the name of the endpoint that provides the data for the Source.</P>
+       * @description <P>A <a href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
        * <P>
-       * The endpoint represents with the HTTP endpoint or the SQL database that contains the actual data.
+       * The endpoint represents the SQL database that contains the actual data.
        * </P>
        * <P>
        * The endpoint must be specified as either a template value (this field) or as a straight name (endpoint).
@@ -1640,12 +1759,20 @@ export interface components {
        * <P>
        * A SQL statement.
        * </P>
+       * <P>
+       * The query must be specified as either a plain SQL statement (this field) or as a template value (queryTemplate).
+       * If both fields are provided it is an error.
+       * </P>
        */
       query?: string;
       /**
-       * @description <P>The query to run against the Endpoint, as a <A href="https://github.com/antlr/stringtemplate4/blob/master/doc/introduction.md">StringTemplate</A> that will be rendered first.</P>
+       * @description <P>The query to run against the Endpoint, as a <a href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
        * <P>
        * A StringTemplate that results in a SQL statement.
+       * </P>
+       * <p>
+       * The query must be specified as either a templated value (this field) or as a plain SQL statement (query).
+       * If both fields are provided it is an error.
        * </P>
        */
       queryTemplate?: string;
@@ -1660,7 +1787,7 @@ export interface components {
       streamingFetchSize?: number;
       /**
        * Format: int32
-       * @description <P>The maxmimum number of connections to open to the Endpoint.</P>
+       * @description <P>The maximum number of connections to open to the Endpoint.</P>
        * <P>
        * If there are likely to be multiple concurrent pipelines running to the same Endpoint it can be beneficial to set this to a small number, otherwise leave it at the default.
        * </P>
@@ -1668,7 +1795,7 @@ export interface components {
       maxPoolSize?: number;
       /**
        * Format: int32
-       * @description <P>The maxmimum number of connections have queued up for the Endpoint.</P>
+       * @description <P>The maximum number of connections have queued up for the Endpoint.</P>
        * <P>
        * This is unlikely to be useful.
        * </P>
@@ -1697,9 +1824,7 @@ export interface components {
        */
       idleTimeout?: string;
       /**
-       * @description <P>The idle timeout for the connection pool that will be created.</P>
-       * <P>
-       * After this time has passed the connection will be closed and a new one will be opened by subequent pipelines.
+       * @description <P>The connection timeout for the connections that will be created.</P>
        * </P>
        * <P>
        * The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
@@ -1823,7 +1948,7 @@ export interface components {
       /**
        * Format: int64
        * @description <P>The index of the first row (out of all those for the current user) present in this dataset.</P>
-       * <P>This shhould equal the skipsRows argument passed in the request for history.</P>
+       * <P>This should equal the skipsRows argument passed in the request for history.</P>
        */
       firstRow: number;
       /**
@@ -2080,7 +2205,7 @@ export interface operations {
     };
     requestBody?: {
       content: {
-        "inode/directory,application/json,application/yaml,application/yaml+velocity,application/json+velocity,application/jexl": string[];
+        "inode/directory,application/json,application/yaml,application/yaml+velocity,application/json+velocity,application/jexl": string;
       };
     };
     responses: {
@@ -2169,7 +2294,7 @@ export interface operations {
   validate: {
     requestBody?: {
       content: {
-        "application/json,application/yaml": string[];
+        "application/json,application/yaml": string;
       };
     };
     responses: {

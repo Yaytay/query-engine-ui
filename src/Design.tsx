@@ -290,7 +290,8 @@ function Design(props : DesignProps) {
     if (expanded.find(n => n === node.path) === undefined) {
       expanded.push(node.path);
     }
-    handleResponse(fetch(url, { method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/yaml' } }));
+    const newPipeline = '{"source":{"type":"TEST"},"formats":[{"type":"Delimited"}]}'
+    handleResponse(fetch(url, { method: 'PUT', body: newPipeline, credentials: 'include', headers: { 'Content-Type': 'application/json' } }));
   }
 
   function onNewPermissions(node : components["schemas"]["DesignDir"]) {
