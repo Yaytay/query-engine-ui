@@ -107,8 +107,17 @@ function Test(props : TestProps) {
 
   const [nodeMap, setNodeMap] = useState({} as any)
 
+  const [defaulExpanded, _] = useState(() => {
+    const saved = localStorage.getItem("test-dir-state")
+    return saved ? JSON.parse(saved) : saved
+  })
+
   const [expanded, setExpanded] = useState([] as string[])
   const [selected, setSelected] = useState('')
+
+  useEffect(() => {
+    localStorage.setItem("test-dir-state", JSON.stringify(expanded));
+  }, [expanded]);
 
   useEffect(() => {
     function AddToNodeMap(nm: any, dirs: string[], node : components["schemas"]["PipelineNode"]) {
@@ -123,7 +132,12 @@ function Test(props : TestProps) {
     const dirs = [] as string[]
     AddToNodeMap(nm, dirs, props.available);
     setNodeMap(nm)
-    setExpanded(dirs) 
+
+    if (defaulExpanded) {
+      setExpanded(dirs.filter(value => defaulExpanded.includes(value)))
+    } else {
+      setExpanded(dirs) 
+    }
   }, [props.available])
 
   const handleToggle = (_: React.SyntheticEvent, itemIds: string[]) => {
@@ -141,7 +155,6 @@ function Test(props : TestProps) {
   };
 
   function fileSelected(path : string) {
-    console.log(path);
     if (nodeMap[path]) {
       console.log('Setting current file', nodeMap[path])
       setCurrentFile(nodeMap[path]);
@@ -245,7 +258,7 @@ function Test(props : TestProps) {
     setDisplayDrawer(!displayDrawer)
   }
 
-  console.log('Rendering with', tabPanel, displayDrawer, currentFile, props.baseUrl)
+  // console.log('Rendering with', tabPanel, displayDrawer, currentFile, props.baseUrl)
 
   return (
     <div className="h-full flex qe-test">

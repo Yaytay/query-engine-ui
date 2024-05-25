@@ -66,11 +66,9 @@ function Design(props : DesignProps) {
   const buildNodeMap = useCallback((root : components["schemas"]["DesignDir"]) => {
     const nm = new Map<string, components["schemas"]["DesignNode"]>();
     function addToNodeMap(node : components["schemas"]["DesignNode"] ) {
+      nm.set(node.path, node)
       if (Array.isArray(node.children)) {
-        nm.set(node.path, node)
         node.children.forEach(n => addToNodeMap(n))
-      } else {
-        nm.set(node.path, node);
       }
     }
     addToNodeMap(root);
@@ -111,6 +109,18 @@ function Design(props : DesignProps) {
       })
   }, [setFiles, setNodeMap, buildNodeMap])
 
+  const [defaulExpanded, _] = useState(() => {
+    const saved = localStorage.getItem("design-dir-state")
+    return saved ? JSON.parse(saved) : saved
+  })
+
+  const [expanded, setExpanded] = useState([] as string[])
+  const [selected, setSelected] = useState('')
+
+  useEffect(() => {
+    localStorage.setItem("design-dir-state", JSON.stringify(expanded));
+  }, [expanded]);
+
   useEffect(() => {
     const getAllDirs = (root : components["schemas"]["DesignDir"]) => {
       const arr : string[] = []
@@ -128,7 +138,12 @@ function Design(props : DesignProps) {
     const url = new URL(props.baseUrl + 'api/design/all');
     handleResponse(fetch(url, {credentials: 'include'}))
       .then(j => {
-        setExpanded(getAllDirs(j));
+        const dirs = getAllDirs(j)
+        if (defaulExpanded) {
+          setExpanded(dirs.filter(value => defaulExpanded.includes(value)))
+        } else {
+          setExpanded(dirs) 
+        }
       })
     const openApiUrl = new URL(props.baseUrl + 'openapi.json');
     fetch(openApiUrl, {credentials: 'include'})
@@ -308,9 +323,6 @@ function Design(props : DesignProps) {
     const url = new URL(props.baseUrl + 'api/design/file/' + node.path);
     handleResponse(fetch(url, { method: 'DELETE', credentials: 'include' }));
   }
-
-  const [expanded, setExpanded] = useState([] as string[])
-  const [selected, setSelected] = useState('')
 
   const handleToggle = (_: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds)

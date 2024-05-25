@@ -205,7 +205,6 @@ function Nav(props : NavProps) {
                     , endIcon: <></>
                   }
                 }
-                onClick={() => console.log('Clicked')}
               /> 
             </Box>
             <QeIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />

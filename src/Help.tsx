@@ -75,21 +75,36 @@ function Help(props : HelpProps) {
     );
   }
 
-  const nodeMap = {} as any
-  const allNodes = [] as string[]
-
-  function AddToNodeMap(node : components["schemas"]["DocNode"]) {
-    if (Array.isArray(node.children)) {
-      node.children.forEach(n => AddToNodeMap(n));
-      allNodes.push(node.path);
-    } else {
-      nodeMap[node.path] = node;
+  useEffect(() => {
+    function AddToNodeMap(nm: any, dirs: string[], node : components["schemas"]["DocNode"]) {
+      if (Array.isArray(node.children)) {
+        node.children.forEach(n => AddToNodeMap(nm, dirs, n));
+        dirs.push(node.path)
+      } else {
+        nm[node.path] = node;
+      }
     }
-  }
-  AddToNodeMap(props.docs);
+    const dirs = [] as string[]
+    AddToNodeMap({}, dirs, props.docs);
 
-  const [expanded, setExpanded] = useState(allNodes)
+    if (defaulExpanded) {
+      setExpanded(dirs.filter(value => defaulExpanded.includes(value)))
+    } else {
+      setExpanded(dirs) 
+    }
+  }, [props.docs])
+
+  const [defaulExpanded, _] = useState(() => {
+    const saved = localStorage.getItem("help-dir-state")
+    return saved ? JSON.parse(saved) : saved
+  })
+
+  const [expanded, setExpanded] = useState([] as string[])
   const [selected, setSelected] = useState('')
+
+  useEffect(() => {
+    localStorage.setItem("help-dir-state", JSON.stringify(expanded));
+  }, [expanded]);
 
   const handleToggle = (_: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds)
