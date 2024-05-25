@@ -213,7 +213,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
     if (propertyType.ref && schema[propertyType.ref].discriminator) {
       const discriminatorProperty = schema[propertyType.ref].discriminator?.propertyName
       const discriminatorMapping = schema[propertyType.ref].discriminator?.mapping
-      if (discriminatorProperty && discriminatorMapping) {
+      if (discriminatorProperty && discriminatorMapping && value) {
         const discriminatorValue = value[discriminatorProperty]
         if (discriminatorValue) {
           const subRef = discriminatorMapping[discriminatorValue]
