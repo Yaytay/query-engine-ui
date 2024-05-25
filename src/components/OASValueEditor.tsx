@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Textarea from 'react-expanding-textarea'
 import OASObjectEditor from './OASObjectEditor';
 import IconButton from '@mui/material/IconButton';
@@ -36,6 +36,32 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
   }
 
   const classes = "grow bg-transobject appearance-none px-1 text-gray-700 leading-tight font-mono overflow-wrap resize";
+
+  function updateHelpText() {
+    let text
+    if (propertyType.description) {
+      text = '<h3>' + field + '</h3>' + propertyType.description
+    }
+    if (propertyType.ref) {
+      const s = schema[propertyType.ref]
+      if (s) {
+        text = '<h3>' + s.name + '</h3>' + s.description
+      }
+    }
+    if (propertyType.discriminatorDocs && propertyType.discriminatorDocs.has(value)) {
+      text = text + '<br><h2>' + value + '</h2>' + propertyType.discriminatorDocs.get(value)
+    }
+
+    if (text) {
+      help(text)
+    }
+  }
+
+  useEffect(() => {
+    if (propertyType.discriminatorDocs) {
+      updateHelpText()
+    }
+  }, [value])
 
   if (propertyType.enum) {
     // Enum/select field

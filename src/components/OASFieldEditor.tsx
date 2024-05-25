@@ -32,7 +32,7 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
     return (<div data-field={field} />)
   }
 
-  function onFocus(e: React.SyntheticEvent<any>) {
+  function updateHelpText() {
     let text
     if (propertyType.description) {
       text = '<h3>' + field + '</h3>' + propertyType.description
@@ -43,10 +43,17 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
         text = '<h3>' + s.name + '</h3>' + s.description
       }
     }
+    if (propertyType.discriminatorDocs && propertyType.discriminatorDocs.has(value)) {
+      text = text + '<br><h2>' + value + '</h2>' + propertyType.discriminatorDocs.get(value)
+    }
 
     if (text) {
       help(text)
     }
+  }
+
+  function onFocus(e: React.SyntheticEvent<any>) {
+    updateHelpText()
     e.preventDefault()
   }
 
@@ -72,7 +79,9 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
             propertyType={propertyType}
             schema={schema}
             onHelpChange={onHelpChange}
-            onChange={(v) => { onChange(field, v) }}
+            onChange={(v) => { 
+              onChange(field, v)
+            }}
             onFocus={onFocus}
             field={field}
             index={index}

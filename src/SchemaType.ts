@@ -41,6 +41,7 @@ export interface PropertyType {
   , required?: boolean 
   , title: string | null
   , uniqueItems: boolean | null
+  , discriminatorDocs: Map<string, string> | null
 }
 
 export interface PropertyMapType {
@@ -86,6 +87,7 @@ export function buildSchema(openapi: any): ObjectTypeMap {
       , pattern: schema.pattern
       , title: schema.title
       , uniqueItems: schema.uniqueItems
+      , discriminatorDocs: null
     }
     if (name) {
       result.name = name
@@ -201,6 +203,15 @@ export function buildSchema(openapi: any): ObjectTypeMap {
       , sortedProperties: sortProperties(k, collectedProperties)
       , hasRequired: schema.required && schema.required.length > 0
       , discriminator: buildDiscriminator(schema)
+    }    
+    if (objectType.discriminator) {
+      const disc = objectType.discriminator
+      objectType.collectedProperties[disc.propertyName].discriminatorDocs = new Map<string, string>()
+      Object.keys(disc.mapping).forEach((k : string) => {
+        console.log(disc.mapping[k])
+        console.log(openapi.components.schemas[disc.mapping[k]])
+        objectType.collectedProperties[disc.propertyName].discriminatorDocs?.set(k, openapi.components.schemas[disc.mapping[k]].description)
+      })
     }
 
     result[k] = objectType
