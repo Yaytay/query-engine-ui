@@ -61,6 +61,7 @@ function OASObjectEditor({ object, schema, field, bg, onHelpChange, onChange, ob
     <div className="grow flex">
       <div className="flex-col grow">
       {objectSchema.sortedProperties.map((f, i) => {
+        console.log(objectSchema)
         return (
           <OASFieldEditor
             id={f}
