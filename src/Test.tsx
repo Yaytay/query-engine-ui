@@ -161,7 +161,7 @@ function Test(props : TestProps) {
       const ta = {} as any
       if (nodeMap[path].arguments) {
         nodeMap[path].arguments.forEach((arg : any) => {
-          ta[arg.name] = arg.defaultValue ?? '';
+          ta[arg.name] = arg.defaultValueExpression ?? '';
         });
         ta['_fmt'] = nodeMap[path].destinations[0].name;
       }

@@ -105,7 +105,7 @@ function Nav(props : NavProps) {
     }
     if (pipeline.arguments) {
       pipeline.arguments.forEach(arg => {
-        ta[arg.name] = arg.defaultValue ?? '';
+        ta[arg.name] = arg.defaultValueExpression ?? '';
       });
     }
     setArgs(ta);

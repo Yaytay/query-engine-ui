@@ -3,7 +3,7 @@
  */
 const fieldOrders = new Map<string, string[]>([
   ['Pipeline', ['title', 'description', 'condition', 'arguments', 'sourceEndpoints', 'dynamicEndpoints', 'source', 'processors', 'destinations']]
-  , ['Argument', ['name', 'type', 'title', 'prompt', 'description', 'optional', 'multiValued', 'ignored', 'dependsUpon', 'defaultValue', 'minimumValue', 'maximumValue', 'possibleValues', 'possibleValuesUrl', 'permittedValuesRegex']]
+  , ['Argument', ['name', 'type', 'title', 'prompt', 'description', 'optional', 'multiValued', 'ignored', 'dependsUpon', 'defaultValueExpression', 'minimumValue', 'maximumValue', 'possibleValues', 'possibleValuesUrl', 'permittedValuesRegex']]
   , ['ArgumentValue', ['value', 'label']]
   , ['Condition', ['expression']]
   , ['Destination', ['type', 'name', 'mediaType']]
