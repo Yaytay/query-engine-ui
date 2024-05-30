@@ -303,16 +303,20 @@ export interface components {
        */
       dependsUpon?: string[];
       /**
-       * @description The default value for the argument, as a <a href="https://commons.apache.org/proper/commons-jexl/">JEXL</a> <a href="https://commons.apache.org/proper/commons-jexl/reference/syntax.html">expression</a>.
+       * @description The default value for the argument, as a <a target="_blank" href="https://commons.apache.org/proper/commons-jexl/">JEXL</a> <a target="_blank" href="https://commons.apache.org/proper/commons-jexl/reference/syntax.html">expression</a>.
        * <P>
-       * The expression will be evaluated in the same context as a {@link Condition} would be, but the result is not constrained to being a boolean value.
+       * The expression will be evaluated in the same context as a <a target="_blank" href="/ui/help/Parameters/uk.co.spudsoft.query.defn.Condition.html">Condition</a> would be, but the result is not constrained to being a boolean value.
        * The evaluation may result in multiple values (as either an array or a Collection) or a single value.
        * Each value will be converted or parsed to the correct data type.
        * Be aware that multi-valued defaults don't work with formio.
        * <P>
-       * Numeric values can simple be entered on their own, but strings must be quoted (single or double) which does complicate things when working with YAML files (where quotes are optional).
+       * Numeric values can simply be entered on their own, but strings must be quoted (single or double) which does complicate things when working with YAML files (where quotes are optional).
+       * <P>
+       * All output from a JEXL epression will be converted to the appropriate data type.
+       * This can either be by parsing a string, or by converting a specific Java type.
+       * <P>
        * When using the Design page of the Query Engine UI it is sufficient to enter a quoted string, but when editing a YAML file directly it will be necessary to quote the string twice (once for YAML and once for JEXL).
-       * Both YAML and JEXL can recognise single and double quotes, JEXL treats them the same but YAML does not (see <a href="https://www.yaml.info/learn/quote.html">To Quote or not to Quote?</a>).
+       * Both YAML and JEXL can recognise single and double quotes, JEXL treats them the same but YAML does not (see <a target="_blank" href="https://www.yaml.info/learn/quote.html">To Quote or not to Quote?</a>).
        * By default the recommended approach is to use single quotes for YAML and double quotes for JEXL.
        * <P>
        * Note that the default value should <em>not</em> be URL encoded.
@@ -749,25 +753,6 @@ export interface components {
      */
     Format: {
       /**
-       * @description <P>The name of the format.</P>
-       * <P>
-       * The name is used to determine the format based upon the '_fmt' query string argument.
-       * </P>
-       * <P>
-       * It is an error for two Formats to have the same name.
-       * This is different from the other Format determinators which can be repeated, the name is the
-       * ultimate arbiter and must be unique.
-       * This ensures that all configured Formats can be used.
-       * </P>
-       */
-      name?: string;
-      /**
-       * @description <P>The type of Format being configured.<P>
-       *
-       * @enum {string}
-       */
-      type: "JSON" | "XLSX" | "Delimited" | "HTML";
-      /**
        * @description <P>The extension of the format.</P>
        * <P>
        * The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
@@ -786,6 +771,25 @@ export interface components {
        * </P>
        */
       mediaType?: string;
+      /**
+       * @description <P>The name of the format.</P>
+       * <P>
+       * The name is used to determine the format based upon the '_fmt' query string argument.
+       * </P>
+       * <P>
+       * It is an error for two Formats to have the same name.
+       * This is different from the other Format determinators which can be repeated, the name is the
+       * ultimate arbiter and must be unique.
+       * This ensures that all configured Formats can be used.
+       * </P>
+       */
+      name?: string;
+      /**
+       * @description <P>The type of Format being configured.<P>
+       *
+       * @enum {string}
+       */
+      type: "JSON" | "XLSX" | "Delimited" | "HTML";
     };
     /** @description Configuration for an output format of delimited text. */
     FormatDelimited: WithRequired<{
@@ -1381,6 +1385,8 @@ export interface components {
     };
     /** @description Processors modify the data stream in flight. */
     Processor: {
+      /** @description <P>Optional condition that controls whether the processor will be run.</P> */
+      condition?: components["schemas"]["Condition"];
       /** @description <P>ID that uniquely idenfities this processor within the pipeline.</P> */
       id: string;
       /**
@@ -1389,8 +1395,6 @@ export interface components {
        * @enum {string}
        */
       type: "LIMIT" | "OFFSET" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-      /** @description <P>Optional condition that controls whether the processor will be run.</P> */
-      condition?: components["schemas"]["Condition"];
     };
     /**
      * @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
@@ -1872,7 +1876,7 @@ export interface components {
        */
       endpoint?: string;
       /**
-       * @description <P>A <a href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
+       * @description <P>A <a target="_blank" href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
        * <P>
        * The endpoint represents the SQL database that contains the actual data.
        * </P>
@@ -1894,7 +1898,7 @@ export interface components {
        */
       query?: string;
       /**
-       * @description <P>The query to run against the Endpoint, as a <a href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
+       * @description <P>The query to run against the Endpoint, as a <a target="_blank" href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
        * <P>
        * A StringTemplate that results in a SQL statement.
        * </P>
