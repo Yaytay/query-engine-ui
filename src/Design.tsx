@@ -260,6 +260,7 @@ function Design(props : DesignProps) {
           setSnackOpen(true)
         })
     } else {
+      setCurrentFile(null)
       setFileContents(null)
       setFileContentsString('')
     }
