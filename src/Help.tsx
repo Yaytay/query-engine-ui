@@ -200,9 +200,9 @@ function Help(props : HelpProps) {
 
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 0, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{ flexGrow: 1, p: '10px 0 0 0', width: { sm: `calc(100% - ${drawerWidth}px)`} }}
       >
-        <iframe src={helpUrl}  width={'100%'} height={'100%'} ></iframe>
+        <iframe src={helpUrl}  width={'100%'} height={'100%'} style={{ border: '0px' }}></iframe>
       </Box>
     </div>);
 }
