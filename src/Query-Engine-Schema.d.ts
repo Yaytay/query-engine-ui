@@ -753,25 +753,6 @@ export interface components {
      */
     Format: {
       /**
-       * @description <P>The extension of the format.</P>
-       * <P>
-       * The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-       * If multiple formats have the same extension the first in the list will be used.
-       * </P>
-       */
-      extension?: string;
-      /**
-       * @description <P>The media type of the format.</P>
-       * <P>
-       * The media type is used to determine the format based upon the Accept header in the request.
-       * If multiple formats have the same media type the first in the list will be used.
-       * </P>
-       * <P>
-       * The media type will also be set as the Content-Type header in the response.
-       * </P>
-       */
-      mediaType?: string;
-      /**
        * @description <P>The name of the format.</P>
        * <P>
        * The name is used to determine the format based upon the '_fmt' query string argument.
@@ -790,6 +771,25 @@ export interface components {
        * @enum {string}
        */
       type: "JSON" | "XLSX" | "Delimited" | "HTML";
+      /**
+       * @description <P>The extension of the format.</P>
+       * <P>
+       * The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
+       * If multiple formats have the same extension the first in the list will be used.
+       * </P>
+       */
+      extension?: string;
+      /**
+       * @description <P>The media type of the format.</P>
+       * <P>
+       * The media type is used to determine the format based upon the Accept header in the request.
+       * If multiple formats have the same media type the first in the list will be used.
+       * </P>
+       * <P>
+       * The media type will also be set as the Content-Type header in the response.
+       * </P>
+       */
+      mediaType?: string;
     };
     /** @description Configuration for an output format of delimited text. */
     FormatDelimited: WithRequired<{
@@ -1385,8 +1385,6 @@ export interface components {
     };
     /** @description Processors modify the data stream in flight. */
     Processor: {
-      /** @description <P>Optional condition that controls whether the processor will be run.</P> */
-      condition?: components["schemas"]["Condition"];
       /** @description <P>ID that uniquely idenfities this processor within the pipeline.</P> */
       id: string;
       /**
@@ -1395,6 +1393,8 @@ export interface components {
        * @enum {string}
        */
       type: "LIMIT" | "OFFSET" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+      /** @description <P>Optional condition that controls whether the processor will be run.</P> */
+      condition?: components["schemas"]["Condition"];
     };
     /**
      * @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
