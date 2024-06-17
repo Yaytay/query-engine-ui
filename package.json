@@ -14,7 +14,7 @@
   "dependencies": {
     "@formio/js": "^5.0.0-rc.48",
     "@formio/react": "^5.3.0",
-    "@mui/system": "^5.15.15",
+    "@mui/system": "^5.15.20",
     "@mui/x-tree-view": "^7.6.2",
     "@types/dompurify": "^3.0.5",
     "bootstrap": "^5.3.3",
