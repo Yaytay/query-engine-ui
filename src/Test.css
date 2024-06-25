@@ -1,5 +1,10 @@
 
 .rawHtmlData {
-  overflow: scroll;
+  overflow: auto;
+  height: 100%;
 }
 
+.rawDataWrapper {
+  overflow: auto;
+  height: 100%;
+}

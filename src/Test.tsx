@@ -319,7 +319,7 @@ function Test(props : TestProps) {
         component="main"
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
-        <pre className="whitespace-pre-wrap">{data}</pre>
+        {data && (<pre className="rawDataWrapper">{data}</pre>)}
         {rawHtml && (<div className="rawHtmlData" dangerouslySetInnerHTML={{ __html: rawHtml }} ></div>)}
       </Box>
     </div>);
