@@ -1,3 +1,4 @@
+import './Test.css';
 import { useState, useEffect } from 'react';
 
 import DragBar from './components/DragBar'
@@ -192,9 +193,10 @@ function Test(props : TestProps) {
     if (!values) {
       return Promise.resolve()
     }
-    console.log('submit', values)
     setArgs(values)
     const dest = findDestination(values._fmt);
+
+    console.log('submit', values, dest)
     if (dest && (dest.type === 'XLSX')) {
       props.window.open(url, "_blank");
       return Promise.resolve()
@@ -258,8 +260,6 @@ function Test(props : TestProps) {
     setDisplayDrawer(!displayDrawer)
   }
 
-  // console.log('Rendering with', tabPanel, displayDrawer, currentFile, props.baseUrl)
-
   return (
     <div className="h-full flex qe-test">
       {displayDrawer && (
@@ -320,7 +320,7 @@ function Test(props : TestProps) {
         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
         <pre className="whitespace-pre-wrap">{data}</pre>
-        {rawHtml && (<div className="rawHtmlData" dangerouslySetInnerHTML={{ __html: rawHtml }}></div>)}
+        {rawHtml && (<div className="rawHtmlData" dangerouslySetInnerHTML={{ __html: rawHtml }} ></div>)}
       </Box>
     </div>);
 }
