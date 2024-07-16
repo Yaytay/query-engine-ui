@@ -204,7 +204,7 @@ function Design(props : DesignProps) {
     if (currentFile.path.endsWith('.jexl')) {
       contents = fileContentsString || ''
     } else {
-      contents = JSON.stringify(fileContents)
+      contents = JSON.stringify(fileContents, [''])
     }
     fetch(url, { method: 'PUT', body: contents, credentials: 'include', headers: {'Content-Type': 'application/json'} })
       .then(r => {
