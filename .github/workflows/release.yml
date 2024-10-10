@@ -31,6 +31,7 @@ jobs:
         sed -i 's#(UI )#(UI '$GITHUB_REF_NAME')#' src/Home.tsx
         npm ci
         npm run build
+        npx "@cyclonedx/cyclonedx-npm" --ignore-npm-errors --output-format json --output-file dist/query-engine-ui.cdx.json
         tar -czf build.tar.gz dist
 
     - name: Create release
