@@ -29,7 +29,7 @@ jobs:
     - run: |
         sed -i 's#<meta name="version" content="" />#<meta name="version" content="'$GITHUB_REF_NAME'" />#' index.html
         sed -i 's#(UI )#(UI '$GITHUB_REF_NAME')#' src/Home.tsx
-        npm ci
+        npm ci --force
         npm run build
         npx "@cyclonedx/cyclonedx-npm" --ignore-npm-errors --output-format json --output-file dist/query-engine-ui.cdx.json
         tar -czf build.tar.gz dist
