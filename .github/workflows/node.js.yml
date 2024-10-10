@@ -30,7 +30,7 @@ jobs:
         sed -i 's#<meta name="version" content="" />#<meta name="version" content="'$GITHUB_REF'@'$GITHUB_SHA'" />#' index.html
         sed -i 's#(UI )#(UI '$GITHUB_REF'@'$GITHUB_SHA')#' src/Home.tsx
         grep version index.html
-        npm ci
+        npm ci --force
         npx tsc --noEmit
         npm run build --if-present
         tar -czf build.tar.gz dist
