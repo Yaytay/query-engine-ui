@@ -402,7 +402,7 @@ function Design(props : DesignProps) {
                 </IconButton>
               </div>
             </div>
-            <div className="grow flex flex-col">
+            <div className="grow flex flex-col" style={{ height: 'calc(100% - 60px)', overflowY: 'auto' }} >
               <SimpleTreeView
                 aria-label="file system navigator"
                 slots={{

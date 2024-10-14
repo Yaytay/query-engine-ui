@@ -62,7 +62,7 @@ function TabPanel({ children, value, index, ...other } : TabPanelProps) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      style={{ height: '100%', overflowY: 'auto' }}
+      style={{ height: 'calc(100% - 55px)', overflowY: 'auto' }}
       {...other}
     >
       {value === index && (

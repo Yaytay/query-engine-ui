@@ -64,6 +64,7 @@ function Help(props : HelpProps) {
         hidden={value !== index}
         id={`simple-tabpanel-${index}`}
         aria-labelledby={`simple-tab-${index}`}
+        style={{ height: 'calc(100% - 55px)', overflowY: 'auto' }}
         {...other}
       >
         {value === index && (
