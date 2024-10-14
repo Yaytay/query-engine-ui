@@ -62,10 +62,11 @@ function TabPanel({ children, value, index, ...other } : TabPanelProps) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      style={{ height: '100%', overflowY: 'auto' }}
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: 3, minHeight: 0 }}>
           {children}
         </Box>
       )}
@@ -261,18 +262,17 @@ function Test(props : TestProps) {
   }
 
   return (
-    <div className="h-full flex qe-test">
+    <div className="h-full flex qe-test ">
       {displayDrawer && (
         <>
-          <div style={{ width: drawerWidth }} className="h-full box-border " >
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <div style={{ width: drawerWidth, minHeight: 0 }} className="flex flex-column" >
+            <Box className="flex-none" sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={tabPanel} onChange={handleChange} >
                 <Tab label="Files" />
                 <Tab label="Properties" disabled={!currentFile} />
               </Tabs>
             </Box>
-            <TabPanel value={tabPanel} index={0}>
-              <Box>
+            <TabPanel value={tabPanel} index={0} >
                 <SimpleTreeView
                   aria-label="file system navigator"
                   slots={{
@@ -288,7 +288,6 @@ function Test(props : TestProps) {
                 >
                   {props.available.children.map((node) => renderTree(node))}
                 </SimpleTreeView>
-              </Box>
             </TabPanel>
             <TabPanel value={tabPanel} index={1} >
               { currentFile && (<Parameters 
