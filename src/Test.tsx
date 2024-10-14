@@ -32,7 +32,20 @@ export function ArgsToArgs(pipeline: components["schemas"]["PipelineFile"], args
   for (let i = 0; i < pipeline.arguments.length; ++i) {
     const arg = pipeline.arguments[i].name
     if (args[arg]) {
-      result.push(arg + '=' + encodeURIComponent(args[arg]));
+      let value =args[arg]
+      if (pipeline.arguments[i].type==='Date' || pipeline.arguments[i].type==='Time' || pipeline.arguments[i].type==='DateTime') {
+        if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+          value = value.substring(1, value.length - 1)
+        }
+      } 
+      
+      if (pipeline.arguments[i].multiValued && Array.isArray(value)) {
+        value.forEach(v => {
+          result.push(arg + '=' + encodeURIComponent(v));
+        })
+      } else {
+        result.push(arg + '=' + encodeURIComponent(args[arg]));
+      }
     }
   }
   if (args['_filters']) {
