@@ -351,6 +351,10 @@ export interface components {
              * @enum {string}
              */
             type: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
+            /** @description <P>The name of the group that the argument should be presented in.</P>
+             *     <P>The group will be used in the presentation of arguments in the UI but otherwise serves no purpose for the processing.</P>
+             *      */
+            group: string;
             /** @description <P>The name of the argument.</P>
              *     <P>No two arguments in a single pipeline should have the same name.</P>
              *     <P>
@@ -395,6 +399,16 @@ export interface components {
              * @default false
              */
             optional: boolean;
+            /**
+             * @description <P>If set to true the pipeline UI will not show this argument and the pipeline will fail if the argument is supplied.</P>
+             *     <P>
+             *     The purpose of hidden arguments is to use the defaultValueExpression to present dynamic data to the query.
+             *     Suggested uses include dynamic limits on a query or values extracted from the token.
+             *     </P>
+             *
+             * @default false
+             */
+            hidden: boolean;
             /**
              * @description <P>If set to true the argument may be provided multiple times.</P>
              *     <P>
@@ -547,6 +561,53 @@ export interface components {
              *      */
             condition?: components["schemas"]["Condition"];
         };
+        /** @description <P>
+         *     An ArgumentGroup represents a group of {@link Argument} instances.
+         *     </P>
+         *     <P>
+         *     Argument groups are entirely for the benefit of the user interface, they are not used in the processing of pipelines.
+         *     </P>
+         *     <P>
+         *     Each {@link Argument} in the {@link Pipeline} can specify a group name.
+         *     It is an error if the group does not also exist in the Pipeline.
+         *     </P>
+         *      */
+        ArgumentGroup: {
+            /** @description <P>The name of the argument group, should be specified by any arguments in this group.</P>
+             *     <P>No two argument groups in a single pipeline should have the same name.</P>
+             *     <P>
+             *     The name must consist entirely of Unicode alpha-numeric characters, it is
+             *     recommended that the name use only ASCII characters to avoid needing to encode it
+             *     but this is not a requirement.
+             *     </P>
+             *      */
+            name: string;
+            /** @description <P>The title to be displayed for the argument group in any UI.</P>
+             *     <P>
+             *     If the title is not set the UI will display the name.
+             *     </P>
+             *      */
+            title?: string;
+            /** @description <P>The description to be displayed for the argument group in any UI.</P>
+             *      */
+            description?: string;
+            /**
+             * @description <P>The type of rendering to use for the argument group.</P>
+             *     <P>
+             *     The type of the argument group is optional, if it is not specified a default rendering will be used.
+             *     </P>
+             *
+             * @enum {string}
+             */
+            type?: "FIELD_SET" | "PANEL" | "COLLAPSIBLE_PANEL";
+            /** @description The theme used to display the argument group in the UI.
+             *     <P>
+             *     This should be any valid Bootstrap Panel Theme
+             *     <P>
+             *     Valid values include: default, primary, success, info, warning, danger.
+             *      */
+            theme?: string;
+        };
         /** @description <P>An ArgumentValue represents a possible value for an Argument to a Pipeline.</P>
          *     <P>
          *     ArgumentValues are not validated by the Query Engine at all, they exist solely to make life nicer for UIs.
@@ -650,6 +711,12 @@ export interface components {
          *     </P>
          *      */
         DynamicEndpoint: {
+            /** @description <P>Get the name of the PreProcessor, that will be used in logging and tracking..</P>
+             *     <P>
+             *     This is optional, if it is not set a generated name will be allocated.
+             *     </P>
+             *      */
+            name?: string;
             /** @description <P>Get the pipeline used to generate the endpoints.</P>
              *     <P>
              *     This pipeline can only use endpoints already in existence.
@@ -884,6 +951,13 @@ export interface components {
          *
          *      */
         Format: {
+            /** @description <P>The extension of the format.</P>
+             *     <P>
+             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
+             *     If multiple formats have the same extension the first in the list will be used.
+             *     </P>
+             *      */
+            extension?: string;
             /** @description <P>The media type of the format.</P>
              *     <P>
              *     The media type is used to determine the format based upon the Accept header in the request.
@@ -894,13 +968,6 @@ export interface components {
              *     </P>
              *      */
             mediaType?: string;
-            /** @description <P>The extension of the format.</P>
-             *     <P>
-             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-             *     If multiple formats have the same extension the first in the list will be used.
-             *     </P>
-             *      */
-            extension?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -1399,7 +1466,7 @@ export interface components {
              *     A condition that constrains who can use the Pipeline.
              *     </P>
              *      */
-            condition?: components["schemas"]["Condition"];
+            condition?: string;
             /** @description <P>
              *     The time for which the results of this pipeline should be cached.
              *     </P>
@@ -1431,7 +1498,42 @@ export interface components {
              *     Rate limit rules that constrain how frequently pipelines can be run.
              *     </P>
              *      */
-            rateLimitRules?: components["schemas"]["RateLimitRule"][];
+            rateLimitRules?: {
+                /** @description <P>The scope of the rate limit rule.</P>
+                 *     <P>At least one value must be provided.</P>
+                 *      */
+                scope: ("host" | "path" | "clientip" | "issuer" | "subject" | "username")[];
+                /** @description <P>The duration of the rate limit.</P>
+                 *     <P>Expressions in ISO8601 time period notication (e.g. PT10M for ten minutes).</P>
+                 *      */
+                timeLimit: string;
+                /** @description <P>The limit on the number of pipeline runs matching the scope that may be initiated.</P>
+                 *     <P>
+                 *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
+                 *     No other non-numeric characters are permitted.
+                 *     </P>
+                 *      */
+                runLimit?: string;
+                /** @description <P>The limit on the number of bytes that may be been sent by previous runs.</P>
+                 *     <P>
+                 *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
+                 *     No other non-numeric characters are permitted.
+                 *     </P>
+                 *      */
+                byteLimit?: string;
+                /**
+                 * Format: int32
+                 * @description <P>The limit on the number of runs matching the scope that may have been started but not completed within the time limit.</P>
+                 *
+                 */
+                concurrencyLimit?: number;
+            };
+            /** @description <P>Declared arguments to the Pipeline.</P>
+             *     <P>
+             *     Arguments may be placed into groups in the user interface, outside of the user interface groups serve no purpose.
+             *     </P>
+             *      */
+            argumentGroups?: components["schemas"]["ArgumentGroup"][];
             /** @description <P>Declared arguments to the Pipeline.</P>
              *     <P>
              *     Pipelines can receive arguments via the HTTP query string.
@@ -1520,9 +1622,9 @@ export interface components {
             /** @description <P>Optional condition that controls whether the processor will be run.</P>
              *      */
             condition?: components["schemas"]["Condition"];
-            /** @description <P>ID that uniquely idenfities this processor within the pipeline.</P>
+            /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
              *      */
-            id: string;
+            name: string;
             /**
              * @description <P>The type of Processor being configured.</P>
              *
@@ -1567,7 +1669,7 @@ export interface components {
          *     </ol>
          *     </ol>
          *      */
-        ProcessorDynamicField: Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        ProcessorDynamicField: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /** @description The inner join flag.
              *     <P>
              *     If set to true the parent row will only be output if the child feed has at least one matching row.
@@ -1632,7 +1734,7 @@ export interface components {
          *      */
         ProcessorExpression: {
             type: "ProcessorExpression";
-        } & (Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /** @description A JEXL expression that is used to determine whether or not the row should be discarded.
              *     <P>
              *     The script should return a value that is either true or false, if the value is false the row will be discarded.
@@ -1736,7 +1838,7 @@ export interface components {
         });
         /** @description Processor that combines multiple values from a child query into a single concatenated string value.
          *      */
-        ProcessorGroupConcat: Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        ProcessorGroupConcat: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /** @description The data feed.
              *     <P>
              *     This data feed should result in two columns childIdColumn and childValueColumn (any other columns will be ignored).
@@ -1784,7 +1886,7 @@ export interface components {
         };
         /** @description Processor that curtails the output after the configured number of rows.
          *      */
-        ProcessorLimit: Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        ProcessorLimit: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * Format: int32
              * @description The limit on the number of rows that will be output by this processor.
@@ -1816,7 +1918,7 @@ export interface components {
          *     If this is undesireable use the Map processor to remove the key field.
          *     </p>
          *      */
-        ProcessorLookup: Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        ProcessorLookup: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /** @description The name of the field in the lookupSource that provides the keys for the map.
              *      */
             lookupKeyField: string;
@@ -1851,10 +1953,16 @@ export interface components {
             /** @description The name of the field to be created in the stream that is to be set by the value from the map.
              *      */
             valueField: string;
+            /** @description Any condition that applies to this field.
+             *     <P>
+             *     This can be used to exclude fields based upon input conditions.
+             *     The condition will be evaluated once at the beginning of the process and will not have access to each output row.
+             *      */
+            condition?: components["schemas"]["Condition"];
         };
         /** @description Processor that renames or removes fields in the output.
          *      */
-        ProcessorMap: Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        ProcessorMap: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /** @description The fields that will be renamed by this processor.
              *      */
             relabels: components["schemas"]["ProcessorMapLabel"][];
@@ -1871,13 +1979,13 @@ export interface components {
             /** @description The name of the field to be renamed.
              *      */
             sourceLabel: string;
-            /** @description The new name of the field, may be blank to remove a field.
+            /** @description The new name of the field, may be null or blank, both of which will remove the field from the stream.
              *      */
             newLabel: string;
         };
         /** @description Processor that curtails the output after the configured number of rows.
          *      */
-        ProcessorOffset: Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        ProcessorOffset: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * Format: int32
              * @description The number of rows that will be skipped by this processor.
@@ -1893,7 +2001,7 @@ export interface components {
         };
         /** @description Processor that filters output rows.
          *      */
-        ProcessorQuery: Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        ProcessorQuery: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /** @description A valid FIQL expression that will be evaluated on each row.
              *      */
             expression: string;
@@ -1906,7 +2014,7 @@ export interface components {
         };
         /** @description Run a custom script on each row of the output.
          *      */
-        ProcessorScript: Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        ProcessorScript: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /** @description The language to use, as understood by GraalVM.
              *     <P>
              *     By default the only acceptable value is "js", but custom builds can use other lanaguages.
@@ -1937,7 +2045,7 @@ export interface components {
          *     This processor is inherently slow, if you need to use it please discuss options with the pipeline designer.
          *     </P>
          *      */
-        ProcessorSort: Omit<WithRequired<components["schemas"]["Processor"], "id" | "type">, "type"> & {
+        ProcessorSort: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /** @description The fields by which this processor will sort the data.
              *      */
             fields?: string[];
@@ -2353,6 +2461,15 @@ export interface components {
              *     </P>
              *      */
             description?: string;
+            /** @description <P>Declared argument groups in the Pipeline.</P>
+             *     <P>
+             *     The UI for gathering arguments should group them into titles sets that may also have a comment.
+             *     </P>
+             *     <P>
+             *     Arguments with no group will always be presented first.
+             *     </P>
+             *      */
+            argumentGroups?: components["schemas"]["ArgumentGroup"][];
             /** @description <P>Declared arguments to the Pipeline.</P>
              *     <P>
              *     Pipelines can receive arguments via the HTTP query string.
@@ -2479,7 +2596,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["AuthConfig"][];
                 };
             };
         };
@@ -2681,7 +2798,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["DocNode"][];
                 };
             };
         };
@@ -2772,7 +2889,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["PipelineNode"][];
                 };
             };
         };
