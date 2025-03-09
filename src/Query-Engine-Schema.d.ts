@@ -951,13 +951,6 @@ export interface components {
          *
          *      */
         Format: {
-            /** @description <P>The extension of the format.</P>
-             *     <P>
-             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-             *     If multiple formats have the same extension the first in the list will be used.
-             *     </P>
-             *      */
-            extension?: string;
             /** @description <P>The media type of the format.</P>
              *     <P>
              *     The media type is used to determine the format based upon the Accept header in the request.
@@ -986,6 +979,13 @@ export interface components {
              * @enum {string}
              */
             type: "JSON" | "XLSX" | "Delimited" | "HTML";
+            /** @description <P>The extension of the format.</P>
+             *     <P>
+             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
+             *     If multiple formats have the same extension the first in the list will be used.
+             *     </P>
+             *      */
+            extension?: string;
         };
         /** @description Configuration for an output format of delimited text.
          *      */
