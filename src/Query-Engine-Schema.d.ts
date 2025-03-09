@@ -1498,36 +1498,7 @@ export interface components {
              *     Rate limit rules that constrain how frequently pipelines can be run.
              *     </P>
              *      */
-            rateLimitRules?: {
-                /** @description <P>The scope of the rate limit rule.</P>
-                 *     <P>At least one value must be provided.</P>
-                 *      */
-                scope: ("host" | "path" | "clientip" | "issuer" | "subject" | "username")[];
-                /** @description <P>The duration of the rate limit.</P>
-                 *     <P>Expressions in ISO8601 time period notication (e.g. PT10M for ten minutes).</P>
-                 *      */
-                timeLimit: string;
-                /** @description <P>The limit on the number of pipeline runs matching the scope that may be initiated.</P>
-                 *     <P>
-                 *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
-                 *     No other non-numeric characters are permitted.
-                 *     </P>
-                 *      */
-                runLimit?: string;
-                /** @description <P>The limit on the number of bytes that may be been sent by previous runs.</P>
-                 *     <P>
-                 *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
-                 *     No other non-numeric characters are permitted.
-                 *     </P>
-                 *      */
-                byteLimit?: string;
-                /**
-                 * Format: int32
-                 * @description <P>The limit on the number of runs matching the scope that may have been started but not completed within the time limit.</P>
-                 *
-                 */
-                concurrencyLimit?: number;
-            };
+            rateLimitRules?: components["schemas"]["RateLimitRule"][];
             /** @description <P>Declared arguments to the Pipeline.</P>
              *     <P>
              *     Arguments may be placed into groups in the user interface, outside of the user interface groups serve no purpose.
