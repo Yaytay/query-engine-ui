@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Textarea from 'react-expanding-textarea'
 import OASObjectEditor from './OASObjectEditor';
 import IconButton from '@mui/material/IconButton';
@@ -21,35 +21,37 @@ interface OASValueEditorProps {
   , onFocus : (e : React.SyntheticEvent<any>) => void
   , index : number
 }
-function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus, field, propertyType } : OASValueEditorProps) {
+function OASValueEditor(props : OASValueEditorProps) {
 
   const colours = [' bg-white', ' bg-slate-50', ' bg-slate-100', ' bg-slate-200', ' bg-slate-300']
 
-  const help = onHelpChange ?? function () { }
+  const help = props.onHelpChange ?? function () { }
 
-  const input = useRef(null);
+  const input = useRef(null)
 
-  const bgcol = (bg < colours.length) ? colours[bg] : colours[0]
+  const [value, setValue] = useState<any>()
+
+  const bgcol = (props.bg < colours.length) ? colours[props.bg] : colours[0]
 
   function handleChange(newValue : any) {
-    onChange(newValue);
+    props.onChange(newValue);
   }
 
   const classes = "grow bg-transobject appearance-none px-1 text-gray-700 leading-tight font-mono overflow-wrap resize";
 
   function updateHelpText() {
     let text
-    if (propertyType.description) {
-      text = '<h3>' + field + '</h3>' + propertyType.description
+    if (props.propertyType.description) {
+      text = '<h3>' + props.field + '</h3>' + props.propertyType.description
     }
-    if (propertyType.ref) {
-      const s = schema[propertyType.ref]
+    if (props.propertyType.ref) {
+      const s = props.schema[props.propertyType.ref]
       if (s) {
         text = '<h3>' + s.name + '</h3>' + s.description
       }
     }
-    if (propertyType.discriminatorDocs && propertyType.discriminatorDocs.has(value)) {
-      text = text + '<br><h2>' + value + '</h2>' + propertyType.discriminatorDocs.get(value)
+    if (props.propertyType.discriminatorDocs && props.propertyType.discriminatorDocs.has(value)) {
+      text = text + '<br><h2>' + value + '</h2>' + props.propertyType.discriminatorDocs.get(value)
     }
 
     if (text) {
@@ -58,56 +60,57 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
   }
 
   useEffect(() => {
-    if (propertyType.discriminatorDocs) {
+    if (props.propertyType.discriminatorDocs) {
       updateHelpText()
     }
-  }, [value])
+    setValue(props.value)
+  }, [props.value])
 
-  if (propertyType.enum) {
+  if (props.propertyType.enum) {
     // Enum/select field
     return (
       <select
-        id={id}
+        id={props.id}
         className={bgcol}
-        aria-placeholder={propertyType.title ?? propertyType.name}
+        aria-placeholder={props.propertyType.title ?? props.propertyType.name}
         defaultValue={value}
         onChange={e => handleChange(e.target.value)}
-        onFocus={onFocus}
+        onFocus={props.onFocus}
         ref={input}
       >
         {
-          propertyType.enum.map(v => {
-            return (<option key={field+v} id={v} value={v}>{v}</option>)
+          props.propertyType.enum.map(v => {
+            return (<option key={props.field+v} id={v} value={v}>{v}</option>)
           })
         }
       </select>
     ) 
-  } else if (propertyType.type === 'boolean') {
+  } else if (props.propertyType.type === 'boolean') {
     // Boolean field
     return (
       <select
-        id={id}
-        aria-placeholder={propertyType.title ?? propertyType.name}
+        id={props.id}
+        aria-placeholder={props.propertyType.title ?? props.propertyType.name}
         defaultValue={value ? 1 : 0}
         className={bgcol}
         onChange={e => { handleChange(e.target.value ? true : false) }}
-        onFocus={onFocus}
+        onFocus={props.onFocus}
         ref={input}
       >
-        <option value="1" key={field +  1}>true</option>
-        <option value="0" key={field +  0}>false</option>
-        <option value="" key={field + 'null'}></option>
+        <option value="1" key={props.field +  1}>true</option>
+        <option value="0" key={props.field +  0}>false</option>
+        <option value="" key={props.field + 'null'}></option>
       </select>
     )
-  } else if (propertyType.type === 'integer') {
+  } else if (props.propertyType.type === 'integer') {
     // Integer field
-    let placeholder = (propertyType.title ?? propertyType.name)
-    if (placeholder && propertyType.default) {
-      placeholder = placeholder + ' (default ' + propertyType.default + ')'
+    let placeholder = (props.propertyType.title ?? props.propertyType.name)
+    if (placeholder && props.propertyType.default) {
+      placeholder = placeholder + ' (default ' + props.propertyType.default + ')'
     }
     return (
       <input className={classes + bgcol}
-        id={id}
+        id={props.id}
         type='text'
         placeholder={placeholder}
         defaultValue={value}
@@ -118,20 +121,20 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
             e.currentTarget.blur();
           }            
         })}
-        onFocus={onFocus}
+        onFocus={props.onFocus}
         ref={input}
       />
     )
-  } else if (propertyType.type === 'string') {
-    let placeholder = (propertyType.title ?? propertyType.name)
-    if (placeholder && propertyType.default) {
-      placeholder = placeholder + ' (default ' + propertyType.default + ')'
+  } else if (props.propertyType.type === 'string') {
+    let placeholder = (props.propertyType.title ?? props.propertyType.name)
+    if (placeholder && props.propertyType.default) {
+      placeholder = placeholder + ' (default ' + props.propertyType.default + ')'
     }
-    if (propertyType.maxLength && propertyType.maxLength <= 1000) {
+    if (props.propertyType.maxLength && props.propertyType.maxLength <= 1000) {
       // Short text field
       return (
         <input className={classes + bgcol}
-          id={id}
+          id={props.id}
           type='text'
           defaultValue={value}
           onChange={e => handleChange(e.target.value)}
@@ -141,7 +144,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
               e.currentTarget.blur();
             }            
           })}
-          onFocus={onFocus}
+          onFocus={props.onFocus}
           ref={input}
           placeholder={placeholder}
         />
@@ -150,42 +153,44 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
       // Long text field
       return (
         <Textarea className={classes + ' h-6' + bgcol}
-          id={id}
-          placeholder={propertyType.title ?? propertyType.name}
+          id={props.id}
+          placeholder={props.propertyType.title ?? props.propertyType.name}
           defaultValue={value}
           onChange={e => handleChange(e.target.value)}
-          onFocus={onFocus}
+          onFocus={props.onFocus}
           ref={input}
         />
       )
     }
-  } else if (propertyType.type === 'array' && propertyType.items) {
+  } else if (props.propertyType.type === 'array' && props.propertyType.items) {
     // Array field
-    const itemType : PropertyType = propertyType.items
+    const itemType : PropertyType = props.propertyType.items
     const itemTypeLabel = itemType.ref || itemType.type
+    console.log(value)
     return (
       <div className={bgcol}>
         {value && value.map((v : any, i : number) => {
+          console.log(v)
           return (
-            <div className="flex grow" key={field + i}>
+            <div className="flex grow" key={props.field + i}>
               <div className="">
                 &nbsp;&nbsp;-
               </div>
               <OASValueEditor
-                id={field + i}
+                id={props.field + i}
                 value={v}
                 propertyType={itemType}
-                schema={schema}
-                field={field}
+                schema={props.schema}
+                field={props.field}
                 onHelpChange={help}
-                bg={bg}
+                bg={props.bg}
                 index={i}
                 onChange={(v) => {
                   const newArr = [...value];
                   newArr[i] = v;
                   handleChange(newArr);
                 }}
-                onFocus={onFocus}
+                onFocus={props.onFocus}
               />
               <div className="flex-col">
                 { i > 0 && 
@@ -194,7 +199,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
                       const newArr = [...value];
                       const item = newArr.splice(i, 1);
                       newArr.splice(i - 1, 0, item[0]);
-                      onChange(newArr);
+                      props.onChange(newArr);
                     }}>
                       <Tooltip title={'Move this ' + itemTypeLabel + ' to position ' + (i - 1)}>
                         <ArrowUpwardIcon fontSize="inherit" />
@@ -208,7 +213,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
                       const newArr = [...value];
                       const item = newArr.splice(i, 1);
                       newArr.splice(i + 1, 0, item[0]);
-                      onChange(newArr);
+                      props.onChange(newArr);
                     }}>
                       <Tooltip title={'Move this ' + itemTypeLabel + ' to position ' + (i + 1)}>
                         <ArrowDownwardIcon fontSize="inherit" />
@@ -233,12 +238,12 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
         })}
       </div>
     )
-  } else if (propertyType.type === 'object' && propertyType.ref) {
+  } else if (props.propertyType.type === 'object' && props.propertyType.ref) {
     // Single object field
-    let ref = propertyType.ref
-    if (propertyType.ref && schema[propertyType.ref].discriminator) {
-      const discriminatorProperty = schema[propertyType.ref].discriminator?.propertyName
-      const discriminatorMapping = schema[propertyType.ref].discriminator?.mapping
+    let ref = props.propertyType.ref
+    if (props.propertyType.ref && props.schema[props.propertyType.ref].discriminator) {
+      const discriminatorProperty = props.schema[props.propertyType.ref].discriminator?.propertyName
+      const discriminatorMapping = props.schema[props.propertyType.ref].discriminator?.mapping
       if (discriminatorProperty && discriminatorMapping && value) {
         const discriminatorValue = value[discriminatorProperty]
         if (discriminatorValue) {
@@ -262,11 +267,11 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
               <OASObjectEditor
                 index={0}
                 object={value}
-                schema={schema}
-                field={field}
-                bg={bg}
+                schema={props.schema}
+                field={props.field}
+                bg={props.bg}
                 onHelpChange={help}
-                objectSchema={schema[ref]}
+                objectSchema={props.schema[ref]}
                 onChange={(_, v) => {
                   handleChange(v);
                 }}
@@ -278,7 +283,7 @@ function OASValueEditor({ id, schema, bg, value, onChange, onHelpChange, onFocus
 
     )
   } else {
-    console.log('Don\'t know how to render ', field)
+    console.log('Don\'t know how to render ', props.field)
   }
 
 }
