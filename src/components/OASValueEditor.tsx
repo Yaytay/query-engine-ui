@@ -166,11 +166,9 @@ function OASValueEditor(props : OASValueEditorProps) {
     // Array field
     const itemType : PropertyType = props.propertyType.items
     const itemTypeLabel = itemType.ref || itemType.type
-    console.log(value)
     return (
       <div className={bgcol}>
         {value && value.map((v : any, i : number) => {
-          console.log(v)
           return (
             <div className="flex grow" key={props.field + i}>
               <div className="">
@@ -283,7 +281,7 @@ function OASValueEditor(props : OASValueEditorProps) {
 
     )
   } else {
-    console.log('Don\'t know how to render ', props.field)
+    console.log('Don\'t know how to render ', props.field, props.propertyType)
   }
 
 }

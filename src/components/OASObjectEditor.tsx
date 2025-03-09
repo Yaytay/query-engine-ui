@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import OASFieldEditor from './OASFieldEditor';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
@@ -19,21 +19,43 @@ interface OASObjectEditorProps {
   , index: number
   , defaultDropped?: boolean
 }
-function OASObjectEditor({ object, schema, field, bg, onHelpChange, onChange, objectSchema, index, defaultDropped }: OASObjectEditorProps) {
+function OASObjectEditor(props: OASObjectEditorProps) {
 
-  const [dropped, setDropped] = useState(defaultDropped)
+  const [dropped, setDropped] = useState(props.defaultDropped)
 
-  if (!object) {
-    object = {}
-  }
+  const [object, setObject] = useState<any>()
+  const [objectSchema, setObjectSchema] = useState<ObjectType>(props.objectSchema)
 
-  if (!objectSchema) {
-    console.log("No schema", field, object)
+  if (!props.objectSchema) {
+    console.log("No schema", props.field, object)
     return;
   }
 
+  useEffect(() => {
+    setObject(props.object)
+  }, [props.object])
+
+  useEffect(() => {
+    let schemaSet = false
+    if (props.objectSchema.discriminator) {
+      const d = props.objectSchema.discriminator;
+      if (object && d && object[d.propertyName]) {
+        const newType = d.mapping[object[d.propertyName]]
+        if (newType) {
+          const newSchema = props.schema[newType]
+          if (newSchema) {
+            setObjectSchema(newSchema)
+            schemaSet = true
+          }
+        }
+      }
+    }
+    if (!schemaSet) {
+      setObjectSchema(props.objectSchema)
+    }
+  }, [props.objectSchema])
+
   function handleInputChange(changedField: string, value: any) {
-    // console.log('Changed ' + objectSchema.name + '[' + changedField + '] = ' + JSON.stringify(value))
     const rep = { ...object }
     rep[changedField] = value
     if (objectSchema.discriminator) {
@@ -41,45 +63,31 @@ function OASObjectEditor({ object, schema, field, bg, onHelpChange, onChange, ob
         setDropped(true)
       }
     }
-    onChange(field, rep)
-  }
-
-  if (objectSchema.discriminator) {
-    const d = objectSchema.discriminator;
-    if (object && d && object[d.propertyName]) {
-      const newType = d.mapping[object[d.propertyName]]
-      if (newType) {
-        const newSchema = schema[newType]
-        if (newSchema) {
-          objectSchema = newSchema
-        }
-      }
-    }
+    props.onChange(props.field, rep)
   }
 
   return (
     <div className="grow flex">
       <div className="flex-col grow">
-      {objectSchema.sortedProperties.map((f, i) => {
-        console.log(objectSchema)
+      {object && objectSchema && objectSchema.sortedProperties.map((f, i) => {
         return (
           <OASFieldEditor
             id={f}
             key={f}
-            bg={bg + (i % 2)}
+            bg={props.bg + (i % 2)}
             value={object[f]}
-            schema={schema}
+            schema={props.schema}
             propertyType={objectSchema.collectedProperties[f]}
-            onHelpChange={onHelpChange}
+            onHelpChange={props.onHelpChange}
             onChange={handleInputChange}
             visible={dropped || !objectSchema.hasRequired}
             field={f}
-            index={index}
+            index={props.index}
           />
         )
       })}
       </div>
-      {objectSchema.sortedProperties.length > 1 && 
+      {objectSchema && objectSchema.sortedProperties.length > 1 && 
         <div className="flex-col">
         {dropped ||
           <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => { setDropped(true) }}>

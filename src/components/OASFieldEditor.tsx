@@ -5,6 +5,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 import OASValueEditor from './OASValueEditor';
 import { PropertyType, ObjectTypeMap } from '../SchemaType';
+import { useEffect, useState } from 'react';
 
 
 interface OASFieldEditorProps {
@@ -19,32 +20,38 @@ interface OASFieldEditorProps {
   , visible: boolean
   , propertyType: PropertyType
 }
-function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHelpChange, propertyType, index }: OASFieldEditorProps) {
+function OASFieldEditor(props: OASFieldEditorProps) {
+
+  const [value, setValue] = useState<any>()
+
+  useEffect(() => {
+    setValue(props.value)
+  }, [props.value])
 
   const colours = [' bg-white', ' bg-slate-50', ' bg-slate-100', ' bg-slate-200', ' bg-slate-300']
 
-  const help = onHelpChange ?? function () { }
+  const help = props.onHelpChange ?? function () { }
 
-  const bgcol = (bg < colours.length) ? colours[bg] : colours[0]
+  const bgcol = (props.bg < colours.length) ? colours[props.bg] : colours[0]
 
-  if (!propertyType) {
-    console.log("Field " + field + " not found in " + JSON.stringify(schema))
-    return (<div data-field={field} />)
+  if (!props.propertyType) {
+    console.log("Field " + props.field + " not found in " + JSON.stringify(props.schema))
+    return (<div data-field={props.field} />)
   }
 
   function updateHelpText() {
     let text
-    if (propertyType.description) {
-      text = '<h3>' + field + '</h3>' + propertyType.description
+    if (props.propertyType.description) {
+      text = '<h3>' + props.field + '</h3>' + props.propertyType.description
     }
-    if (propertyType.ref) {
-      const s = schema[propertyType.ref]
+    if (props.propertyType.ref) {
+      const s = props.schema[props.propertyType.ref]
       if (s) {
         text = '<h3>' + s.name + '</h3>' + s.description
       }
     }
-    if (propertyType.discriminatorDocs && propertyType.discriminatorDocs.has(value)) {
-      text = text + '<br><h2>' + value + '</h2>' + propertyType.discriminatorDocs.get(value)
+    if (props.propertyType.discriminatorDocs && props.propertyType.discriminatorDocs.has(value)) {
+      text = text + '<br><h2>' + value + '</h2>' + props.propertyType.discriminatorDocs.get(value)
     }
 
     if (text) {
@@ -58,45 +65,45 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
   }
 
   if (
-    !visible
-    && !(propertyType && propertyType.required)
-    && !(value !== propertyType.default)
+    !props.visible
+    && !(props.propertyType && props.propertyType.required)
+    && !(value !== props.propertyType.default)
   ) {
     return (<div className='hidden'></div>)
   }
 
-  if (propertyType.type === 'object') {
+  if (props.propertyType.type === 'object') {
     // Single value
     return (
       <div className={"align-top" + bgcol}>
-        <label className="px-1 text-blue-500 reflabel" onClick={onFocus}>{field}:</label>
+        <label className="px-1 text-blue-500 reflabel" onClick={onFocus}>{props.field}:</label>
         <div className="grow flex flex-col">
           <OASValueEditor
-            id={id}
-            key={id}
-            bg={bg + (index % 2)}
+            id={props.id}
+            key={props.id}
+            bg={props.bg + (props.index % 2)}
             value={value}
-            propertyType={propertyType}
-            schema={schema}
-            onHelpChange={onHelpChange}
+            propertyType={props.propertyType}
+            schema={props.schema}
+            onHelpChange={props.onHelpChange}
             onChange={(v) => { 
-              onChange(field, v)
+              props.onChange(props.field, v)
             }}
             onFocus={onFocus}
-            field={field}
-            index={index}
+            field={props.field}
+            index={props.index}
           />
         </div>
       </div>
     )
-  } else if (propertyType.type === 'array' && propertyType.items) {
+  } else if (props.propertyType.type === 'array' && props.propertyType.items) {
     // Array
-    const itemType : PropertyType = propertyType.items
+    const itemType : PropertyType = props.propertyType.items
     const itemTypeLabel = itemType.ref || itemType.type
     return (
       <div className={"align-top" + bgcol}>
         <div className='flex'>
-          <label className="px-1 text-blue-500 flex" onClick={onFocus}>{field}:</label>
+          <label className="px-1 text-blue-500 flex" onClick={onFocus}>{props.field}:</label>
           <div className='grow'></div>
           <div className=''>
             <IconButton sx={{ 'borderRadius': '20%', padding: '1px' }} size="small" onClick={() => {
@@ -106,7 +113,7 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
               } else {
                 newArr.push('');
               }
-              onChange(field, newArr);
+              props.onChange(props.field, newArr);
             }}>
               <Tooltip title={'Create a new ' + itemTypeLabel}>
                 <AddIcon fontSize="inherit" />
@@ -115,17 +122,17 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
           </div>
         </div>
         <OASValueEditor
-          id={id}
-          key={id}
-          bg={bg + (index % 2)}
+          id={props.id}
+          key={props.id}
+          bg={props.bg + (props.index % 2)}
           value={value}
-          propertyType={propertyType}
-          schema={schema}
-          onHelpChange={onHelpChange}
-          onChange={(v) => { onChange(field, v) }}
+          propertyType={props.propertyType}
+          schema={props.schema}
+          onHelpChange={props.onHelpChange}
+          onChange={(v) => { props.onChange(props.field, v) }}
           onFocus={onFocus}
-          field={field}
-          index={index}
+          field={props.field}
+          index={props.index}
         />
       </div>
     )
@@ -133,19 +140,19 @@ function OASFieldEditor({ id, schema, field, bg, value, visible, onChange, onHel
     // Primitive
     return (
       <div className={"flex align-top" + bgcol}>
-        <label className="px-1 text-blue-500 stdlabel" onClick={onFocus}>{field}:</label>
+        <label className="px-1 text-blue-500 stdlabel" onClick={onFocus}>{props.field}:</label>
         <OASValueEditor
-          id={id}
-          key={id}
-          bg={bg + (index % 2)}
+          id={props.id}
+          key={props.id}
+          bg={props.bg + (props.index % 2)}
           value={value}
-          propertyType={propertyType}
-          schema={schema}
-          onHelpChange={onHelpChange}
-          onChange={(v) => { onChange(field, v) }}
+          propertyType={props.propertyType}
+          schema={props.schema}
+          onHelpChange={props.onHelpChange}
+          onChange={(v) => { props.onChange(props.field, v) }}
           onFocus={onFocus}
-          field={field}
-          index={index}
+          field={props.field}
+          index={props.index}
         />
       </div>
     )
