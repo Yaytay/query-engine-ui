@@ -64,7 +64,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Return a single 'true', in order to check whether deisng mode is enabled */
+        /** @description Return a single 'true', in order to check whether design mode is enabled */
         get: operations["getEnabled"];
         put?: never;
         post?: never;
@@ -183,7 +183,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Return details of the current user */
+        /**
+         * Return history rows matching the criteria.
+         * @description Will only ever return data for the user making the request (token subject must match).
+         *     <p>
+         *     By default returns the first 1000000 rows sorted by timestsamp with the most recent data first.
+         *
+         */
         get: operations["getHistory"];
         put?: never;
         post?: never;
@@ -978,7 +984,7 @@ export interface components {
              *
              * @enum {string}
              */
-            type: "JSON" | "XLSX" | "Delimited" | "HTML";
+            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
             /** @description <P>The extension of the format.</P>
              *     <P>
              *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
@@ -986,6 +992,50 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
+        };
+        /** @description Configuration for an output format of Atom.
+         *     There are no formatting options for Atom output.
+         *      */
+        FormatAtom: {
+            /**
+             * @description The type of the format.
+             * @enum {string}
+             */
+            type?: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
+            /**
+             * @description <p>The name of the format.</p>
+             *     <p>The name is used to determine the format based upon the '_fmt' query
+             *     string argument.</p>
+             *     <p>It is an error for two Formats to have the same name. This is different
+             *     from the other Format determinators which can be repeated; the name is the
+             *     ultimate arbiter and must be unique.</p>
+             *
+             * @default XML
+             */
+            name: string;
+            /**
+             * @description <p>The extension of the format.</p>
+             *     <p>This is used to determine the file extension for output files and
+             *     for URL paths.</p>
+             *
+             * @default .xml
+             */
+            extension: string;
+            /**
+             * @description The media type (e.g., application/xml).
+             * @default application/xml
+             */
+            mediaType: string;
+            /**
+             * @description Fix applied to the initial letter of a field's name.
+             * @default F
+             */
+            fieldInitialLetterFix: string;
+            /**
+             * @description Fix applied to invalid letters in field names.
+             * @default _
+             */
+            fieldInvalidLetterFix: string;
         };
         /** @description Configuration for an output format of delimited text.
          *      */
@@ -1256,6 +1306,24 @@ export interface components {
              * @default true
              */
             headers: boolean;
+            /**
+             * @description The Excel format to use for date columns if no other format is specified.
+             *
+             * @default yyyy-mm-dd
+             */
+            defaultDateFormat: string;
+            /**
+             * @description The Excel format to use for date/time columns if no other format is specified.
+             *
+             * @default yyyy-mm-dd hh:mm:ss
+             */
+            defaultDateTimeFormat: string;
+            /**
+             * @description The Excel format to use for time columns if no other format is specified.
+             *
+             * @default hh:mm:ss
+             */
+            defaultTimeFormat: string;
             /** @description <P>The font to use for the header row.</P>
              *     <P>
              *     There is no default value in the format, but if not specified the font used will be Calibri, 11pt.
@@ -1414,6 +1482,86 @@ export interface components {
              *
              */
             fontSize?: number;
+        };
+        /** @description Configuration for an output format of XML.
+         *     There are no formatting options for XML output.
+         *      */
+        FormatXml: Omit<components["schemas"]["Format"], "type"> & {
+            /**
+             * @description The type of the format.
+             * @enum {string}
+             */
+            type?: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
+            /**
+             * @description <p>The name of the format.</p>
+             *     <p>The name is used to determine the format based upon the '_fmt' query
+             *     string argument.</p>
+             *     <p>It is an error for two Formats to have the same name. This is different
+             *     from the other Format determinators which can be repeated; the name is the
+             *     ultimate arbiter and must be unique.</p>
+             *
+             * @default XML
+             */
+            name: string;
+            /**
+             * @description <p>The extension of the format.</p>
+             *     <p>This is used to determine the file extension for output files and
+             *     for URL paths.</p>
+             *
+             * @default .xml
+             */
+            extension: string;
+            /**
+             * @description The media type (e.g., application/xml).
+             * @default application/xml
+             */
+            mediaType: string;
+            /**
+             * @description Whether the XML declaration should be included.
+             * @default true
+             */
+            xmlDeclaration: boolean;
+            /**
+             * @description The character encoding (e.g., UTF-8) for the XML.
+             * @default utf-8
+             */
+            encoding: string;
+            /**
+             * @description Whether the XML output should include indentation.
+             * @default false
+             */
+            indent: boolean;
+            /**
+             * @description Whether to write fields as attributes in the XML.
+             * @default false
+             */
+            fieldsAsAttributes: boolean;
+            /**
+             * @description The root document name in the XML output.
+             * @default data
+             */
+            docName: string;
+            /**
+             * @description The row element name.
+             * @default row
+             */
+            rowName: string;
+            /**
+             * @description Fix applied to the initial letter of a field's name.
+             * @default F
+             */
+            fieldInitialLetterFix: string;
+            /**
+             * @description Fix applied to invalid letters in field names.
+             * @default _
+             */
+            fieldInvalidLetterFix: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "XML";
         };
         /** @description <P>The Pipeline is the fundamental unit of processing in QueryEngine.</P>
          *     <P>
@@ -2320,7 +2468,7 @@ export interface components {
              *     </P>
              *      */
             path: string;
-        };
+        } & (components["schemas"]["DocDir"] | components["schemas"]["DocFile"]);
         /** @description Information about requests made to the query engine by a single user.
          *      */
         AuditHistory: {
@@ -2411,9 +2559,7 @@ export interface components {
          *     </P>
          *      */
         PipelineDir: WithRequired<components["schemas"]["PipelineNode"], "children" | "name" | "path"> & {
-            /** @description <P>
-             *     The children of the directory.
-             *     </P>
+            /** @description The children of the directory.
              *      */
             children: components["schemas"]["PipelineNode"][];
         };
@@ -2490,9 +2636,7 @@ export interface components {
              *      */
             destinations?: components["schemas"]["Format"][];
         };
-        /** @description <P>
-         *     Base class for pipelines and the directories that contain them.
-         *     </P>
+        /** @description Base class for pipelines and the directories that contain them.
          *      */
         PipelineNode: {
             /** @description <P>
@@ -2500,11 +2644,9 @@ export interface components {
              *     </P>
              *      */
             name: string;
-            /** @description <P>
-             *     The children of the node.
-             *     </P>
+            /** @description The children of the node.
              *     <P>
-             *     If this is null then the node is a file, otherwise it is a directory.
+             *     If this is null then the node is a PipelineFile, otherwise it is a PipelineDir.
              *     </P>
              *      */
             children?: components["schemas"]["PipelineNode"][];
@@ -2513,7 +2655,7 @@ export interface components {
              *     </P>
              *      */
             path: string;
-        };
+        } & (components["schemas"]["PipelineDir"] | components["schemas"]["PipelineFile"]);
         /** @description Information about the current user and environment.
          *     <P>
          *     This information is pulled from the access token and is only available if present there.
@@ -2785,7 +2927,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A documnent about Query Engine. */
+            /** @description A document about Query Engine. */
             200: {
                 headers: {
                     [name: string]: unknown;
