@@ -176,7 +176,9 @@ function Test(props : TestProps) {
       const ta = {} as any
       if (nodeMap[path].arguments) {
         nodeMap[path].arguments.forEach((arg : any) => {
-          ta[arg.name] = arg.defaultValueExpression ?? '';
+          if (!arg.hidden) {
+            ta[arg.name] = arg.defaultValueExpression ?? '';
+          }
         });
         ta['_fmt'] = nodeMap[path].destinations[0].name;
       }
@@ -215,7 +217,6 @@ function Test(props : TestProps) {
       props.window.open(url, "_blank");
       return Promise.resolve()
     } else {
-
       return fetch(url, {credentials: 'include'})
         .then(r => {
           if (r.ok) {

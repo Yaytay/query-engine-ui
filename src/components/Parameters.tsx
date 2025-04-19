@@ -31,14 +31,13 @@ function Parameters(props : ParametersProps) {
   const [urlStr, setUrlStr] = useState('')
   const [sub, _] = useState({data: props.values})
   const [form, setForm] = useState({})
+  const [webform, setWebForm] = useState<any>()
   
   console.log('Props: ', props)
   console.log('Sub: ', sub)
 
   const url = useRef(props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns);
   const formSet = useRef({})
-
-  let webform: any
 
   useEffect(() => {
     console.log('Fetching form', url)
@@ -58,8 +57,10 @@ function Parameters(props : ParametersProps) {
     console.log('onSubmit:', submission)
     props.onRequestSubmit(submission.data)
       .then((_) => {
+        console.log('Submit finished', webform)
           if (webform) {
             webform.emit('submitDone')
+            console.log('Submit done emitted')
           }
         }
       )
@@ -102,7 +103,7 @@ function Parameters(props : ParametersProps) {
 
   function formReady(webform2: any) {
     console.log('formReady:', webform2)
-    webform = webform2
+    setWebForm(webform2)
   }
 
   console.log('Rendering with', form, sub)
@@ -120,7 +121,7 @@ function Parameters(props : ParametersProps) {
           onCustomEvent={onCustomEvent}
           onPrevPage={onPrevPage}
           onNextPage={onNextPage}
-          formReady={formReady}
+          onFormReady={formReady}
           />
         {
           props.displayUrl && (
