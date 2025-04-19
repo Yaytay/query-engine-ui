@@ -957,16 +957,6 @@ export interface components {
          *
          *      */
         Format: {
-            /** @description <P>The media type of the format.</P>
-             *     <P>
-             *     The media type is used to determine the format based upon the Accept header in the request.
-             *     If multiple formats have the same media type the first in the list will be used.
-             *     </P>
-             *     <P>
-             *     The media type will also be set as the Content-Type header in the response.
-             *     </P>
-             *      */
-            mediaType?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -992,6 +982,16 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
+            /** @description <P>The media type of the format.</P>
+             *     <P>
+             *     The media type is used to determine the format based upon the Accept header in the request.
+             *     If multiple formats have the same media type the first in the list will be used.
+             *     </P>
+             *     <P>
+             *     The media type will also be set as the Content-Type header in the response.
+             *     </P>
+             *      */
+            mediaType?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
@@ -1738,9 +1738,6 @@ export interface components {
         /** @description Processors modify the data stream in flight.
          *      */
         Processor: {
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
-            condition?: components["schemas"]["Condition"];
             /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
              *      */
             name: string;
@@ -1749,7 +1746,10 @@ export interface components {
              *
              * @enum {string}
              */
-            type: "LIMIT" | "OFFSET" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
         };
         /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
          *
@@ -1956,14 +1956,21 @@ export interface components {
             fieldValue?: string;
         });
         /** @description Processor that combines multiple values from a child query into a single concatenated string value.
+         *     <P>
+         *     There are three ways that the group concat can be performed:
+         *     <OL>
+         *     <LI>Specify the childValueColumn and the parentValueColumn.
+         *     A single field will be added to the parent stream, the value will be taken from the childValueColumns and the new field will be named parentValueColumn.
+         *     <LI>Specify only childValueColumn, do not specify parentValueColumn.
+         *     A single field will be added to the parent stream, the value will be taken from the childValueColumns and the new field will be named childValueColumn.
+         *     <LI>Do not specify childValueColumn.
+         *     All fields from the child stream will be (indepdently) concatenated and added to the parent stream (with the same names).
+         *     </OL>
          *      */
         ProcessorGroupConcat: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /** @description The data feed.
              *     <P>
-             *     This data feed should result in two columns childIdColumn and childValueColumn (any other columns will be ignored).
-             *     The data should be sorted by childIdColumn (and the parent feed should be sorted by parentIdColumn).
-             *     <P>
-             *     The values in childValueColumn for each value of childIdColumn will be concatenated together using delimiter as a delimiter and the result will be set as parentValueColumn in the parent feed.
+             *     The data must be sorted by the childIdColumns (and the parent feed should be sorted by the parentIdColumns).
              *      */
             input?: components["schemas"]["SourcePipeline"];
             /** @description The inner join flag.
@@ -1971,26 +1978,31 @@ export interface components {
              *     If set to true the parent row will only be output if the child feed has at least one matching row.
              *      */
             innerJoin?: boolean;
-            /** @description The parent ID column.
+            /** @description The parent ID columns.
              *     <P>
-             *     This is the name of the field in the main stream that is to be used to match against child rows.
-             *     The main stream must be sorted by this field.
+             *     These are the names of the fields in the main stream that is to be used to match against child rows.
+             *     The main stream must be sorted by these fields.
              *      */
             parentIdColumns?: string[];
-            /** @description The child ID column.
+            /** @description The child ID columns.
              *     <P>
-             *     This is the name of the field in the child stream that is to be used to match against parent rows.
-             *     The child stream must be sorted by this field.
+             *     These are the names of the fields in the child stream that are to be used to match against parent rows.
+             *     The child stream must be sorted by these fields.
              *      */
             childIdColumns?: string[];
             /** @description The child value column.
              *     <P>
              *     This is the name of the field in the child stream that contains the data to be extracted.
+             *     <P>
+             *     If this is not provided all fields in the child stream that are not in the childIdColumns will be individually concatenated and brought over.
              *      */
             childValueColumn?: string;
             /** @description The parent value column.
              *     <P>
              *     This is the name of the field that will be created in the parent stream to contain the data from the child stream.
+             *     <P>
+             *     If this is not provided the parent stream fields will have the same name(s) as the child stream fields.
+             *     It is an error to provide this and not to provide childValueColumn.
              *      */
             parentValueColumn?: string;
             /** @description The delimiter to place between each value returned.
@@ -2102,6 +2114,42 @@ export interface components {
              *      */
             newLabel: string;
         };
+        /** @description Processor that adds all fields from a child query into the primary stream.
+         *     <P>
+         *     If there are multiple rows in the child stream that match the parent row all except the first will be ignored.
+         *      */
+        ProcessorMerge: {
+            type: "ProcessorMerge";
+        } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description The data feed.
+             *     <P>
+             *     This data feed should result in two columns childIdColumn and childValueColumn (any other columns will be ignored).
+             *     The data should be sorted by childIdColumn (and the parent feed should be sorted by parentIdColumn).
+             *     <P>
+             *     The values in childValueColumn for each value of childIdColumn will be concatenated together using delimiter as a delimiter and the result will be set as parentValueColumn in the parent feed.
+             *      */
+            input?: components["schemas"]["SourcePipeline"];
+            /** @description The inner join flag.
+             *     <P>
+             *     If set to true the parent row will only be output if the child feed has at least one matching row.
+             *      */
+            innerJoin?: boolean;
+            /** @description The parent ID columns.
+             *     <P>
+             *     These are the names of the fields in the main stream that is to be used to match against child rows.
+             *     The main stream must be sorted by these fields.
+             *      */
+            parentIdColumns?: string[];
+            /** @description The child ID columns.
+             *     <P>
+             *     These are the names of the fields in the child stream that are to be used to match against parent rows.
+             *     The child stream must be sorted by these fields.
+             *      */
+            childIdColumns?: string[];
+            /** @description The delimiter to place between each value returned.
+             *      */
+            delimiter?: string;
+        });
         /** @description Processor that curtails the output after the configured number of rows.
          *      */
         ProcessorOffset: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
