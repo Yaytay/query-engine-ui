@@ -34,7 +34,7 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.3",
     "@types/react-modal": "^3.16.3",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.21",
     "dompurify": "^3.2.4",
     "eslint": "^9.18.0",
