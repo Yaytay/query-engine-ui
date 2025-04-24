@@ -97,14 +97,14 @@ function Nav(props : NavProps) {
   }
   
   function displayParameters(item : components["schemas"]["PipelineFile"]) {
-    console.log(item);
+    console.log(item);    
     pipeline = item;
   
     const ta : any = {
       '_fmt': (Array.isArray(pipeline.destinations) ? pipeline.destinations[0].name : null)
     }
     if (pipeline.arguments) {
-      pipeline.arguments.forEach(arg => {
+      pipeline.arguments.forEach((arg: components["schemas"]["Argument"]) => {
         ta[arg.name] = arg.defaultValueExpression ?? '';
       });
     }

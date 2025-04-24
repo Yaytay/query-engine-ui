@@ -79,7 +79,7 @@ function Help(props : HelpProps) {
   useEffect(() => {
     function AddToNodeMap(nm: any, dirs: string[], node : components["schemas"]["DocNode"]) {
       if (Array.isArray(node.children)) {
-        node.children.forEach(n => AddToNodeMap(nm, dirs, n));
+        node.children.forEach((n : components["schemas"]["DocNode"]) => AddToNodeMap(nm, dirs, n));
         dirs.push(node.path)
       } else {
         nm[node.path] = node;
@@ -137,9 +137,10 @@ function Help(props : HelpProps) {
         )
       }
     } else {
+      const nodeDir = node as components["schemas"]["DocDir"]
       return (
-        <TreeItem key={node.name} itemId={node.path} label={node.name} >
-          { node.children && node.children.map((child) => renderTree(child)) }
+        <TreeItem key={nodeDir.name} itemId={nodeDir.path} label={nodeDir.name} >
+          { nodeDir.children && nodeDir.children.map((child : components["schemas"]["DocNode"]) => renderTree(child)) }
         </TreeItem>
       )
     }
@@ -181,7 +182,7 @@ function Help(props : HelpProps) {
                   onSelectedItemsChange={handleSelect}
                   sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                 >
-                  {props.docs.children && props.docs.children.map((node) => renderTree(node))}
+                  {props.docs.children && props.docs.children.map((node : components["schemas"]["DocNode"]) => renderTree(node))}
                 </SimpleTreeView>
               </Box>
             </TabPanel>

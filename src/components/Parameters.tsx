@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Form } from '@formio/react';
+import { Form, FormType } from '@formio/react';
 import { Formio }  from 'formiojs';
 import { components } from "../Query-Engine-Schema";
 import { ArgsToArgs } from '../Test';
@@ -30,7 +30,7 @@ function Parameters(props : ParametersProps) {
 
   const [urlStr, setUrlStr] = useState('')
   const [sub, _] = useState({data: props.values})
-  const [form, setForm] = useState({})
+  const [form, setForm] = useState<FormType | undefined>()
   const [webform, setWebForm] = useState<any>()
   
   console.log('Props: ', props)
@@ -110,8 +110,10 @@ function Parameters(props : ParametersProps) {
   return (
     <>
       <div className="relative py-1 px-4 md:px-10 bg-white shadow-md rounded border border-gray-400" >
+        { form && 
         <Form 
           form={form}
+          src=""
           submission={sub}
           onSubmit={onSubmit}
           onSubmitDone={onSubmitDone}
@@ -123,6 +125,7 @@ function Parameters(props : ParametersProps) {
           onNextPage={onNextPage}
           onFormReady={formReady}
           />
+        }
         {
           props.displayUrl && (
             <div>

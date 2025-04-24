@@ -137,7 +137,7 @@ function Test(props : TestProps) {
   useEffect(() => {
     function AddToNodeMap(nm: any, dirs: string[], node : components["schemas"]["PipelineNode"]) {
       if (Array.isArray(node.children)) {
-        node.children.forEach(n => AddToNodeMap(nm, dirs, n));
+        node.children.forEach((n : components["schemas"]["PipelineNode"]) => AddToNodeMap(nm, dirs, n));
         dirs.push(node.path)
       } else {
         nm[node.path] = node;
@@ -257,9 +257,10 @@ function Test(props : TestProps) {
     if (isPipelineFile(node)) {
       return (<TreeItem key={node.name} itemId={node.path} label={node.title ?? node.name}/>)
     } else {
+      const nodeDir = node as components["schemas"]["PipelineDir"]
       return (
-        <TreeItem key={node.name} itemId={node.path} label={node.name} >
-          {node.children && node.children.map((child) => renderTree(child))}
+        <TreeItem key={nodeDir.name} itemId={nodeDir.path} label={nodeDir.name} >
+          {nodeDir.children && nodeDir.children.map((child : components["schemas"]["PipelineNode"]) => renderTree(child))}
         </TreeItem>
       )
     }
@@ -300,7 +301,7 @@ function Test(props : TestProps) {
                   onSelectedItemsChange={handleSelect}
                   sx={{ height: '100%', flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
                 >
-                  {props.available.children.map((node) => renderTree(node))}
+                  {props.available.children.map((node : components["schemas"]["PipelineNode"]) => renderTree(node))}
                 </SimpleTreeView>
             </TabPanel>
             <TabPanel value={tabPanel} index={1} >
