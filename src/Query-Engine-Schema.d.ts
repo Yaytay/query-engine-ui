@@ -996,7 +996,7 @@ export interface components {
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
          *      */
-        FormatAtom: {
+        FormatAtom: Omit<components["schemas"]["Format"], "type"> & {
             /**
              * @description The type of the format.
              * @enum {string}
@@ -1036,6 +1036,12 @@ export interface components {
              * @default _
              */
             fieldInvalidLetterFix: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "Atom";
         };
         /** @description Configuration for an output format of delimited text.
          *      */
@@ -1233,6 +1239,52 @@ export interface components {
              */
             type: "JSON";
         };
+        /** @description Configuration for an output format of RSS.
+         *     There are no formatting options for RSS output.
+         *      */
+        FormatRss: {
+            type: "FormatRss";
+        } & (Omit<components["schemas"]["Format"], "type"> & {
+            /**
+             * @description The type of the format.
+             * @enum {string}
+             */
+            type?: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
+            /**
+             * @description <p>The name of the format.</p>
+             *     <p>The name is used to determine the format based upon the '_fmt' query
+             *     string argument.</p>
+             *     <p>It is an error for two Formats to have the same name. This is different
+             *     from the other Format determinators which can be repeated; the name is the
+             *     ultimate arbiter and must be unique.</p>
+             *
+             * @default XML
+             */
+            name: string;
+            /**
+             * @description <p>The extension of the format.</p>
+             *     <p>This is used to determine the file extension for output files and
+             *     for URL paths.</p>
+             *
+             * @default .xml
+             */
+            extension: string;
+            /**
+             * @description The media type (e.g., application/xml).
+             * @default application/xml
+             */
+            mediaType: string;
+            /**
+             * @description Fix applied to the initial letter of a field's name.
+             * @default F
+             */
+            fieldInitialLetterFix: string;
+            /**
+             * @description Fix applied to invalid letters in field names.
+             * @default _
+             */
+            fieldInvalidLetterFix: string;
+        });
         /** @description Configuration for an output format of XLSX.
          *      */
         FormatXlsx: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
