@@ -73,7 +73,7 @@ function OASValueEditor(props : OASValueEditorProps) {
         id={props.id}
         className={bgcol}
         aria-placeholder={props.propertyType.title ?? props.propertyType.name}
-        defaultValue={value}
+        value={value}
         onChange={e => handleChange(e.target.value)}
         onFocus={props.onFocus}
         ref={input}
@@ -263,7 +263,8 @@ function OASValueEditor(props : OASValueEditorProps) {
           <div className="grow flex flex-col">
             <div className="flex" >
               <OASObjectEditor
-                index={0}
+                index={props.index}
+                parentId={props.id + '.'}
                 object={value}
                 schema={props.schema}
                 field={props.field}

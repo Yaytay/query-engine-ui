@@ -18,6 +18,7 @@ interface OASObjectEditorProps {
   , objectSchema: ObjectType
   , index: number
   , defaultDropped?: boolean
+  , parentId: string
 }
 function OASObjectEditor(props: OASObjectEditorProps) {
 
@@ -72,7 +73,7 @@ function OASObjectEditor(props: OASObjectEditorProps) {
       {object && objectSchema && objectSchema.sortedProperties.map((f, i) => {
         return (
           <OASFieldEditor
-            id={f}
+            id={props.parentId + f}
             key={f}
             bg={props.bg + (i % 2)}
             value={object[f]}

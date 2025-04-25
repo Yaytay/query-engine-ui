@@ -24,6 +24,7 @@ function PipelineEditor({ pipeline, schema, onHelpChange, onChange } : PipelineE
         objectSchema={schema['Pipeline']}
         bg={0}
         index={0}
+        parentId={''}
         defaultDropped={true}
         onChange={(_, pipeline : components["schemas"]["Pipeline"]) => {
           onChange && onChange(pipeline)

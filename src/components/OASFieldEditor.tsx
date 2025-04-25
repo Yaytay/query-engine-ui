@@ -122,7 +122,7 @@ function OASFieldEditor(props: OASFieldEditorProps) {
           </div>
         </div>
         <OASValueEditor
-          id={props.id}
+          id={props.id + String(props.index)}
           key={props.id}
           bg={props.bg + (props.index % 2)}
           value={value}
