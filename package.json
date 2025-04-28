@@ -15,7 +15,7 @@
     "@formio/js": "^5.0.1",
     "@formio/react": "^6.0.1",
     "@mui/system": "^6.4.6",
-    "@mui/x-tree-view": "^7.26.0",
+    "@mui/x-tree-view": "^8.1.0",
     "@tailwindcss/vite": "^4.1.4",
     "bootstrap": "^5.3.3",
     "fast-deep-equal": "^3.1.3",
