@@ -957,6 +957,16 @@ export interface components {
          *
          *      */
         Format: {
+            /** @description <P>The media type of the format.</P>
+             *     <P>
+             *     The media type is used to determine the format based upon the Accept header in the request.
+             *     If multiple formats have the same media type the first in the list will be used.
+             *     </P>
+             *     <P>
+             *     The media type will also be set as the Content-Type header in the response.
+             *     </P>
+             *      */
+            mediaType?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -970,6 +980,17 @@ export interface components {
              *      */
             name?: string;
             /**
+             * @description <P>Whether the format should be removed from the list when presented as an option to users.
+             *     <P>
+             *     This has no effect on processing and is purely a UI hint.
+             *     <P>
+             *     When hidden is true the format should removed from any UI presenting formats to the user.
+             *     </P>
+             *
+             * @default false
+             */
+            hidden: boolean;
+            /**
              * @description <P>The type of Format being configured.<P>
              *
              * @enum {string}
@@ -982,16 +1003,6 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
-            /** @description <P>The media type of the format.</P>
-             *     <P>
-             *     The media type is used to determine the format based upon the Accept header in the request.
-             *     If multiple formats have the same media type the first in the list will be used.
-             *     </P>
-             *     <P>
-             *     The media type will also be set as the Content-Type header in the response.
-             *     </P>
-             *      */
-            mediaType?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
@@ -1232,6 +1243,71 @@ export interface components {
              * @default application/json
              */
             mediaType: string;
+            /** @description The name of the parent data element in the output JSON.
+             *     <P>
+             *     JSON output consists of an array of objects, with an object for each row of the output.
+             *     <P>
+             *     By default this is the only contents in the output (the root of the JSON will be an array).
+             *     <P>
+             *     If dataName is set the output will instead be an object containing the array.
+             *     </P>
+             *      */
+            dataName?: string;
+            /** @description The name of the metadata element in the output JSON.
+             *     <P>
+             *     JSON output consists of an array of objects, with an object for each row of the output.
+             *     <P>
+             *     By default this is the only contents in the output (the root of the JSON will be an array) and there will be no information about the field types in the output.
+             *     <P>
+             *     If dataName and metadataName are both set the output will instead be an object containing the array and there will be an object containing a description of the output.
+             *     The metadata will contain two elements:
+             *     <UL>
+             *     <LI>The name of the feed.
+             *     <LI>An object describing the type of each field in the output.
+             *     </UL>
+             *      */
+            metadataName?: string;
+            /**
+             * @description When set to true the types output in the metadata will be recorded in lowercase and with Boolean shortened to bool.
+             *     <P>
+             *     By default, no metadata is output at all, if both metadataName and dataName are set then a separate metadata list will be output.
+             *     This will list all the fields in the pipeline along with their data types.
+             *     <P>
+             *     By default the types will be given as the names from the {@link DataType} enum.
+             *     If compatibleTypeNames is true the type names will all be in lower case and boolean will be shortened to bool.
+             *     <p>
+             *     The default is to not output metadata at all, and to not change the case of type names if metadata is output.
+             *
+             * @default false
+             */
+            compatibleTypeNames: boolean;
+            /**
+             * @description The Java format to use for date fields.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format dates.
+             *
+             * @default yyyy-mm-dd
+             */
+            dateFormat: string;
+            /**
+             * @description The Java format to use for date/time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format datetimes.
+             *     <P>
+             *     Many JSON users expect timestamps as time since epoch, for their benefit
+             *     the special values "EPOCH_SECONDS" and "EPOCH_MILLISECONDS" can be used to output date/time values as seconds (or milliseconds) since the epoch.
+             *
+             * @default yyyy-mm-ddThh:mm:ss
+             */
+            dateTimeFormat: string;
+            /**
+             * @description The Java format to use for time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format times.
+             *
+             * @default hh:mm:ss
+             */
+            timeFormat: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -1790,6 +1866,9 @@ export interface components {
         /** @description Processors modify the data stream in flight.
          *      */
         Processor: {
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
              *      */
             name: string;
@@ -1799,9 +1878,6 @@ export interface components {
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
-            condition?: components["schemas"]["Condition"];
         };
         /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
          *
