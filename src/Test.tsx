@@ -155,11 +155,11 @@ function Test(props : TestProps) {
     }
   }, [props.available])
 
-  const handleToggle = (_: React.SyntheticEvent, itemIds: string[]) => {
+  const handleToggle = (_: React.SyntheticEvent | null, itemIds: string[]) => {
     setExpanded(itemIds)
   };
 
-  const handleSelect = (_: React.SyntheticEvent, itemId: string | null) => {
+  const handleSelect = (_: React.SyntheticEvent | null, itemId: string | null) => {
     if (itemId) {
       setSelected(itemId)
       fileSelected(itemId)

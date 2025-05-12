@@ -107,11 +107,11 @@ function Help(props : HelpProps) {
     localStorage.setItem("help-dir-state", JSON.stringify(expanded));
   }, [expanded]);
 
-  const handleToggle = (_: React.SyntheticEvent, nodeIds: string[]) => {
+  const handleToggle = (_: React.SyntheticEvent | null, nodeIds: string[]) => {
     setExpanded(nodeIds)
   };
 
-  const handleSelect = (_: React.SyntheticEvent, itemId: string | null) => {
+  const handleSelect = (_: React.SyntheticEvent | null, itemId: string | null) => {
     if (itemId) {
       setSelected(itemId)
       fileSelected(itemId)

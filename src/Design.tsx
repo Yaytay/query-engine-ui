@@ -15,7 +15,7 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import SaveIcon from '@mui/icons-material/Save';
 import Snackbar from '@mui/material/Snackbar';
 import Tooltip from '@mui/material/Tooltip';
-import { SimpleTreeView } from '@mui/x-tree-view//SimpleTreeView'
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { components } from "./Query-Engine-Schema";
@@ -325,11 +325,11 @@ function Design(props : DesignProps) {
     handleResponse(fetch(url, { method: 'DELETE', credentials: 'include' }));
   }
 
-  const handleToggle = (_: React.SyntheticEvent, nodeIds: string[]) => {
+  const handleToggle = (_: React.SyntheticEvent | null, nodeIds: string[]) => {
     setExpanded(nodeIds)
   };
 
-  const handleSelect = (_: React.SyntheticEvent, itemId: string | null) => {
+  const handleSelect = (_: React.SyntheticEvent | null, itemId: string | null) => {
     if (itemId) {
       setSelected(itemId)
       fileSelected(itemId)
