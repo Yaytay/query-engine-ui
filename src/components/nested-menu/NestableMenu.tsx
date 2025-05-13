@@ -67,7 +67,7 @@ function NestableMenu(props: NestableMenuProps) {
       setChildAnchor(event.currentTarget);
     }
 
-    function handleSubMenuClose(event: React.MouseEvent<HTMLElement>) {
+    function handleSubMenuClose(_: React.MouseEvent<HTMLElement>) {
       setChildAnchor(null);
     }
 
