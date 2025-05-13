@@ -957,6 +957,19 @@ export interface components {
          *
          *      */
         Format: {
+            /** @description <P>The extension of the format.</P>
+             *     <P>
+             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
+             *     If multiple formats have the same extension the first in the list will be used.
+             *     </P>
+             *      */
+            extension?: string;
+            /** @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             *      */
+            filename?: string;
             /** @description <P>The media type of the format.</P>
              *     <P>
              *     The media type is used to determine the format based upon the Accept header in the request.
@@ -996,13 +1009,6 @@ export interface components {
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
-            /** @description <P>The extension of the format.</P>
-             *     <P>
-             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-             *     If multiple formats have the same extension the first in the list will be used.
-             *     </P>
-             *      */
-            extension?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
