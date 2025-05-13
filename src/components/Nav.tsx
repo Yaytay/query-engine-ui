@@ -14,12 +14,9 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import { components } from "../Query-Engine-Schema";
 
-import { NestedDropdown, MenuItemData } from 'mui-nested-menu';
 import { ManagementEndpointType } from '../Manage';
 import { ArgsToArgs } from '../Test';
-
-let [modalIsOpen, setModalIsOpen] = [null as boolean | null, (_ : any) => {}]
-let [args, setArgs] = [null, (_ : any) => {}]
+import NestableMenu, { NestableMenuItemData } from './nested-menu/NestableMenu';
 
 let pipeline : components["schemas"]["PipelineFile"]
 
@@ -36,10 +33,6 @@ const customStyles = {
   },
 };
 
-function closeModal() {
-  setModalIsOpen(false);
-}
-
 interface NavProps {
   designMode: boolean
   , baseUrl: string
@@ -53,12 +46,20 @@ interface NavProps {
 
 function Nav(props : NavProps) {
 
-  [modalIsOpen, setModalIsOpen] = useState(false);
-  [args, setArgs] = useState({} as any);
+  const [dataMenuAnchor, setDataMenuAnchor] = useState<HTMLElement|null>(null)
+  const [topMenuAnchor, setTopMenuAnchor] = useState<HTMLElement|null>(null)
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [args, setArgs] = useState({} as any);
   const navigate = useNavigate()
   
+  function closeModal() {
+    setModalIsOpen(false);
+  }
+
   const handleCloseMenu = () => {
     console.log('handleCloseMenu');
+    setDataMenuAnchor(null)
+    setTopMenuAnchor(null)
   };
 
   function submitModal(values : any): Promise<void> {
@@ -116,42 +117,44 @@ function Nav(props : NavProps) {
     props.available.name = 'Data';
   }
 
-  function topMenuItems() : MenuItemData {    
-    const items : MenuItemData[] = []
+  function topMenuItems() : NestableMenuItemData[] {    
+    const items : NestableMenuItemData[] = []
     if (props.designMode) {
-      items.push({ label: 'Design', callback: () => {
+      items.push({ key: 'design', caption: 'Design', callback: () => {
         navigate('/ui/design')
       }})
     }
-    items.push({ label: 'Test', callback: () => {
+    items.push({ key: 'test', caption: 'Test', callback: () => {
       navigate('/ui/test')
     }})
     if (props.available) {
-      items.push(dataMenuItems(props.available))
+      items.push(dataMenuItems(props.available, 'data'))
     }
     if (props.managementEndpoints) {
-      items.push({ label: 'Manage', callback: () => {
+      items.push({ key: 'manage', caption: 'Manage', callback: () => {
         navigate('/ui/manage')
       }})
     }
-    items.push({ label: 'Help', callback: () => {
+    items.push({ key: 'help', caption: 'Help', callback: () => {
       navigate('/ui/help')
     }})
-    items.push({ label: 'API', callback: () => {
+    items.push({ key: 'api', caption: 'API', callback: () => {
       navigate('/ui/api')
     }})
-    return { label: '', items: items};
+    return items;
   }
 
-  function dataMenuItems(node: components["schemas"]["PipelineNode"]) : MenuItemData {    
+  function dataMenuItems(node: components["schemas"]["PipelineNode"], parent: string) : NestableMenuItemData {    
+    const key = parent + '->' + node.name
     if (node.children) {
-      const items : MenuItemData[] = []
+      const items : NestableMenuItemData[] = []
       for (const idx in node.children) {
-        items.push(dataMenuItems(node.children[idx]))
+        items.push(dataMenuItems(node.children[idx], key))
       }
-      return { label: node.name, callback: (event, item) => console.log('Data clicked', event, item), items: items}
+      return { key: key, caption: node.name, callback: (event, item) => console.log('Data clicked', event, item), items: items}
     } else {
-      return { label: node.name, callback: () => {
+      return { key: key, caption: node.name, callback: () => {
+        setDataMenuAnchor(null)
         displayParameters(node)
       }}
     }
@@ -189,12 +192,12 @@ function Nav(props : NavProps) {
               <QeIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1}}/>
             </Link>            
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-              <NestedDropdown
-                menuItemsData={topMenuItems()}
+              <NestableMenu
+                menuItems={topMenuItems()}
+                anchor={topMenuAnchor}
                 MenuProps={
                   {
                     elevation: 3
-
                   }
                 }
                 ButtonProps={
@@ -242,17 +245,20 @@ function Nav(props : NavProps) {
                   </Link>
                 }
                 { props.available && 
-                  <NestedDropdown
-                    menuItemsData={dataMenuItems(props.available)}
-                    MenuProps={{elevation: 3}}
-                    ButtonProps={
-                      {
-                        variant: 'text'
-                        , sx: { my: 2, color: 'white' }
-                      }
-                    }
-                    onClick={() => console.log('Clicked')}
-                  /> 
+                <div>
+                  <Button key='Data' sx={{ my: 2, color: 'white' }} onClick={(event) => {
+                    setDataMenuAnchor(event.currentTarget)
+                  }}>
+                    Data
+                  </Button>
+                  <NestableMenu menuItems={dataMenuItems(props.available, 'Data').items || []}
+                      anchor={dataMenuAnchor}
+                      onClose={() => {
+                        setDataMenuAnchor(null)
+                      }}
+                   >
+                  </NestableMenu>
+                  </div>
                 }
                 { props.profile && 
                   <Link to="/ui/history">

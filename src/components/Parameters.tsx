@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Form, FormType } from '@formio/react';
-import { Formio }  from '@formio/js/form';
+import { Formio }  from '@formio/js';
 import { components } from "../Query-Engine-Schema";
 import { ArgsToArgs } from '../Test';
 import equal from 'fast-deep-equal/es6/react';
