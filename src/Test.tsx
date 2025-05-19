@@ -24,8 +24,9 @@ interface TestProps {
   , window: Window
 }
 
-export function ArgsToArgs(pipeline: components["schemas"]["PipelineFile"], args : any) {
+export function ArgsToArgs(pipeline: components["schemas"]["PipelineDetails"], args : any) {
   if (args == null || !pipeline || !pipeline.arguments) {
+    console.log('no args', args, pipeline)
     return null;
   }
   const result = [] as any[];
@@ -108,7 +109,8 @@ function Test(props : TestProps) {
   )
 
   const [tabPanel, setTabPanel] = useState(0);
-  const [currentFile, setCurrentFile] = useState(null as components["schemas"]["PipelineFile"] | null);
+  const [currentFile, setCurrentFile] = useState<components["schemas"]["PipelineFile"] | null>();
+  const [pipelineDetails, setPipelineDetails] = useState<components["schemas"]["PipelineDetails"] | null>();
   const [args, setArgs] = useState(null as any);
   const [data, setData] = useState(emptyTable as any);
   const [rawHtml, setRawHtml] = useState(null as string | null);
@@ -172,18 +174,17 @@ function Test(props : TestProps) {
   function fileSelected(path : string) {
     if (nodeMap[path]) {
       console.log('Setting current file', nodeMap[path])
-      setCurrentFile(nodeMap[path]);
-      const ta = {} as any
-      if (nodeMap[path].arguments) {
-        nodeMap[path].arguments.forEach((arg : any) => {
-          if (!arg.hidden) {
-            ta[arg.name] = arg.defaultValueExpression ?? '';
-          }
+
+      const pipelinedetailsurl = props.baseUrl + 'api/info/details/' + path
+      fetch(pipelinedetailsurl, {credentials: 'include'})
+        .then((response) => response.json())
+        .then((data) => {
+          setPipelineDetails(data)
         });
-        ta['_fmt'] = nodeMap[path].destinations[0].name;
-      }
-      setArgs(ta);
-      setTabPanel(1);
+
+      setCurrentFile(nodeMap[path]);
+      setArgs({});
+      setTabPanel(1);      
     }
   }
 
@@ -199,10 +200,10 @@ function Test(props : TestProps) {
   }
 
   function submit(values: any) : Promise<void> {
-    if (!currentFile) {
+    if (!currentFile || !pipelineDetails) {
       return Promise.resolve()
     }
-    const query = ArgsToArgs(currentFile, values);
+    const query = ArgsToArgs(pipelineDetails, values);
     const url = props.baseUrl + 'query/' + currentFile.path + (query == null ? '' : ('?' + query))
     console.log(url)
 
@@ -305,11 +306,11 @@ function Test(props : TestProps) {
                 </SimpleTreeView>
             </TabPanel>
             <TabPanel value={tabPanel} index={1} >
-              { currentFile && (<Parameters 
+              { pipelineDetails && (<Parameters 
                   baseUrl={props.baseUrl} 
                   onRequestSubmit={submit} 
                   closeable={false} 
-                  pipeline={currentFile} 
+                  pipelineDetails={pipelineDetails}
                   values={args} 
                   columns={1} 
                   displayUrl={true} 

@@ -11,7 +11,7 @@ interface ParametersProps {
   , closeable : boolean
   , onRequestSubmit: (values : any[]) => Promise<void>
   , onRequestClose?: () => void | undefined
-  , pipeline: components["schemas"]["PipelineFile"]
+  , pipelineDetails: components["schemas"]["PipelineDetails"]
   , values: any
   , columns: number
   , displayUrl: boolean
@@ -19,39 +19,27 @@ interface ParametersProps {
 
 function Parameters(props : ParametersProps) {
 
-  useEffect(() => {
-    console.log('Mounted Parameters')
-    return () => {
-      console.log("Unmounted Parameters");
-    };    
-  }, []);  
-
   Formio.requireLibrary('flatpickr-formio', 'flatpickr-formio', 'https://cdn.jsdelivr.net/npm/flatpickr');
 
   const [urlStr, setUrlStr] = useState('')
   const [sub, _] = useState({data: props.values})
   const [form, setForm] = useState<FormType | undefined>()
   const [webform, setWebForm] = useState<any>()
-  
-  console.log('Props: ', props)
-  console.log('Sub: ', sub)
 
-  const url = useRef(props.baseUrl + 'api/formio/' + props.pipeline.path + '?columns=' + props.columns);
+  const formiourl = useRef(props.baseUrl + 'api/formio/' + props.pipelineDetails.path + '?columns=' + props.columns);
   const formSet = useRef({})
 
   useEffect(() => {
-    console.log('Fetching form', url)
-    fetch(url.current, {credentials: 'include'})
+    console.log('Fetching form', formiourl)
+    fetch(formiourl.current, {credentials: 'include'})
       .then((response) => response.json())
       .then((data) => {
-        console.log('Setting form', formSet.current, data)
         if (!equal(formSet.current, data)) {
-          console.log("Actually setting form")
           formSet.current = data
           setForm(data)
         }
       });
-  }, [props.baseUrl, props.pipeline.path, props.columns]);
+  }, [props.baseUrl, props.pipelineDetails, props.columns]);
 
   function onSubmit(submission: any) {
     console.log('onSubmit:', submission)
@@ -72,9 +60,9 @@ function Parameters(props : ParametersProps) {
 
   function onChange(submission: any) {
     console.log('Changed:', submission)
-    if (props.displayUrl) {
-      const query = ArgsToArgs(props.pipeline, submission.data);
-      setUrlStr(props.baseUrl + 'query/' + props.pipeline.path + (query == null ? '' : ('?' + query)))
+    if (props.displayUrl && props.pipelineDetails) {
+      const query = ArgsToArgs(props.pipelineDetails, submission.data);
+      setUrlStr(props.baseUrl + 'query/' + props.pipelineDetails.path + (query == null ? '' : ('?' + query)))
     }
   }
 
@@ -102,11 +90,9 @@ function Parameters(props : ParametersProps) {
   }
 
   function formReady(webform2: any) {
-    console.log('formReady:', webform2)
     setWebForm(webform2)
   }
 
-  console.log('Rendering with', form, sub)
   return (
     <>
       <div className="relative py-1 px-4 md:px-10 bg-white shadow-md rounded border border-gray-400" >

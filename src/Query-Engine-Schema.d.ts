@@ -216,6 +216,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/info/details/{path}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Return a form.io definition for a given document */
+        get: operations["getDetails"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/session/profile": {
         parameters: {
             query?: never;
@@ -957,19 +974,12 @@ export interface components {
          *
          *      */
         Format: {
-            /** @description <P>The extension of the format.</P>
+            /** @description <P>The description of the format.</P>
              *     <P>
-             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
-             *     If multiple formats have the same extension the first in the list will be used.
+             *     The description is used in UIs to help users choose which format to use.
              *     </P>
              *      */
-            extension?: string;
-            /** @description <P>The filename to specify in the Content-Disposition header.</P>
-             *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
-             *     </P>
-             *      */
-            filename?: string;
+            description?: string;
             /** @description <P>The media type of the format.</P>
              *     <P>
              *     The media type is used to determine the format based upon the Accept header in the request.
@@ -980,6 +990,12 @@ export interface components {
              *     </P>
              *      */
             mediaType?: string;
+            /** @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             *      */
+            filename?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -1009,6 +1025,13 @@ export interface components {
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
+            /** @description <P>The extension of the format.</P>
+             *     <P>
+             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
+             *     If multiple formats have the same extension the first in the list will be used.
+             *     </P>
+             *      */
+            extension?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
@@ -2760,6 +2783,295 @@ export interface components {
              *     </P>
              *      */
             description?: string;
+        };
+        /** @description Base class for pipelines and the directories that contain them.
+         *      */
+        PipelineNode: {
+            /** @description <P>
+             *     The leaf name of the node.
+             *     </P>
+             *      */
+            name: string;
+            /** @description The children of the node.
+             *     <P>
+             *     If this is null then the node is a PipelineFile, otherwise it is a PipelineDir.
+             *     </P>
+             *      */
+            children?: components["schemas"]["PipelineNode"][];
+            /** @description <P>
+             *     The relative path to the node from the root.
+             *     </P>
+             *      */
+            path: string;
+        } & (components["schemas"]["PipelineDir"] | components["schemas"]["PipelineFile"]);
+        /** @description <P>
+         *     An Argument represents a named piece of data that will be passed in to a pipeline.
+         *     </P>
+         *     <P>
+         *     Typically these correspond to query string arguments.
+         *     </P>
+         *      */
+        ArgumentDetails: {
+            /**
+             * @description <P>The data type of the argument</P>
+             *
+             * @enum {string}
+             */
+            type: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
+            /** @description <P>The name of the group that the argument should be presented in.</P>
+             *     <P>The group will be used in the presentation of arguments in the UI but otherwise serves no purpose for the processing.</P>
+             *      */
+            group: string;
+            /** @description <P>The name of the argument.</P>
+             *     <P>No two arguments in a single pipeline should have the same name.</P>
+             *     <P>
+             *     The name must consist entirely of Unicode alpha-numeric characters, it is
+             *     recommended that the name use only ASCII characters to avoid needing to encode it
+             *     but this is not a requirement.
+             *     </P>
+             *      */
+            name: string;
+            /** @description <P>The title to be displayed for the argument in any UI.</P>
+             *     <P>
+             *     The title serves no purpose in the processing of the pipeline.
+             *     If the title is not set the UI will display the name.
+             *     </P>
+             *      */
+            title?: string;
+            /** @description <P>The prompt to be displayed for the argument in any UI.</P>
+             *     <P>
+             *     The prompt serves no purpose in the processing of the pipeline.
+             *     </P>
+             *     <P>
+             *     The prompt should be kept short (a single word or phrase) so as to fit in the Input field on the UI parameter form.
+             *     </P>
+             *      */
+            prompt?: string;
+            /** @description <P>The description to be displayed for the argument in any UI.</P>
+             *     <P>
+             *     The description serves no purpose in the processing of the pipeline.
+             *     </P>
+             *     <P>
+             *     The description should be kept short (one short sentence) so as to fit above the Input field on the UI parameter form.
+             *     </P>
+             *      */
+            description?: string;
+            /**
+             * @description <P>If set to false the pipeline will fail if the argument is not supplied.</P>
+             *     <P>
+             *     Declaring mandatory arguments to not be optional results in a better user experience when
+             *     the users fail to provide it.
+             *     </P>
+             *
+             * @default false
+             */
+            optional: boolean;
+            /**
+             * @description <P>If set to true the argument may be provided multiple times.</P>
+             *     <P>
+             *     Multivalued arguments will be arrays when the Source sees them, for SQL they should usually be used
+             *     with an "IN" clause.
+             *     </P>
+             *     <P>
+             *     If an argument that is not multi-valued is provided multiple times the Query Engine will fail to run the Pipeline.
+             *     </P>
+             *
+             * @default false
+             */
+            multiValued: boolean;
+            /**
+             * @description <P>If set to true the argument will be ignored by the pipeline and may be excluded from those sent in.</P>
+             *     <P>
+             *     Ignored arguments are intended to be used by the UI for derivative arguments and should not be used by the processing of the pipeline.
+             *     </P>
+             *     <P>
+             *     If an argument that should be ignored is provided the Query Engine will fail to run the Pipeline.
+             *     </P>
+             *
+             * @default false
+             */
+            ignored: boolean;
+            /**
+             * @description <P>If set to true the argument will be validated.</P>
+             *     <P>
+             *     Validation can only check:
+             *     <ul>
+             *     <li>Possible values specified directly (not via possibleValuesUrl).
+             *     <li>Minimum and maximum values.
+             *     <li>Permitted values regex.
+             *     </ul>
+             *     </P>
+             *     <P>
+             *     Additionally, if the argument is not provided and takes on default values, these will only be checked
+             *     against the possible values list or the permitted values regexe if the default values generated by the expression
+             *     are Strings.
+             *     This does not prevent them being converted to the relevant data type after being generated and validated.
+             *
+             * @default true
+             */
+            validate: boolean;
+            /** @description <P>
+             *     A list of the name(s) of another argument(s) that this argument requires.
+             *     </P>
+             *     <P>
+             *     This is intended to allow the UI to disable inputs until their dependent argument has been provided.
+             *     </P>
+             *     <P>
+             *     This serves no purpose in the processing of the pipeline (it is explicitly not validated at runtime).
+             *     </P>
+             *      */
+            dependsUpon?: string[];
+            /** @description The default value for the argument.
+             *     <P>
+             *     This value is calculated at runtime by evaluating an expression in the Pipeline definition.
+             *     <P>
+             *     It should NOT be used as the default value in a UI field as this would cause the default value to be passed in.
+             *     If the default value is required no value should be passed in (the argument should be omitted from the query string) in order that
+             *     the expression be run specifically for that run.
+             *     <P>
+             *      */
+            defaultValue?: Record<string, never>;
+            /** @description <P>The minimum value for the argument, as a string.</P>
+             *     <P>
+             *     The minimum value will be converted to the correct data type as it would be if it were received
+             *     as the argument.
+             *     Note that the minimum value should <em>not</em> be URL encoded.
+             *     </P>
+             *     <P>
+             *     If an argument is provided that is less than the minimum value (using an appropriate comparison for the
+             *     datatype, not a string comparison) then it will be refused.
+             *     </P>
+             *      */
+            minimumValue?: string;
+            /** @description <P>The maximum value for the argument, as a string.</P>
+             *     <P>
+             *     The maximum value will be converted to the correct data type as it would be if it were received
+             *     as the argument.
+             *     Note that the maximum value should <em>not</em> be URL encoded.
+             *     </P>
+             *     <P>
+             *     If an argument is provided that is greater than the mimum value (using an appropriate comparison for the
+             *     datatype, not a string comparison) then it will be refused.
+             *     </P>
+             *      */
+            maximumValue?: string;
+            /** @description <P>A list of possible values that the argument may have.</P>
+             *     <P>
+             *     The possible values are not validated, if an invalid value is provided the pipeline will still
+             *     attempt to run with it.
+             *     </P>
+             *     <P>
+             *     If more than a few values are possible the possibleValuesUrl (or possibleValuesRegex) should be used instead.
+             *     </P>
+             *      */
+            possibleValues?: components["schemas"]["ArgumentValue"][];
+            /** @description <P>A URL that will provide a list of possible values that the argument may have.</P>
+             *     <P>
+             *     The URL should be called using the same credentials as the Pipeline was (it is expected, but not required, that the URL will be another Pipeline).
+             *     </P><P>
+             *     If the URL is just a path the UI will appended it to the base URL that was used to access the query engine.
+             *     </P>
+             *     <P>
+             *     It is possible to reference other argument values in the query string of the URL.
+             *     If the query string contains a structure like [&name=:arg] (specifically is contains a match of the regular expression ) then the entire
+             *     block will be repeated for each value that the argument 'arg' has at the time of the call.
+             *     If the query string contains the simpler structure &name=:arg (without the brackets) then just the :arg value will be replaced.
+             *     </P>
+             *     <P>
+             *     The URL should return a JSON list that may contain either:
+             *     <ul>
+             *     <li>Strings.
+             *     <li>Objects containing a &quot;value&quot; field.
+             *     <li>Objects containing a &quot;value&quot; field and a &quot;label&quot; field.
+             *     </ul>
+             *
+             *     The PossibleValuesUrl overrides the PossibleValues, a UI may choose to display the PossibleValues whilst the request to the PossibleValuesUrl is in flight, but the
+             *     end result should be the values returned by the PossibleValuesUrl.
+             *     <P>
+             *     The possible values are not validated, if an invalid value is provided the pipeline will still
+             *     attempt to run with it.
+             *     </P>
+             *      */
+            possibleValuesUrl?: string;
+            /** @description <P>A regular expression that all values of the argument must match.</P>
+             *     <P>
+             *     All values passed in are validated and the Query Engine will fail to run if the values does not match the reguarl expression.
+             *     </P>
+             *     <P>
+             *     At runtime expression will be treated as a standard Java regular expression, but well written UI should also validate
+             *     values against the expression so Interactive Pipelines should only use expressions that are compatible with JavaScrtip.
+             *      */
+            permittedValuesRegex?: string;
+        };
+        /** @description <P>
+         *     An Argument represents a named piece of data that will be passed in to a pipeline.
+         *     </P>
+         *     <P>
+         *     Typically these correspond to query string arguments.
+         *     </P>
+         *      */
+        FormatDetails: {
+            /**
+             * @description The type of the format.
+             * @enum {string}
+             */
+            type?: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
+            /**
+             * @description <p>The name of the format.</p>
+             *     <p>The name is used to determine the format based upon the '_fmt' query
+             *     string argument.</p>
+             *     <p>It is an error for two Formats to have the same name. This is different
+             *     from the other Format determinators which can be repeated; the name is the
+             *     ultimate arbiter and must be unique.</p>
+             *
+             * @default XML
+             */
+            name: string;
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
+            /**
+             * @description <p>The extension of the format.</p>
+             *     <p>This is used to determine the file extension for output files and
+             *     for URL paths.</p>
+             *
+             * @default .xml
+             */
+            extension: string;
+            /**
+             * @description The media type (e.g., application/xml).
+             * @default application/xml
+             */
+            mediaType: string;
+        };
+        /** @description <P>
+         *     Representation of a Pipeline for display in a custom UI.
+         *     </P>
+         *      */
+        PipelineDetails: {
+            /** @description <P>
+             *     The name of the pipeline file, to be displayed in the UI if no title is set.
+             *     </P>
+             *      */
+            name?: string;
+            /** @description <P>
+             *     The path to the pipeline.
+             *     </P>
+             *      */
+            path?: string;
+            /** @description <P>
+             *     The title of the pipeline, to be displayed in the UI.
+             *     </P>
+             *      */
+            title?: string;
+            /** @description <P>
+             *     The description of the pipeline.
+             *     </P>
+             *      */
+            description?: string;
             /** @description <P>Declared argument groups in the Pipeline.</P>
              *     <P>
              *     The UI for gathering arguments should group them into titles sets that may also have a comment.
@@ -2784,7 +3096,7 @@ export interface components {
              *     between them).
              *     </P>
              *      */
-            arguments?: components["schemas"]["Argument"][];
+            arguments?: components["schemas"]["ArgumentDetails"][];
             /** @description <P>The outputs that this Pipeline supports.</P>
              *     <P>
              *     The format to use for a pipeline is chosen by according to the following rules:
@@ -2816,28 +3128,8 @@ export interface components {
              *     </ol>
              *     <p>
              *      */
-            destinations?: components["schemas"]["Format"][];
+            formats?: components["schemas"]["FormatDetails"][];
         };
-        /** @description Base class for pipelines and the directories that contain them.
-         *      */
-        PipelineNode: {
-            /** @description <P>
-             *     The leaf name of the node.
-             *     </P>
-             *      */
-            name: string;
-            /** @description The children of the node.
-             *     <P>
-             *     If this is null then the node is a PipelineFile, otherwise it is a PipelineDir.
-             *     </P>
-             *      */
-            children?: components["schemas"]["PipelineNode"][];
-            /** @description <P>
-             *     The relative path to the node from the root.
-             *     </P>
-             *      */
-            path: string;
-        } & (components["schemas"]["PipelineDir"] | components["schemas"]["PipelineFile"]);
         /** @description Information about the current user and environment.
          *     <P>
          *     This information is pulled from the access token and is only available if present there.
@@ -3185,6 +3477,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PipelineNode"][];
+                };
+            };
+        };
+    };
+    getDetails: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                path: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A form.io definition for a given document. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PipelineDetails"];
                 };
             };
         };

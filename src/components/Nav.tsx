@@ -50,6 +50,7 @@ function Nav(props : NavProps) {
   const [topMenuAnchor, setTopMenuAnchor] = useState<HTMLElement|null>(null)
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [args, setArgs] = useState({} as any);
+  const [pipelineDetails, setPipelineDetails] = useState<components["schemas"]["PipelineDetails"] | null>();
   const navigate = useNavigate()
   
   function closeModal() {
@@ -98,19 +99,17 @@ function Nav(props : NavProps) {
   }
   
   function displayParameters(item : components["schemas"]["PipelineFile"]) {
-    console.log(item);    
-    pipeline = item;
-  
-    const ta : any = {
-      '_fmt': (Array.isArray(pipeline.destinations) ? pipeline.destinations[0].name : null)
-    }
-    if (pipeline.arguments) {
-      pipeline.arguments.forEach((arg: components["schemas"]["Argument"]) => {
-        ta[arg.name] = arg.defaultValueExpression ?? '';
+    console.log(item);
+
+    const pipelinedetailsurl = props.baseUrl + 'api/info/details/' + item.path
+    fetch(pipelinedetailsurl, {credentials: 'include'})
+      .then((response) => response.json())
+      .then((data) => {
+        setPipelineDetails(data)
+        setArgs({});
+        setModalIsOpen(true);
       });
-    }
-    setArgs(ta);
-    setModalIsOpen(true);
+  
   }  
 
   if (props.available && props.available.name === '') {
@@ -161,12 +160,12 @@ function Nav(props : NavProps) {
   }
 
   let columns = 1
-  if (pipeline && pipeline.arguments) {
-    if (pipeline.arguments.length > 9) {
+  if (pipelineDetails && pipelineDetails.arguments) {
+    if (pipelineDetails.arguments.length > 9) {
       columns = 4;
-    } else if (pipeline.arguments.length > 6) {
+    } else if (pipelineDetails.arguments.length > 6) {
       columns = 3;
-    } else if (pipeline.arguments.length > 3) {
+    } else if (pipelineDetails.arguments.length > 3) {
       columns = 2;
     }
   }
@@ -174,16 +173,18 @@ function Nav(props : NavProps) {
   return (
     <>
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles}>
-        <Parameters 
-            baseUrl={props.baseUrl} 
-            onRequestClose={closeModal} 
-            onRequestSubmit={submitModal} 
-            pipeline={pipeline} 
-            values={args} 
-            closeable={true} 
-            columns={columns}
-            displayUrl={true}
-            />
+        {pipelineDetails && 
+          <Parameters 
+              baseUrl={props.baseUrl} 
+              onRequestClose={closeModal} 
+              onRequestSubmit={submitModal} 
+              pipelineDetails={pipelineDetails} 
+              values={args} 
+              closeable={true} 
+              columns={columns}
+              displayUrl={true}
+              />
+        }
       </Modal>
       <AppBar position="static">
         <Container maxWidth="xl">
