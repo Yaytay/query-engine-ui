@@ -974,28 +974,6 @@ export interface components {
          *
          *      */
         Format: {
-            /** @description <P>The description of the format.</P>
-             *     <P>
-             *     The description is used in UIs to help users choose which format to use.
-             *     </P>
-             *      */
-            description?: string;
-            /** @description <P>The media type of the format.</P>
-             *     <P>
-             *     The media type is used to determine the format based upon the Accept header in the request.
-             *     If multiple formats have the same media type the first in the list will be used.
-             *     </P>
-             *     <P>
-             *     The media type will also be set as the Content-Type header in the response.
-             *     </P>
-             *      */
-            mediaType?: string;
-            /** @description <P>The filename to specify in the Content-Disposition header.</P>
-             *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
-             *     </P>
-             *      */
-            filename?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -1032,6 +1010,28 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
+            /** @description <P>The media type of the format.</P>
+             *     <P>
+             *     The media type is used to determine the format based upon the Accept header in the request.
+             *     If multiple formats have the same media type the first in the list will be used.
+             *     </P>
+             *     <P>
+             *     The media type will also be set as the Content-Type header in the response.
+             *     </P>
+             *      */
+            mediaType?: string;
+            /** @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             *      */
+            filename?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
@@ -1895,9 +1895,6 @@ export interface components {
         /** @description Processors modify the data stream in flight.
          *      */
         Processor: {
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
-            condition?: components["schemas"]["Condition"];
             /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
              *      */
             name: string;
@@ -1907,6 +1904,9 @@ export interface components {
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
         };
         /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
          *
@@ -1977,6 +1977,15 @@ export interface components {
             /** @description The name of the column in the values feed that contains the ID of the field represented by that row.
              *      */
             valuesFieldIdColumn?: string;
+            /** @description The list of fields to look in for the field value.
+             *     <P>
+             *     This should not be used, the correct approach is to identify the field value column in the field definition query - this approach only exists for backwards compatibility.
+             *     <P>
+             *     When set, this should be a comma separate list of field names from the values stream.
+             *     Even if this value is set, it will only be used if the field value column in the field definition query is not set.
+             *     At runtime the named columns in the values stream will be checked in order and the first one that is not null be be taken.
+             *      */
+            fieldValueColumnName?: string;
             /** @description Get the feed for the field definitions.
              *
              *     This data feed should result in four columns:
