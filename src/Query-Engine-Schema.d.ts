@@ -655,6 +655,25 @@ export interface components {
              *      */
             label?: string;
         };
+        /** @description Override of the data type for a specific column.
+         *
+         *     This facility is rarely required, but can be useful when a database does not provide adequate information for Query Engine to correctly identify the type of a field.
+         *
+         *     This is known to be useful for boolean fields with MySQL.
+         *
+         *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
+         *      */
+        ColumnTypeOverride: {
+            /** @description <P>The name of the column that is to have its data type set.</P>
+             *      */
+            column?: string;
+            /**
+             * @description <P>The desired type of the column.</P>
+             *
+             * @enum {string}
+             */
+            type?: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
+        };
         /** @description <P>
          *     Conditions are expressions using <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> that control access to something.
          *     <P>
@@ -1144,10 +1163,20 @@ export interface components {
             closeQuote: string;
             /**
              * @description If a string value contains the close quote string it will be prefixed by this string.
+             *     <P>
+             *     Do not set both this and replaceCloseQuote, this value will take preference.
              *
              * @default "
              */
             escapeCloseQuote: string;
+            /**
+             * @description If a string value contains the close quote string it will be replaced by this string.
+             *     <P>
+             *     Do not set both this and escapeCloseQuote, the value of escapeCloseQuote will take preference.
+             *
+             * @default "
+             */
+            replaceCloseQuote: string;
             /**
              * @description Each row in the output will be suffixed by this value.
              *
@@ -2594,6 +2623,18 @@ export interface components {
              *     </P>
              *      */
             replaceDoubleQuotes?: boolean;
+            /** @description Get the overrides for column types.
+             *     <P>
+             *     This is a map of column names (from the results for this query) to the Query Engine {@link DataType} that should be used in the
+             *     result stream.
+             *     <P>
+             *     This facility is rarely required, but can be useful when a data base does not provide adequate information for Query Engine to correctly identify the type of a field.
+             *     <P>
+             *     This is known to be useful for boolean fields with MySQL.
+             *     <P>
+             *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
+             *      */
+            columnTypeOverrides?: components["schemas"]["ColumnTypeOverride"][];
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
