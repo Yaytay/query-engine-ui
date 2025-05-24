@@ -993,35 +993,6 @@ export interface components {
          *
          *      */
         Format: {
-            /** @description <P>The name of the format.</P>
-             *     <P>
-             *     The name is used to determine the format based upon the '_fmt' query string argument.
-             *     </P>
-             *     <P>
-             *     It is an error for two Formats to have the same name.
-             *     This is different from the other Format determinators which can be repeated, the name is the
-             *     ultimate arbiter and must be unique.
-             *     This ensures that all configured Formats can be used.
-             *     </P>
-             *      */
-            name?: string;
-            /**
-             * @description <P>Whether the format should be removed from the list when presented as an option to users.
-             *     <P>
-             *     This has no effect on processing and is purely a UI hint.
-             *     <P>
-             *     When hidden is true the format should removed from any UI presenting formats to the user.
-             *     </P>
-             *
-             * @default false
-             */
-            hidden: boolean;
-            /**
-             * @description <P>The type of Format being configured.<P>
-             *
-             * @enum {string}
-             */
-            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
             /** @description <P>The extension of the format.</P>
              *     <P>
              *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
@@ -1051,6 +1022,35 @@ export interface components {
              *     </P>
              *      */
             filename?: string;
+            /** @description <P>The name of the format.</P>
+             *     <P>
+             *     The name is used to determine the format based upon the '_fmt' query string argument.
+             *     </P>
+             *     <P>
+             *     It is an error for two Formats to have the same name.
+             *     This is different from the other Format determinators which can be repeated, the name is the
+             *     ultimate arbiter and must be unique.
+             *     This ensures that all configured Formats can be used.
+             *     </P>
+             *      */
+            name?: string;
+            /**
+             * @description <P>Whether the format should be removed from the list when presented as an option to users.
+             *     <P>
+             *     This has no effect on processing and is purely a UI hint.
+             *     <P>
+             *     When hidden is true the format should removed from any UI presenting formats to the user.
+             *     </P>
+             *
+             * @default false
+             */
+            hidden: boolean;
+            /**
+             * @description <P>The type of Format being configured.<P>
+             *
+             * @enum {string}
+             */
+            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
@@ -1081,8 +1081,8 @@ export interface components {
              */
             extension: string;
             /**
-             * @description The media type (e.g., application/xml).
-             * @default application/xml
+             * @description The media type (e.g., application/atom+xml; charset=utf-8).
+             * @default application/atom+xml; charset=utf-8
              */
             mediaType: string;
             /**
@@ -1095,6 +1095,36 @@ export interface components {
              * @default _
              */
             fieldInvalidLetterFix: string;
+            /**
+             * @description The Java format to use for date fields.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format dates.
+             *     <P>
+             *     The default behaviour is to use java.time.LocalDate#toString(), which will output in accordance with ISO 8601.
+             *
+             * @default yyyy-mm-dd
+             */
+            dateFormat: string;
+            /**
+             * @description The Java format to use for date/time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format datetimes.
+             *     <P>
+             *     The default behaviour is to use java.time.LocalDateTime#toString(), which will output in accordance with ISO 8601.
+             *
+             * @default yyyy-mm-ddThh:mm:ss
+             */
+            dateTimeFormat: string;
+            /**
+             * @description The Java format to use for time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format times.
+             *     <P>
+             *     The default behaviour is to use java.time.LocalTime#toString(), which will output in accordance with ISO 8601.
+             *
+             * @default hh:mm:ss
+             */
+            timeFormat: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -1143,6 +1173,12 @@ export interface components {
              * @default text/csv
              */
             mediaType: string;
+            /**
+             * @description If true date/time values will be surrounded by quotes, otherwise they will not.
+             *
+             * @default true
+             */
+            quoteTemporal: boolean;
             /**
              * @description The delimiter between field values in the output.
              *
@@ -1405,9 +1441,14 @@ export interface components {
             extension: string;
             /**
              * @description The media type (e.g., application/xml).
-             * @default application/xml
+             * @default application/rss+xml; charset=utf-8
              */
             mediaType: string;
+            /**
+             * @description The XML namespace to use for custom fields in the RSS output.
+             * @default https://yaytay.github.io/query-engine/rss
+             */
+            customNamespace: string;
             /**
              * @description Fix applied to the initial letter of a field's name.
              * @default F
@@ -1418,6 +1459,36 @@ export interface components {
              * @default _
              */
             fieldInvalidLetterFix: string;
+            /**
+             * @description The Java format to use for date fields.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format dates.
+             *     <P>
+             *     The default behaviour is to use java.time.LocalDate#toString(), which will output in accordance with ISO 8601.
+             *
+             * @default yyyy-mm-dd
+             */
+            dateFormat: string;
+            /**
+             * @description The Java format to use for date/time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format datetimes.
+             *     <P>
+             *     The default behaviour is to use java.time.LocalDateTime#toString(), which will output in accordance with ISO 8601.
+             *
+             * @default yyyy-mm-ddThh:mm:ss
+             */
+            dateTimeFormat: string;
+            /**
+             * @description The Java format to use for time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format times.
+             *     <P>
+             *     The default behaviour is to use java.time.LocalTime#toString(), which will output in accordance with ISO 8601.
+             *
+             * @default hh:mm:ss
+             */
+            timeFormat: string;
         });
         /** @description Configuration for an output format of XLSX.
          *      */
@@ -1699,7 +1770,7 @@ export interface components {
             extension: string;
             /**
              * @description The media type (e.g., application/xml).
-             * @default application/xml
+             * @default application/xml; charset=utf-8
              */
             mediaType: string;
             /**
@@ -1742,6 +1813,36 @@ export interface components {
              * @default _
              */
             fieldInvalidLetterFix: string;
+            /**
+             * @description The Java format to use for date fields.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format dates.
+             *     <P>
+             *     The default behaviour is to use java.time.LocalDate#toString(), which will output in accordance with ISO 8601.
+             *
+             * @default yyyy-mm-dd
+             */
+            dateFormat: string;
+            /**
+             * @description The Java format to use for date/time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format datetimes.
+             *     <P>
+             *     The default behaviour is to use java.time.LocalDateTime#toString(), which will output in accordance with ISO 8601.
+             *
+             * @default yyyy-mm-ddThh:mm:ss
+             */
+            dateTimeFormat: string;
+            /**
+             * @description The Java format to use for time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format times.
+             *     <P>
+             *     The default behaviour is to use java.time.LocalTime#toString(), which will output in accordance with ISO 8601.
+             *
+             * @default hh:mm:ss
+             */
+            timeFormat: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -1924,6 +2025,9 @@ export interface components {
         /** @description Processors modify the data stream in flight.
          *      */
         Processor: {
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
              *      */
             name: string;
@@ -1933,9 +2037,6 @@ export interface components {
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
-            condition?: components["schemas"]["Condition"];
         };
         /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
          *
