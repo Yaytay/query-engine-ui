@@ -993,28 +993,6 @@ export interface components {
          *
          *      */
         Format: {
-            /** @description <P>The description of the format.</P>
-             *     <P>
-             *     The description is used in UIs to help users choose which format to use.
-             *     </P>
-             *      */
-            description?: string;
-            /** @description <P>The media type of the format.</P>
-             *     <P>
-             *     The media type is used to determine the format based upon the Accept header in the request.
-             *     If multiple formats have the same media type the first in the list will be used.
-             *     </P>
-             *     <P>
-             *     The media type will also be set as the Content-Type header in the response.
-             *     </P>
-             *      */
-            mediaType?: string;
-            /** @description <P>The filename to specify in the Content-Disposition header.</P>
-             *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
-             *     </P>
-             *      */
-            filename?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -1051,6 +1029,28 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
+            /** @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             *      */
+            filename?: string;
+            /** @description <P>The media type of the format.</P>
+             *     <P>
+             *     The media type is used to determine the format based upon the Accept header in the request.
+             *     If multiple formats have the same media type the first in the list will be used.
+             *     </P>
+             *     <P>
+             *     The media type will also be set as the Content-Type header in the response.
+             *     </P>
+             *      */
+            mediaType?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
@@ -1227,14 +1227,114 @@ export interface components {
              * @default yyyy-MM-dd
              */
             dateFormat: string;
-            /**
-             * @description The Java format to use for date/time columns.
+            /** @description The Java format to use for date/time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format datetimes.
-             *
-             * @default yyyy-MM-dd'T'HH:mm
-             */
-            dateTimeFormat: string;
+             *     <P>
+             *     To value may be either a DateTimeFormatter pattern or one of the predefined formats:
+             *     <table class="striped" style="text-align:left">
+             *     <caption>Predefined Formatters</caption>
+             *     <thead>
+             *     <tr>
+             *     <th scope="col">Formatter</th>
+             *     <th scope="col">Description</th>
+             *     <th scope="col">Example</th>
+             *     </tr>
+             *     </thead>
+             *     <tbody>
+             *     <tr>
+             *     <th scope="row"> BASIC_ISO_DATE</th>
+             *     <td>Basic ISO date </td> <td>'20111203'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE</th>
+             *     <td> ISO Local Date </td>
+             *     <td>'2011-12-03'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_TIME</th>
+             *     <td> Time without offset </td>
+             *     <td>'10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_TIME</th>
+             *     <td> Time with or without offset </td>
+             *     <td>'10:15:30+01:00'; '10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
+             *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ORDINAL_DATE</th>
+             *     <td> Year and day of year </td>
+             *     <td>'2012-337'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_SECONDS</th>
+             *     <td> Seconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330L</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_MILLISECONDS</th>
+             *     <td> Milliseconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330120L</td>
+             *     </tr>
+             *     <tr colspan="3"><td>
+             *     The following predefined formats all require zone/offset data that will be assumed to be UTC.
+             *     </td></tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE</th>
+             *     <td> ISO Date with offset </td>
+             *     <td>'2023-05-15Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_TIME</th>
+             *     <td> Time with offset </td>
+             *     <td>'13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE_TIME</th>
+             *     <td> Date Time with Offset </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ZONED_DATE_TIME</th>
+             *     <td> Zoned Date Time </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_DATE_TIME</th>
+             *     <td> Date and time with ZoneId </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_INSTANT</th>
+             *     <td> Date and Time of an Instant </td>
+             *     <td>'2023-05-15T13:45:30.120Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> RFC_1123_DATE_TIME</th>
+             *     <td> RFC 1123 / RFC 822 </td>
+             *     <td>'Mon, 15 May 2023 13:45:30 GMT'</td>
+             *     </tr>
+             *     </table>
+             *     <P>
+             *     The predefined formatters have capabilities that the pattern formatting does not, specifically, if you want to output an ISO8601
+             *     date time with fractional seconds but only showing signficant figures in the fractional seconds, use ISO_LOCAL_DATE_TIME.
+             *     <P>
+             *     The default output (when the format is not set) is that of the java LocalDateTime.toString() method, specifically, the output will be one of the following ISO-8601 formats:
+             *     <ul>
+             *     <li>uuuu-MM-dd'T'HH:mm
+             *     <li>uuuu-MM-dd'T'HH:mm:ss
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
+             *     </ul>
+             *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *      */
+            dateTimeFormat?: string;
             /**
              * @description The Java format to use for time columns.
              *     <P>
@@ -1407,8 +1507,7 @@ export interface components {
              * @default yyyy-mm-dd
              */
             dateFormat: string;
-            /**
-             * @description The Java format to use for date/time columns.
+            /** @description The Java format to use for date/time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format datetimes.
              *     <P>
@@ -1462,14 +1561,60 @@ export interface components {
              *     <td> Milliseconds since the epoch (1970-01-01)</td>
              *     <td>1684158330120L</td>
              *     </tr>
+             *     <tr colspan="3"><td>
+             *     The following predefined formats all require zone/offset data that will be assumed to be UTC.
+             *     </td></tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE</th>
+             *     <td> ISO Date with offset </td>
+             *     <td>'2023-05-15Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_TIME</th>
+             *     <td> Time with offset </td>
+             *     <td>'13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE_TIME</th>
+             *     <td> Date Time with Offset </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ZONED_DATE_TIME</th>
+             *     <td> Zoned Date Time </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_DATE_TIME</th>
+             *     <td> Date and time with ZoneId </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_INSTANT</th>
+             *     <td> Date and Time of an Instant </td>
+             *     <td>'2023-05-15T13:45:30.120Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> RFC_1123_DATE_TIME</th>
+             *     <td> RFC 1123 / RFC 822 </td>
+             *     <td>'Mon, 15 May 2023 13:45:30 GMT'</td>
+             *     </tr>
              *     </table>
              *     <P>
              *     The predefined formatters have capabilities that the pattern formatting does not, specifically, if you want to output an ISO8601
              *     date time with fractional seconds but only showing signficant figures in the fractional seconds, use ISO_LOCAL_DATE_TIME.
-             *
-             * @default yyyy-mm-ddThh:mm:ss
-             */
-            dateTimeFormat: string;
+             *     <P>
+             *     The default output (when the format is not set) is that of the java LocalDateTime.toString() method, specifically, the output will be one of the following ISO-8601 formats:
+             *     <ul>
+             *     <li>uuuu-MM-dd'T'HH:mm
+             *     <li>uuuu-MM-dd'T'HH:mm:ss
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
+             *     </ul>
+             *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *      */
+            dateTimeFormat?: string;
             /**
              * @description The Java format to use for time columns.
              *     <P>
@@ -2101,9 +2246,6 @@ export interface components {
         /** @description Processors modify the data stream in flight.
          *      */
         Processor: {
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
-            condition?: components["schemas"]["Condition"];
             /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
              *      */
             name: string;
@@ -2113,6 +2255,9 @@ export interface components {
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
         };
         /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
          *
