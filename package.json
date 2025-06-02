@@ -28,7 +28,7 @@
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.2.5",
     "@mui/icons-material": "7.1.0",
-    "@mui/material": "^7.1.0",
+    "@mui/material": "^7.1.1",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.15.21",
     "@types/react": "^19.1.5",
