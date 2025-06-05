@@ -1623,6 +1623,14 @@ export interface components {
              * @default hh:mm:ss
              */
             timeFormat: string;
+            /** @description The Java format to use for float and double columns.
+             *     <P>
+             *     This value will be used by the Java DecimalFormat to format floating point values.
+             *     <P>
+             *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
+             *     (i.e. it will include at least one digit after the decimal point).
+             *      */
+            decimalFormat?: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -2302,6 +2310,16 @@ export interface components {
              *     If set to true the parent row will only be output if the child feed has at least one matching row.
              *      */
             innerJoin?: boolean;
+            /**
+             * @description The inner join flag.
+             *     <P>
+             *     If set to true the parent row will only be output if the child feed has at least one matching row.
+             *     <P>
+             *     For the sake of clarity this should usually be left as false.
+             *
+             * @default false
+             */
+            useCaseInsensitiveFieldNames: boolean;
             /** @description The name of the column in the field defns feed that is used to identify the extra column.
              *      */
             fieldIdColumn?: string;
