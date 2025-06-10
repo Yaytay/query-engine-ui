@@ -1035,12 +1035,6 @@ export interface components {
              *     </P>
              *      */
             description?: string;
-            /** @description <P>The filename to specify in the Content-Disposition header.</P>
-             *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
-             *     </P>
-             *      */
-            filename?: string;
             /** @description <P>The media type of the format.</P>
              *     <P>
              *     The media type is used to determine the format based upon the Accept header in the request.
@@ -1051,6 +1045,12 @@ export interface components {
              *     </P>
              *      */
             mediaType?: string;
+            /** @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             *      */
+            filename?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
@@ -1343,6 +1343,44 @@ export interface components {
              * @default HH:mm
              */
             timeFormat: string;
+            /** @description The Java format to use for float and double columns.
+             *     <P>
+             *     This value will be used by the Java DecimalFormat to format floating point values.
+             *     <P>
+             *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
+             *     (i.e. it will include at least one digit after the decimal point).
+             *      */
+            decimalFormat?: string;
+            /** @description Get the format to use for Boolean columns.
+             *     <P>
+             *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
+             *     an array of two string values - the first being true and the second being false.
+             *     These strings will be inserted into the output stream as is, and thus must be valid JSON; specifically they can be:
+             *     <UL>
+             *     <LI>true  (any case)
+             *     <LI>false  (any case)
+             *     <LI>A numeric value
+             *     <LI>A string value
+             *     </UL>
+             *     The following are all examples of valid expressions:
+             *     <UL>
+             *     <LI>['true', 'false']
+             *     Valid, but pointless, because this is the default behaviour.
+             *     <LI>['True', 'False']
+             *     Python formatting.
+             *     <LI>['1', '0']
+             *     Output a numeric 1 or 0.
+             *     <LI>['"1"', '"0"']
+             *     Output a quoted "1" or "0".
+             *     <LI>['"yes"', '"no"']
+             *     Output a quoted "yes" or "no".
+             *     </UL>
+             *     <P>
+             *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
+             *     <P>
+             *     If not set Boolean values will be output as "true" or "false".
+             *      */
+            booleanFormat?: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -1412,6 +1450,168 @@ export interface components {
              * @default text/html
              */
             mediaType: string;
+            /**
+             * @description The Java format to use for date fields.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format dates.
+             *
+             * @default yyyy-MM-dd
+             */
+            dateFormat: string;
+            /** @description The Java format to use for date/time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format datetimes.
+             *     <P>
+             *     To value may be either a DateTimeFormatter pattern or one of the predefined formats:
+             *     <table class="striped" style="text-align:left">
+             *     <caption>Predefined Formatters</caption>
+             *     <thead>
+             *     <tr>
+             *     <th scope="col">Formatter</th>
+             *     <th scope="col">Description</th>
+             *     <th scope="col">Example</th>
+             *     </tr>
+             *     </thead>
+             *     <tbody>
+             *     <tr>
+             *     <th scope="row"> BASIC_ISO_DATE</th>
+             *     <td>Basic ISO date </td> <td>'20111203'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE</th>
+             *     <td> ISO Local Date </td>
+             *     <td>'2011-12-03'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_TIME</th>
+             *     <td> Time without offset </td>
+             *     <td>'10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_TIME</th>
+             *     <td> Time with or without offset </td>
+             *     <td>'10:15:30+01:00'; '10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
+             *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ORDINAL_DATE</th>
+             *     <td> Year and day of year </td>
+             *     <td>'2012-337'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_SECONDS</th>
+             *     <td> Seconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330L</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_MILLISECONDS</th>
+             *     <td> Milliseconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330120L</td>
+             *     </tr>
+             *     <tr colspan="3"><td>
+             *     The following predefined formats all require zone/offset data that will be assumed to be UTC.
+             *     </td></tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE</th>
+             *     <td> ISO Date with offset </td>
+             *     <td>'2023-05-15Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_TIME</th>
+             *     <td> Time with offset </td>
+             *     <td>'13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE_TIME</th>
+             *     <td> Date Time with Offset </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ZONED_DATE_TIME</th>
+             *     <td> Zoned Date Time </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_DATE_TIME</th>
+             *     <td> Date and time with ZoneId </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_INSTANT</th>
+             *     <td> Date and Time of an Instant </td>
+             *     <td>'2023-05-15T13:45:30.120Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> RFC_1123_DATE_TIME</th>
+             *     <td> RFC 1123 / RFC 822 </td>
+             *     <td>'Mon, 15 May 2023 13:45:30 GMT'</td>
+             *     </tr>
+             *     </table>
+             *     <P>
+             *     The predefined formatters have capabilities that the pattern formatting does not, specifically, if you want to output an ISO8601
+             *     date time with fractional seconds but only showing signficant figures in the fractional seconds, use ISO_LOCAL_DATE_TIME.
+             *     <P>
+             *     The default output (when the format is not set) is that of the java LocalDateTime.toString() method, specifically, the output will be one of the following ISO-8601 formats:
+             *     <ul>
+             *     <li>uuuu-MM-dd'T'HH:mm
+             *     <li>uuuu-MM-dd'T'HH:mm:ss
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
+             *     </ul>
+             *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *      */
+            dateTimeFormat?: string;
+            /**
+             * @description The Java format to use for time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format times.
+             *
+             * @default HH:mm
+             */
+            timeFormat: string;
+            /** @description The Java format to use for float and double columns.
+             *     <P>
+             *     This value will be used by the Java DecimalFormat to format floating point values.
+             *     <P>
+             *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
+             *     (i.e. it will include at least one digit after the decimal point).
+             *      */
+            decimalFormat?: string;
+            /** @description Get the format to use for Boolean columns.
+             *     <P>
+             *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
+             *     an array of two string values - the first being true and the second being false.
+             *     These strings will be inserted into the output stream as is, and thus must be valid JSON; specifically they can be:
+             *     <UL>
+             *     <LI>true  (any case)
+             *     <LI>false  (any case)
+             *     <LI>A numeric value
+             *     <LI>A string value
+             *     </UL>
+             *     The following are all examples of valid expressions:
+             *     <UL>
+             *     <LI>['true', 'false']
+             *     Valid, but pointless, because this is the default behaviour.
+             *     <LI>['True', 'False']
+             *     Python formatting.
+             *     <LI>['1', '0']
+             *     Output a numeric 1 or 0.
+             *     <LI>['"1"', '"0"']
+             *     Output a quoted "1" or "0".
+             *     <LI>['"yes"', '"no"']
+             *     Output a quoted "yes" or "no".
+             *     </UL>
+             *     <P>
+             *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
+             *     <P>
+             *     If not set Boolean values will be output as "true" or "false".
+             *      */
+            booleanFormat?: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -1631,6 +1831,34 @@ export interface components {
              *     (i.e. it will include at least one digit after the decimal point).
              *      */
             decimalFormat?: string;
+            /** @description Get the format to use for Boolean columns.
+             *     <P>
+             *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
+             *     an array of two string values - the first being true and the second being false.
+             *     These strings will be inserted into the output stream as is, and thus must be valid JSON; specifically they can be:
+             *     <UL>
+             *     <LI>true
+             *     <LI>false
+             *     <LI>A numeric value
+             *     <LI>A string value
+             *     </UL>
+             *     The following are all examples of valid expressions:
+             *     <UL>
+             *     <LI>['true', 'false']
+             *     Valid, but pointless, because this is the default behaviour.
+             *     <LI>['1', '0']
+             *     Output a numeric 1 or 0.
+             *     <LI>['"1"', '"0"']
+             *     Output a quoted "1" or "0".
+             *     <LI>['"yes"', '"no"']
+             *     Output a quoted "yes" or "no".
+             *     </UL>
+             *     <P>
+             *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce invalid JSON with a bad format.
+             *     <P>
+             *     If not set Boolean values will be output as standard JSON Boolean values.
+             *      */
+            booleanFormat?: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
