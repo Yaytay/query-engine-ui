@@ -283,9 +283,7 @@ export interface components {
              *     </P>
              *      */
             name: string;
-            /** @description <P>
-             *     The children of the node.
-             *     </P>
+            /** @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
@@ -313,6 +311,12 @@ export interface components {
          *     </P>
          *      */
         DesignFile: WithRequired<components["schemas"]["DesignNode"], "modified" | "name" | "path"> & {
+            /** @description The children of the node.
+             *     <P>
+             *     If this is null then the node is a file, otherwise it is a directory.
+             *     </P>
+             *      */
+            children?: components["schemas"]["DesignNode"][];
             /**
              * Format: int64
              * @description <P>
@@ -332,9 +336,7 @@ export interface components {
              *     </P>
              *      */
             name: string;
-            /** @description <P>
-             *     The children of the node.
-             *     </P>
+            /** @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
@@ -356,6 +358,122 @@ export interface components {
              *
              */
             modified: string;
+        };
+        /** @description <p>A definition of a rule that prevents a pipeline from running if previous runs that match the scope and time limit exceed the byte count.</p>
+         *     <p>Note that rate limit rules are only evaluated before running a pipeline and do not take the current run into consideration at all.</p>
+         *     <p>
+         *     * As an example a rateLimit defined as:
+         *     <pre>
+         *     * scope: [ "username", "path" ]
+         *     * timeLimit: PT10M
+         *     * byteLimit: 10000000
+         *     </pre>
+         *     says that if the current user has executed the current pipeline (same path) within the past ten minutes generating more than ten million bytes then this request should be refused.
+         *     </p>
+         *     <p>
+         *     Refused requests result in an HTTP status code 429 ("Too Many Requests").
+         *     </p>
+         *      */
+        RateLimitRule: {
+            /** @description <P>The scope of the rate limit rule.</P>
+             *     <P>At least one value must be provided.</P>
+             *      */
+            scope: ("host" | "path" | "clientip" | "issuer" | "subject" | "username")[];
+            /** @description <P>The duration of the rate limit.</P>
+             *     <P>Expressions in ISO8601 time period notication (e.g. PT10M for ten minutes).</P>
+             *      */
+            timeLimit: string;
+            /** @description <P>The limit on the number of pipeline runs matching the scope that may be initiated.</P>
+             *     <P>
+             *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
+             *     No other non-numeric characters are permitted.
+             *     </P>
+             *      */
+            runLimit?: string;
+            /** @description <P>The limit on the number of bytes that may be been sent by previous runs.</P>
+             *     <P>
+             *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
+             *     No other non-numeric characters are permitted.
+             *     </P>
+             *      */
+            byteLimit?: string;
+            /**
+             * Format: int32
+             * @description <P>The limit on the number of runs matching the scope that may have been started but not completed within the time limit.</P>
+             *
+             */
+            concurrencyLimit?: number;
+        };
+        /** @description <P>
+         *     An ArgumentGroup represents a group of {@link Argument} instances.
+         *     </P>
+         *     <P>
+         *     Argument groups are entirely for the benefit of the user interface, they are not used in the processing of pipelines.
+         *     </P>
+         *     <P>
+         *     Each {@link Argument} in the {@link Pipeline} can specify a group name.
+         *     It is an error if the group does not also exist in the Pipeline.
+         *     </P>
+         *      */
+        ArgumentGroup: {
+            /** @description <P>The name of the argument group, should be specified by any arguments in this group.</P>
+             *     <P>No two argument groups in a single pipeline should have the same name.</P>
+             *     <P>
+             *     The name must consist entirely of Unicode alpha-numeric characters, it is
+             *     recommended that the name use only ASCII characters to avoid needing to encode it
+             *     but this is not a requirement.
+             *     </P>
+             *      */
+            name: string;
+            /** @description <P>The title to be displayed for the argument group in any UI.</P>
+             *     <P>
+             *     If the title is not set the UI will display the name.
+             *     </P>
+             *      */
+            title?: string;
+            /** @description <P>The description to be displayed for the argument group in any UI.</P>
+             *      */
+            description?: string;
+            /**
+             * @description <P>The type of rendering to use for the argument group.</P>
+             *     <P>
+             *     The type of the argument group is optional, if it is not specified a default rendering will be used.
+             *     </P>
+             *
+             * @enum {string}
+             */
+            type?: "FIELD_SET" | "PANEL" | "COLLAPSIBLE_PANEL";
+            /** @description The theme used to display the argument group in the UI.
+             *     <P>
+             *     This should be any valid Bootstrap Panel Theme
+             *     <P>
+             *     Valid values include: default, primary, success, info, warning, danger.
+             *      */
+            theme?: string;
+        };
+        /** @description <P>An ArgumentValue represents a possible value for an Argument to a Pipeline.</P>
+         *     <P>
+         *     ArgumentValues are not validated by the Query Engine at all, they exist solely to make life nicer for UIs.
+         *     The &quot;value&quot; in an ArgumentValue is the value that is to be passed in, the &quot;label&quot; field is purely for a UI to display.
+         *     It is expected that a UI will display the &quot;value&quot; if the &quot;label&quot; field is null or blank.
+         *      */
+        ArgumentValue: {
+            /** @description <P>
+             *     The value that is the actual potential argument that the Pipeline expects to receive.
+             *     </P>
+             *     <P>
+             *     The value is considered required, the label field is not.
+             *     </P>
+             *      */
+            value: string;
+            /** @description <P>
+             *     The label that should be shown to the user for the given value.
+             *     </P>
+             *     <P>
+             *     This label  is nullable, in which case the value should be displayed to the user.
+             *     </P>
+             *      */
+            label?: string;
         };
         /** @description <P>
          *     An Argument represents a named piece of data that will be passed in to a pipeline.
@@ -585,96 +703,6 @@ export interface components {
             condition?: components["schemas"]["Condition"];
         };
         /** @description <P>
-         *     An ArgumentGroup represents a group of {@link Argument} instances.
-         *     </P>
-         *     <P>
-         *     Argument groups are entirely for the benefit of the user interface, they are not used in the processing of pipelines.
-         *     </P>
-         *     <P>
-         *     Each {@link Argument} in the {@link Pipeline} can specify a group name.
-         *     It is an error if the group does not also exist in the Pipeline.
-         *     </P>
-         *      */
-        ArgumentGroup: {
-            /** @description <P>The name of the argument group, should be specified by any arguments in this group.</P>
-             *     <P>No two argument groups in a single pipeline should have the same name.</P>
-             *     <P>
-             *     The name must consist entirely of Unicode alpha-numeric characters, it is
-             *     recommended that the name use only ASCII characters to avoid needing to encode it
-             *     but this is not a requirement.
-             *     </P>
-             *      */
-            name: string;
-            /** @description <P>The title to be displayed for the argument group in any UI.</P>
-             *     <P>
-             *     If the title is not set the UI will display the name.
-             *     </P>
-             *      */
-            title?: string;
-            /** @description <P>The description to be displayed for the argument group in any UI.</P>
-             *      */
-            description?: string;
-            /**
-             * @description <P>The type of rendering to use for the argument group.</P>
-             *     <P>
-             *     The type of the argument group is optional, if it is not specified a default rendering will be used.
-             *     </P>
-             *
-             * @enum {string}
-             */
-            type?: "FIELD_SET" | "PANEL" | "COLLAPSIBLE_PANEL";
-            /** @description The theme used to display the argument group in the UI.
-             *     <P>
-             *     This should be any valid Bootstrap Panel Theme
-             *     <P>
-             *     Valid values include: default, primary, success, info, warning, danger.
-             *      */
-            theme?: string;
-        };
-        /** @description <P>An ArgumentValue represents a possible value for an Argument to a Pipeline.</P>
-         *     <P>
-         *     ArgumentValues are not validated by the Query Engine at all, they exist solely to make life nicer for UIs.
-         *     The &quot;value&quot; in an ArgumentValue is the value that is to be passed in, the &quot;label&quot; field is purely for a UI to display.
-         *     It is expected that a UI will display the &quot;value&quot; if the &quot;label&quot; field is null or blank.
-         *      */
-        ArgumentValue: {
-            /** @description <P>
-             *     The value that is the actual potential argument that the Pipeline expects to receive.
-             *     </P>
-             *     <P>
-             *     The value is considered required, the label field is not.
-             *     </P>
-             *      */
-            value: string;
-            /** @description <P>
-             *     The label that should be shown to the user for the given value.
-             *     </P>
-             *     <P>
-             *     This label  is nullable, in which case the value should be displayed to the user.
-             *     </P>
-             *      */
-            label?: string;
-        };
-        /** @description Override of the data type for a specific column.
-         *
-         *     This facility is rarely required, but can be useful when a database does not provide adequate information for Query Engine to correctly identify the type of a field.
-         *
-         *     This is known to be useful for boolean fields with MySQL.
-         *
-         *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
-         *      */
-        ColumnTypeOverride: {
-            /** @description <P>The name of the column that is to have its data type set.</P>
-             *      */
-            column?: string;
-            /**
-             * @description <P>The desired type of the column.</P>
-             *
-             * @enum {string}
-             */
-            type?: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
-        };
-        /** @description <P>
          *     Conditions are expressions using <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> that control access to something.
          *     <P>
          *     Conditions can be applied to entire directories (in the permissions.jexl file); to Pipelines or to Endpoints.
@@ -724,6 +752,25 @@ export interface components {
             /** @description The expression that makes up the condition.
              *      */
             expression: string;
+        };
+        /** @description Override of the data type for a specific column.
+         *
+         *     This facility is rarely required, but can be useful when a database does not provide adequate information for Query Engine to correctly identify the type of a field.
+         *
+         *     This is known to be useful for boolean fields with MySQL.
+         *
+         *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
+         *      */
+        ColumnTypeOverride: {
+            /** @description <P>The name of the column that is to have its data type set.</P>
+             *      */
+            column?: string;
+            /**
+             * @description <P>The desired type of the column.</P>
+             *
+             * @enum {string}
+             */
+            type?: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
         };
         /** @description <P>
          *     Represents a pipeline that can used to generate endpoints before the main pipeline is run.
@@ -861,101 +908,724 @@ export interface components {
              */
             conditionField: string;
         };
-        /** @description <P>Definition of an endpoint that can be used for querying data.</P>
-         *     <P>
-         *     An Endpoint represents a connection to a data source, where a Source represents an actual data query.
-         *     For EndpointType.HTTP Sources there is often a one-to-one relationship between Source and Endpoint, but for EndpointType.SQL Sources there
-         *     are often multiple Sources for a single Endpoint (for SQL a Source is a query and an Endpoint is a database).
-         *     </P>
-         *     <P>
-         *     The credentials for an Endpoint can be specified in three ways:
-         *     <ul>
-         *     <li>By including them in the URL specified in the Endpoint definition.
-         *     This is the least secure option as the URL value will be written to log entries.
-         *     <li>By explicitly setting username/password on the Endpoint.
-         *     The password will not be logged, but will be in your configuration files and thus in your source repo.
-         *     <li>By using secrets set in the configuration of the query engine.
-         *     This is the most secure option as it puts the responsibility on the deployment to protect the credentials.
-         *     </ul>
-         *     </P>
-         *     <P>
-         *     If the secret field is set it will take precedence over both the username and the password set in the Endpoint
-         *     , as a result it is not valid to set either username or password at the same time as secret.
-         *     The same does not apply to the condition field, that can be set on both the Endpoint and the Secret (and both conditions
-         *     must be met for the Endpoint to work).
-         *     </P>
+        /** @description Processors modify the data stream in flight.
          *      */
-        Endpoint: {
-            /** @description <P>The name of the Endpoint, that will be used to refer to it in Sources.
+        Processor: {
+            /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
              *      */
             name: string;
             /**
-             * @description <P>The type of Endpoint being configured</P>
+             * @description <P>The type of Processor being configured.</P>
              *
              * @enum {string}
              */
-            type: "SQL" | "HTTP";
-            /**
-             * Format: uri
-             * @description <P>A URL that defines the Endpoint.</P>
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
+        };
+        /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
+         *
+         *     Two child pipelines must be defined:
+         *     <ul>
+         *     <li>The definition  pipeline, that is queried in its entirety at the beginning and that defines the columns that will be found.
+         *     <li>The values pipeline, that is queried in parallel with the main stream and the supplies the data for the dynamic columns.
+         *     </il>
+         *     The definition pipeline must provide four fields:
+         *     <ul>
+         *     <li>The ID for the dynamic column to be added - this value must correspond to the ID from the values pipeline.
+         *     <li>The name for the dynamic column - this will be the name of the newly created field.
+         *     <li>The type for the dynamic column - one of the{@link uk.co.spudsoft.query.defn.DataType} values.
+         *     <li>The name of the column in the values stream that will contain the actual value.
+         *     </ul>
+         *     The names of these four fields can be controlled using the field*Column properties on this processor (though they have sensible defaults).
+         *
+         *     The values pipeline must provide at least three fields:
+         *     <ul>
+         *     <li>The parent ID, that matches the ID of the data row in the main pipeline.
+         *     <li>The field ID, that matches one of the rows returned from the definition pipeline.
+         *     <li>The value field, whose name must match that defined for the selected field.
+         *     </ul>
+         *
+         *     As a streaming processor this processor requires the main pipeline and the values pipeline to be sorted by the same ID (the parent ID from the point of view of this processor).
+         *
+         *     The processor works by:
+         *     <ol>
+         *     <li>If the parent ID is greater than the values ID, skip through values until it isn't.
+         *     <li>If the values ID is greater than the parent ID, skip through parent rows until it isn't.
+         *     <li>While the two IDs match:
+         *     <ol>
+         *     <li>Find the definition for the current value.
+         *     <li>Get the name of the value field from the field definition.
+         *     <li>Add a new field to the parent data row with the name from the field definition and the value from the value field of the value row.
+         *     </ol>
+         *     </ol>
+         *      */
+        ProcessorDynamicField: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description The inner join flag.
              *     <P>
-             *     Invalid if the URL template field is provided.
+             *     If set to true the parent row will only be output if the child feed has at least one matching row.
+             *      */
+            innerJoin?: boolean;
+            /**
+             * @description The inner join flag.
+             *     <P>
+             *     If set to true the parent row will only be output if the child feed has at least one matching row.
+             *     <P>
+             *     For the sake of clarity this should usually be left as false.
+             *
+             * @default false
+             */
+            useCaseInsensitiveFieldNames: boolean;
+            /** @description The name of the column in the field defns feed that is used to identify the extra column.
+             *      */
+            fieldIdColumn?: string;
+            /** @description The name of the column in the field defns feed that is used to name the extra column.
+             *      */
+            fieldNameColumn?: string;
+            /** @description The name of the column in the field defns feed that is used to determine the type of the extra column.
+             *      */
+            fieldTypeColumn?: string;
+            /** @description The name of the column in the field defns feed that is used to find the name of the field in the values feed that contains the actual value.
+             *      */
+            fieldColumnColumn?: string;
+            /** @description The parent ID column.
+             *     <P>
+             *     This is the name of the field in the main stream that is to be used to match against child rows.
+             *     The main stream must be sorted by this field.
+             *      */
+            parentIdColumns?: string[];
+            /** @description The name of the column in the values feed that contains the ID to match to the parent feed.
+             *     <P>
+             *     The values feed must be sorted by this column.
+             *      */
+            valuesParentIdColumns?: string[];
+            /** @description The name of the column in the values feed that contains the ID of the field represented by that row.
+             *      */
+            valuesFieldIdColumn?: string;
+            /** @description The list of fields to look in for the field value.
+             *     <P>
+             *     This should not be used, the correct approach is to identify the field value column in the field definition query - this approach only exists for backwards compatibility.
+             *     <P>
+             *     When set, this should be a comma separate list of field names from the values stream.
+             *     Even if this value is set, it will only be used if the field value column in the field definition query is not set.
+             *     At runtime the named columns in the values stream will be checked in order and the first one that is not null be be taken.
+             *      */
+            fieldValueColumnName?: string;
+            /** @description Get the feed for the field definitions.
+             *
+             *     This data feed should result in four columns:
+             *     <ul>
+             *     <li>fieldIdColumn - The ID value that will be used to refer to the field from the values feed.
+             *     <li>fieldNameColumn - The name that the resultant field will be given.
+             *     <li>fieldTypeColumn - The type of the resultant field (will be processed using {@link uk.co.spudsoft.query.defn.DataType#valueOf(java.lang.String)}/
+             *     <li>fieldColumnColumn - The column in the field values feed that contains the actual value for this field.
+             *     </ul>
+             *     The fields will be added to the parent feed in the order of the rows returned by this query (regardless of the ordering in the fieldValues feed).
+             *      */
+            fieldDefns?: components["schemas"]["SourcePipeline"];
+            /** @description The feed for the field values.
+             *     <P>
+             *     This data feed should result in at least three columns:
+             *     <ul>
+             *     <li>valuesParentIdColumn - ID of the parent row that is gaining a field value.
+             *     <li>valuesFieldIdColumn - ID of the field that this row relates to (used to define the type and name of the resulting field).
+             *     <li>Values - One or more fields that contain values, identified from the Column value in the FieldDefns feed.
+             *     </ul>
+             *      */
+            fieldValues?: components["schemas"]["SourcePipeline"];
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "DYNAMIC_FIELD";
+        };
+        /** @description Run an JEXL expression each row of the output.
+         *      */
+        ProcessorExpression: {
+            type: "ProcessorExpression";
+        } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description A JEXL expression that is used to determine whether or not the row should be discarded.
+             *     <P>
+             *     The script should return a value that is either true or false, if the value is false the row will be discarded.
+             *     <p>
+             *     The context of the evaluation includes a variable of type {@link uk.co.spudsoft.query.exec.conditions.RequestContext} called &quot;req&quot; that includes:
+             *     <UL>
+             *     <LI>requestId
+             *     A unique ID for the request.  If Distributed Tracing is enabled this will be the Span ID, otherwise it will be a random UUID.
+             *     <LI>String url
+             *     The full URL of the request.
+             *     <LI>host
+             *     The host extracted from the URL.
+             *     <LI>arguments
+             *     <p>
+             *     An {@link com.google.common.collect.ImmutableMap} of query string arguments.
+             *     <p>
+             *     The arguments will be typed according to their specified {@link uk.co.spudsoft.query.defn.DataType} and will either be a single value or, if the argument is multi-valued, an {@link com.google.common.collect.ImmutableList} or typed values.
+             *     <p>
+             *     Note that the arguments are only typed when a pipeline instance is created, if the arguments field is access before (i.e. in a folder permissions.jexl file) all values will be strings.
+             *     <LI>params
+             *     <p>
+             *     A {@link io.vertx.core.MultiMap} of un-processed query string argumets.
+             *     <LI>headers
+             *     <p>
+             *     A {@link io.vertx.core.MultiMap} of request headers.
+             *     <LI>cookies
+             *     <p>
+             *     A {@link java.util.Map} map of request cookies.
+             *     <LI>clientIp
+             *     <p>
+             *     The IP address of client making the request, taken from the first of:
+             *     <UL>
+             *     <LI>The X-Cluster-Client-IP header.
+             *     <LI>The X-Forwarded-For header.
+             *     <LI>The actual IP address making the TCP connection.
+             *     </UL>
+             *     <LI>jwt
+             *     The <A href="https://jwt.io/" target="_blank">Json Web Token</A> associated with the request, if any.
+             *     <LI>clientIpIsIn
+             *     A function that receives an array of IP addresses or subnets (in slash notation) and returns true if the clientIp matches any of them.
+             *     </UL>
+             *      */
+            predicate?: string;
+            /** @description The field that is to be created/updated by the {@link Processor}.
+             *     <P>
+             *     If this value is set the fieldType and fieldValue must both also be set.
+             *      */
+            field?: string;
+            /**
+             * @description The type of the field that is to be created/updated.
+             *     <p>
+             *     It can be awkward to ensure the correct return type from a JEXL expression, so the result of the expression will be cast/parsed to this data type as appropriate.
+             *     If the field being set is an existing field then the type specified must be the same as the existing type of that field (or must be null).
+             *     <p>
+             *     If this value is set, but "field" is not set then it will be ignored.
+             *
+             * @enum {string}
+             */
+            fieldType?: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
+            /** @description A JEXL expression that is evaluated, then parsed/cast to the fieldType and then assigned to the field.
+             *     <P>
+             *     The context of the evaluation includes a variable of type {@link uk.co.spudsoft.query.exec.conditions.RequestContext} called &quot;req&quot; that includes:
+             *     <UL>
+             *     <LI>requestId
+             *     A unique ID for the request.  If Distributed Tracing is enabled this will be the Span ID, otherwise it will be a random UUID.
+             *     <LI>String url
+             *     The full URL of the request.
+             *     <LI>host
+             *     The host extracted from the URL.
+             *     <LI>arguments
+             *     <p>
+             *     An {@link com.google.common.collect.ImmutableMap} of query string arguments.
+             *     <p>
+             *     The arguments will be typed according to their specified {@link uk.co.spudsoft.query.defn.DataType} and will either be a single value or, if the argument is multi-valued, an {@link com.google.common.collect.ImmutableList} or typed values.
+             *     <p>
+             *     Note that the arguments are only typed when a pipeline instance is created, if the arguments field is access before (i.e. in a folder permissions.jexl file) all values will be strings.
+             *     <LI>params
+             *     <p>
+             *     A {@link io.vertx.core.MultiMap} of un-processed query string argumets.
+             *     <LI>headers
+             *     <p>
+             *     A {@link io.vertx.core.MultiMap} of request headers.
+             *     <LI>cookies
+             *     <p>
+             *     A {@link java.util.Map} map of request cookies.
+             *     <LI>clientIp
+             *     <p>
+             *     The IP address of client making the request, taken from the first of:
+             *     <UL>
+             *     <LI>The X-Cluster-Client-IP header.
+             *     <LI>The X-Forwarded-For header.
+             *     <LI>The actual IP address making the TCP connection.
+             *     </UL>
+             *     <LI>jwt
+             *     The <A href="https://jwt.io/" target="_blank">Json Web Token</A> associated with the request, if any.
+             *     <LI>clientIpIsIn
+             *     A function that receives an array of IP addresses or subnets (in slash notation) and returns true if the clientIp matches any of them.
+             *     </UL>
+             *      */
+            fieldValue?: string;
+        });
+        /** @description Processor that combines multiple values from a child query into a single concatenated string value.
+         *     <P>
+         *     There are three ways that the group concat can be performed:
+         *     <OL>
+         *     <LI>Specify the childValueColumn and the parentValueColumn.
+         *     A single field will be added to the parent stream, the value will be taken from the childValueColumns and the new field will be named parentValueColumn.
+         *     <LI>Specify only childValueColumn, do not specify parentValueColumn.
+         *     A single field will be added to the parent stream, the value will be taken from the childValueColumns and the new field will be named childValueColumn.
+         *     <LI>Do not specify childValueColumn.
+         *     All fields from the child stream will be (indepdently) concatenated and added to the parent stream (with the same names).
+         *     </OL>
+         *      */
+        ProcessorGroupConcat: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description The data feed.
+             *     <P>
+             *     The data must be sorted by the childIdColumns (and the parent feed should be sorted by the parentIdColumns).
+             *      */
+            input?: components["schemas"]["SourcePipeline"];
+            /** @description The inner join flag.
+             *     <P>
+             *     If set to true the parent row will only be output if the child feed has at least one matching row.
+             *      */
+            innerJoin?: boolean;
+            /** @description The parent ID columns.
+             *     <P>
+             *     These are the names of the fields in the main stream that is to be used to match against child rows.
+             *     The main stream must be sorted by these fields.
+             *      */
+            parentIdColumns?: string[];
+            /** @description The child ID columns.
+             *     <P>
+             *     These are the names of the fields in the child stream that are to be used to match against parent rows.
+             *     The child stream must be sorted by these fields.
+             *      */
+            childIdColumns?: string[];
+            /** @description The child value column.
+             *     <P>
+             *     This is the name of the field in the child stream that contains the data to be extracted.
+             *     <P>
+             *     If this is not provided all fields in the child stream that are not in the childIdColumns will be individually concatenated and brought over.
+             *      */
+            childValueColumn?: string;
+            /** @description The parent value column.
+             *     <P>
+             *     This is the name of the field that will be created in the parent stream to contain the data from the child stream.
+             *     <P>
+             *     If this is not provided the parent stream fields will have the same name(s) as the child stream fields.
+             *     It is an error to provide this and not to provide childValueColumn.
+             *      */
+            parentValueColumn?: string;
+            /** @description The delimiter to place between each value returned.
+             *      */
+            delimiter?: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "GROUP_CONCAT";
+        };
+        /** @description Processor that curtails the output after the configured number of rows.
+         *      */
+        ProcessorLimit: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * Format: int32
+             * @description The limit on the number of rows that will be output by this processor.
+             *
+             */
+            limit?: number;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "LIMIT";
+        };
+        /** @description <p>
+         *     Processor that runs an initial query to generate a map of key/value pairs, and then updates fields based on that map.
+         *     </p><p>
+         *     In most cases this processor is a bad idea, but in a few specific situations it can be a lot quicker to
+         *     find lookup values in memory rather than in SQL.
+         *     Consider using this processor with large datasets that access the same lookup data in multiple fields.
+         *     </p><p>
+         *     A child pipeline must be defined to generate the map.
+         *     This pipeline must result in two fields (additional fields will be ignored).
+         *     </p><p>
+         *     As there can only be a single value field in the initial query, all the field generated by this processor will be of the same type.
+         *     </p><p>
+         *     It is possible to specify an existing field to be the destination for the looked up value, but this cannot result in a change of the
+         *     field's type.
+         *     It is thus not usually possible to replace the key with the value and it us usually necessary to add an additional field.
+         *     If this is undesireable use the Map processor to remove the key field.
+         *     </p>
+         *      */
+        ProcessorLookup: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description The name of the field in the lookupSource that provides the keys for the map.
+             *      */
+            lookupKeyField: string;
+            /** @description The name of the field in the lookupSource that provides the values for the map.
+             *      */
+            lookupValueField: string;
+            /** @description The fields in the main stream that are to be looked up and the fields that are to be created in the main stream for the values found.
+             *      */
+            lookupFields?: components["schemas"]["ProcessorLookupField"][];
+            /** @description Get the feed for the lookup key/value pairs.
+             *
+             *     This data feed should result in two columns:
+             *     <ul>
+             *     <li>lookupKeyField - The key that will be used to find values in the map.
+             *     <li>lookupValueField - The value that will be take from the map and put into the main feed.
+             *     </ul>
+             *      */
+            map?: components["schemas"]["SourcePipeline"];
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "LOOKUP";
+        };
+        /** @description Argument to the LookupProcessor that specifies the field containing the key to be looked up and the field that the value will be written to.
+         *      */
+        ProcessorLookupField: {
+            /** @description The name of the field in the primary stream that is to be looked up in the map.
+             *      */
+            keyField: string;
+            /** @description The name of the field to be created in the stream that is to be set by the value from the map.
+             *      */
+            valueField: string;
+            /** @description Any condition that applies to this field.
+             *     <P>
+             *     This can be used to exclude fields based upon input conditions.
+             *     The condition will be evaluated once at the beginning of the process and will not have access to each output row.
+             *      */
+            condition?: components["schemas"]["Condition"];
+        };
+        /** @description Processor that renames or removes fields in the output.
+         *      */
+        ProcessorMap: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description The fields that will be renamed by this processor.
+             *      */
+            relabels: components["schemas"]["ProcessorMapLabel"][];
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "MAP";
+        };
+        /** @description Argument to the MapProcessor that renames or removes fields in the output.
+         *      */
+        ProcessorMapLabel: {
+            /** @description The name of the field to be renamed.
+             *      */
+            sourceLabel: string;
+            /** @description The new name of the field, may be null or blank, both of which will remove the field from the stream.
+             *      */
+            newLabel: string;
+        };
+        /** @description Processor that adds all fields from a child query into the primary stream.
+         *     <P>
+         *     If there are multiple rows in the child stream that match the parent row all except the first will be ignored.
+         *      */
+        ProcessorMerge: {
+            type: "ProcessorMerge";
+        } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description The data feed.
+             *     <P>
+             *     This data feed should result in two columns childIdColumn and childValueColumn (any other columns will be ignored).
+             *     The data should be sorted by childIdColumn (and the parent feed should be sorted by parentIdColumn).
+             *     <P>
+             *     The values in childValueColumn for each value of childIdColumn will be concatenated together using delimiter as a delimiter and the result will be set as parentValueColumn in the parent feed.
+             *      */
+            input?: components["schemas"]["SourcePipeline"];
+            /** @description The inner join flag.
+             *     <P>
+             *     If set to true the parent row will only be output if the child feed has at least one matching row.
+             *      */
+            innerJoin?: boolean;
+            /** @description The parent ID columns.
+             *     <P>
+             *     These are the names of the fields in the main stream that is to be used to match against child rows.
+             *     The main stream must be sorted by these fields.
+             *      */
+            parentIdColumns?: string[];
+            /** @description The child ID columns.
+             *     <P>
+             *     These are the names of the fields in the child stream that are to be used to match against parent rows.
+             *     The child stream must be sorted by these fields.
+             *      */
+            childIdColumns?: string[];
+            /** @description The delimiter to place between each value returned.
+             *      */
+            delimiter?: string;
+        });
+        /** @description Processor that curtails the output after the configured number of rows.
+         *      */
+        ProcessorOffset: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * Format: int32
+             * @description The number of rows that will be skipped by this processor.
+             *
+             */
+            offset?: number;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "OFFSET";
+        };
+        /** @description Processor that filters output rows.
+         *      */
+        ProcessorQuery: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description A valid FIQL expression that will be evaluated on each row.
+             *      */
+            expression: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "QUERY";
+        };
+        /** @description Run a custom script on each row of the output.
+         *      */
+        ProcessorScript: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description The language to use, as understood by GraalVM.
+             *     <P>
+             *     By default the only acceptable value is "js", but custom builds can use other lanaguages.
+             *      */
+            language?: string;
+            /** @description A predicate script is used to determine whether or not the row should be discarded.
+             *     <P>
+             *     The script should return a value that is either true or false, if the value is false the row will be discarded.
+             *      */
+            predicate?: string;
+            /** @description A process script can manipulate the row in any way it wants.
+             *     <P>
+             *      */
+            process?: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "SCRIPT";
+        };
+        /** @description Processor that sorts the data stream.
+         *     <P>
+         *     Note that this pipeline, unlike most others, has to buffer the entire stream before it can sort it.
+         *     Additionally, if the data consists of too many rows it will be sorted on disc.
+         *     </P>
+         *     <P>
+         *     This processor is inherently slow, if you need to use it please discuss options with the pipeline designer.
+         *     </P>
+         *      */
+        ProcessorSort: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /** @description The fields by which this processor will sort the data.
+             *      */
+            fields?: string[];
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "SORT";
+        };
+        /** @description A Source is the source of data for a pipeline.
+         *      */
+        Source: {
+            /** @description <P>Get the name of the Source, that will be used in logging.</P>
+             *     <P>
+             *     This is optional, if it is not set a numeric (or delimited numeric) name will be allocated.
+             *     </P>
+             *      */
+            name?: string;
+            /**
+             * @description <P>The type of Source being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "TEST" | "SQL" | "HTTP";
+        };
+        /** @description <P>A SourcePipeline is the core part of a Pipeline, without the globally defined elements.</P>
+         *     <P>
+         *     A SourcePipeline cannot be directly referenced externally, but is used within a Pipeline to declare the source and processing of the data.
+         *     </P>
+         *     <P>
+         *     Every Pipeline is also a SourcePipeline.
+         *     </P>
+         *      */
+        SourcePipeline: {
+            /** @description <P>
+             *     The query for the pipeline.
+             *     </P>
+             *      */
+            source: components["schemas"]["Source"];
+            /** @description <P>Processors to run on the data as it flows from the Source.</P>
+             *      */
+            processors?: components["schemas"]["Processor"][];
+        };
+        /** @description Pipeline data source that gets data from a SQL database.
+         *     <P>
+         *     This is the standard source of data for pipelines.
+         *      */
+        SourceSql: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
+            /** @description <P>The name of the endpoint that provides the data for the Source.</P>
+             *     <P>
+             *     The endpoint represents the SQL database that contains the actual data.
              *     </P>
              *     <P>
-             *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
-             *     fields of the Endpoint will not be.
+             *     The endpoint must be specified as either a straight name (this field) or as a template value (endpointEmplate).
+             *     If both fields are provided it is an error.
+             *     </P>
+             *      */
+            endpoint?: string;
+            /** @description <P>A <a target="_blank" href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
+             *     <P>
+             *     The endpoint represents the SQL database that contains the actual data.
+             *     </P>
+             *     <P>
+             *     The endpoint must be specified as either a template value (this field) or as a straight name (endpoint).
+             *     If both fields are provided it is an error.
+             *     </P>
+             *      */
+            endpointTemplate?: string;
+            /** @description <P>The query to run against the Endpoint.</P>
+             *     <P>
+             *     A SQL statement.
+             *     </P>
+             *     <P>
+             *     The query must be specified as either a plain SQL statement (this field) or as a template value (queryTemplate).
+             *     If both fields are provided it is an error.
+             *     </P>
+             *      */
+            query?: string;
+            /** @description <P>The query to run against the Endpoint, as a <a target="_blank" href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
+             *     <P>
+             *     A StringTemplate that results in a SQL statement.
+             *     </P>
+             *     <p>
+             *     The query must be specified as either a templated value (this field) or as a plain SQL statement (query).
+             *     If both fields are provided it is an error.
+             *     </P>
+             *      */
+            queryTemplate?: string;
+            /**
+             * Format: int32
+             * @description <P>The number of rows to get from the Source at a time.</P>
+             *     <P>
+             *     A larger streaming fetch size will slow the initial data, but may be quicker overall (at the cost of more memory).
+             *     Experiment with values in the range 10-1000.
              *     </P>
              *
              */
-            url?: string;
-            /** @description <P>A StringTemplate that will be rendered as the URL that defines the Endpoint.</P>
+            streamingFetchSize?: number;
+            /**
+             * Format: int32
+             * @description <P>The maximum number of connections to open to the Endpoint.</P>
              *     <P>
-             *     Invalid if the URL field is provided.
+             *     If there are likely to be multiple concurrent pipelines running to the same Endpoint it can be beneficial to set this to a small number, otherwise leave it at the default.
+             *     </P>
+             *
+             */
+            maxPoolSize?: number;
+            /**
+             * Format: int32
+             * @description <P>The maximum number of connections have queued up for the Endpoint.</P>
+             *     <P>
+             *     This is unlikely to be useful.
+             *     </P>
+             *
+             */
+            maxPoolWaitQueueSize?: number;
+            /** @description <P>The idle timeout for the connection pool that will be created.</P>
+             *     <P>
+             *     After this time has passed the connection will be closed and a new one will be opened by subequent pipelines.
              *     </P>
              *     <P>
-             *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
-             *     fields of the Endpoint will not be.
-             *     </P>
-             *      */
-            urlTemplate?: string;
-            /** @description <P>The name of the secret that contains the credentials to be used for the connection.</P>
-             *     <P>
-             *     Invalid if the username or password fields are provided.
-             *     </P>
-             *     <P>
-             *     The named secret must be configured in the instance of the query engine.
-             *     The currently running instance is in design mode and thus should not be your live instance,
-             *     which unfortuantely means it is not possible to list the known secrets of your live instance here.
-             *     Please ask your systems administrator for this information.
-             *     </P>
-             *      */
-            secret?: string;
-            /** @description <P>The username that should be used when communicating with the endpoint.</P>
-             *     <P>
-             *     Invalid if the secret field  provided.
+             *     The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
+             *     The sections have suffixes in ASCII of "D", "H", "M" and "S" for days, hours, minutes and seconds, accepted in upper or lower case.
+             *     The suffixes must occur in order.
+             *     The ASCII letter "T" must occur before the first occurrence, if any, of an hour, minute or second section.
+             *     At least one of the four sections must be present, and if "T" is present there must be at least one section after the "T".
+             *     The number part of each section must consist of one or more ASCII digits.
+             *     The number of days, hours and minutes must parse to an long.
+             *     The number of seconds must parse to an long with optional fraction.
+             *     The decimal point may be either a dot or a comma.
+             *     The fractional part may have from zero to 9 digits.
              *     </P>
              *     <P>
-             *     The username will be logged.
-             *     </P>
-             *      */
-            username?: string;
-            /** @description <P>The password that should be used when communicating with the endpoint.</P>
-             *     <P>
-             *     Invalid if the secret field  provided.
-             *     </P>
-             *     <P>
-             *     The password will not be logged.
-             *     </P>
-             *     <P>
-             *     Any password entered here will inevitably end up in your pipeline repo.
-             *     This is not a security best practice.
-             *     Please use secrets instead of username/password for live deployments.
+             *     The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
              *     </P>
              *      */
-            password?: string;
-            /** @description <P>A condition that must be passed for the endpoint to be used.</P>
+            idleTimeout?: string;
+            /** @description <P>The connection timeout for the connections that will be created.</P>
+             *     </P>
+             *     <P>
+             *     The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
+             *     The sections have suffixes in ASCII of "D", "H", "M" and "S" for days, hours, minutes and seconds, accepted in upper or lower case.
+             *     The suffixes must occur in order.
+             *     The ASCII letter "T" must occur before the first occurrence, if any, of an hour, minute or second section.
+             *     At least one of the four sections must be present, and if "T" is present there must be at least one section after the "T".
+             *     The number part of each section must consist of one or more ASCII digits.
+             *     The number of days, hours and minutes must parse to an long.
+             *     The number of seconds must parse to an long with optional fraction.
+             *     The decimal point may be either a dot or a comma.
+             *     The fractional part may have from zero to 9 digits.
+             *     </P>
+             *     <P>
+             *     The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
+             *     </P>
              *      */
-            condition?: components["schemas"]["Condition"];
+            connectionTimeout?: string;
+            /** @description <P>If set to true all double quotes in the query will be replaced with the identifier quoting character for the target.</P>
+             *     <P>
+             *     If the native quoting character is already a double quote no replacement will take place.
+             *     </P>
+             *     <P>
+             *     This enables queries for all database platforms to be defined using double quotes for identifiers, but it is a straight replacement
+             *     so if the query needs to contain a double quote that is not quoting an identifier then this must be set to false.
+             *     </P>
+             *     <P>
+             *     This is only useful when it is not known what flavour of database is being queried, which should be rare.
+             *     </P>
+             *      */
+            replaceDoubleQuotes?: boolean;
+            /** @description Get the overrides for column types.
+             *     <P>
+             *     This is a map of column names (from the results for this query) to the Query Engine {@link DataType} that should be used in the
+             *     result stream.
+             *     <P>
+             *     This facility is rarely required, but can be useful when a data base does not provide adequate information for Query Engine to correctly identify the type of a field.
+             *     <P>
+             *     This is known to be useful for boolean fields with MySQL.
+             *     <P>
+             *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
+             *      */
+            columnTypeOverrides?: components["schemas"]["ColumnTypeOverride"][];
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "SQL";
+        };
+        /** @description Source producing a fixed set of data without any need to communicate with a database.
+         *     <P>
+         *     The data stream will have two fields:
+         *     <UL>
+         *     <LI>value
+         *     A monotonically increasing integer.
+         *     <LI>name
+         *     The name of the source.
+         *     </UL>
+         *     The number of rows to be returned can be configured, as can a delay between each row returned.
+         *      */
+        SourceTest: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
+            /**
+             * Format: int32
+             * @description The number of rows that the source will return.
+             *
+             */
+            rowCount?: number;
+            /**
+             * Format: int32
+             * @description Get the number of milliseconds to delay between production of each data row.
+             *     <P>
+             *     Note that 0 explicitly outputs all rows in a single thread and any non-zero value will use a periodic timer to output rows.
+             *
+             */
+            delayMs?: number;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "TEST";
         };
         /** @description <P>The configuration for the final WriteStream of a pipeline.</P>
          *     <P>
@@ -1135,44 +1805,6 @@ export interface components {
         /** @description Configuration for an output format of delimited text.
          *      */
         FormatDelimited: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
-            /**
-             * @description <P>The name of the format.</P>
-             *     <P>
-             *     The name is used to determine the format based upon the '_fmt' query string argument.
-             *     </P>
-             *     <P>
-             *     It is an error for two Formats to have the same name.
-             *     This is different from the other Format determinators which can be repeated, the name is the
-             *     ultimate arbiter and must be unique.
-             *     This ensures that all configured Formats can be used.
-             *     </P>
-             *
-             * @default csv
-             */
-            name: string;
-            /**
-             * @description <P>The extension of the format.</P>
-             *     <P>
-             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-             *     If multiple formats have the same extension the first in the list will be used.
-             *     </P>
-             *
-             * @default csv
-             */
-            extension: string;
-            /**
-             * @description <P>The media type of the format.</P>
-             *     <P>
-             *     The media type is used to determine the format based upon the Accept header in the request.
-             *     If multiple formats have the same media type the first in the list will be used.
-             *     </P>
-             *     <P>
-             *     The media type will also be set as the Content-Type header in the response.
-             *     </P>
-             *
-             * @default text/csv
-             */
-            mediaType: string;
             /**
              * @description If true date/time values will be surrounded by quotes, otherwise they will not.
              *
@@ -2307,6 +2939,102 @@ export interface components {
              */
             type: "XML";
         };
+        /** @description <P>Definition of an endpoint that can be used for querying data.</P>
+         *     <P>
+         *     An Endpoint represents a connection to a data source, where a Source represents an actual data query.
+         *     For EndpointType.HTTP Sources there is often a one-to-one relationship between Source and Endpoint, but for EndpointType.SQL Sources there
+         *     are often multiple Sources for a single Endpoint (for SQL a Source is a query and an Endpoint is a database).
+         *     </P>
+         *     <P>
+         *     The credentials for an Endpoint can be specified in three ways:
+         *     <ul>
+         *     <li>By including them in the URL specified in the Endpoint definition.
+         *     This is the least secure option as the URL value will be written to log entries.
+         *     <li>By explicitly setting username/password on the Endpoint.
+         *     The password will not be logged, but will be in your configuration files and thus in your source repo.
+         *     <li>By using secrets set in the configuration of the query engine.
+         *     This is the most secure option as it puts the responsibility on the deployment to protect the credentials.
+         *     </ul>
+         *     </P>
+         *     <P>
+         *     If the secret field is set it will take precedence over both the username and the password set in the Endpoint
+         *     , as a result it is not valid to set either username or password at the same time as secret.
+         *     The same does not apply to the condition field, that can be set on both the Endpoint and the Secret (and both conditions
+         *     must be met for the Endpoint to work).
+         *     </P>
+         *      */
+        Endpoint: {
+            /** @description <P>The name of the Endpoint, that will be used to refer to it in Sources.
+             *      */
+            name: string;
+            /**
+             * @description <P>The type of Endpoint being configured</P>
+             *
+             * @enum {string}
+             */
+            type: "SQL" | "HTTP";
+            /**
+             * Format: uri
+             * @description <P>A URL that defines the Endpoint.</P>
+             *     <P>
+             *     Invalid if the URL template field is provided.
+             *     </P>
+             *     <P>
+             *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
+             *     fields of the Endpoint will not be.
+             *     </P>
+             *
+             */
+            url?: string;
+            /** @description <P>A StringTemplate that will be rendered as the URL that defines the Endpoint.</P>
+             *     <P>
+             *     Invalid if the URL field is provided.
+             *     </P>
+             *     <P>
+             *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
+             *     fields of the Endpoint will not be.
+             *     </P>
+             *      */
+            urlTemplate?: string;
+            /** @description <P>The name of the secret that contains the credentials to be used for the connection.</P>
+             *     <P>
+             *     Invalid if the username or password fields are provided.
+             *     </P>
+             *     <P>
+             *     The named secret must be configured in the instance of the query engine.
+             *     The currently running instance is in design mode and thus should not be your live instance,
+             *     which unfortuantely means it is not possible to list the known secrets of your live instance here.
+             *     Please ask your systems administrator for this information.
+             *     </P>
+             *      */
+            secret?: string;
+            /** @description <P>The username that should be used when communicating with the endpoint.</P>
+             *     <P>
+             *     Invalid if the secret field  provided.
+             *     </P>
+             *     <P>
+             *     The username will be logged.
+             *     </P>
+             *      */
+            username?: string;
+            /** @description <P>The password that should be used when communicating with the endpoint.</P>
+             *     <P>
+             *     Invalid if the secret field  provided.
+             *     </P>
+             *     <P>
+             *     The password will not be logged.
+             *     </P>
+             *     <P>
+             *     Any password entered here will inevitably end up in your pipeline repo.
+             *     This is not a security best practice.
+             *     Please use secrets instead of username/password for live deployments.
+             *     </P>
+             *      */
+            password?: string;
+            /** @description <P>A condition that must be passed for the endpoint to be used.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
+        };
         /** @description <P>The Pipeline is the fundamental unit of processing in QueryEngine.</P>
          *     <P>
          *      A single Pipeline takes data from a single Source, passes it through any number of Processors and finally delivers it to a Format.
@@ -2479,777 +3207,14 @@ export interface components {
              *      */
             formats?: components["schemas"]["Format"][];
         };
-        /** @description Processors modify the data stream in flight.
-         *      */
-        Processor: {
-            /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
-             *      */
-            name: string;
-            /**
-             * @description <P>The type of Processor being configured.</P>
-             *
-             * @enum {string}
-             */
-            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
-            condition?: components["schemas"]["Condition"];
-        };
-        /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
-         *
-         *     Two child pipelines must be defined:
-         *     <ul>
-         *     <li>The definition  pipeline, that is queried in its entirety at the beginning and that defines the columns that will be found.
-         *     <li>The values pipeline, that is queried in parallel with the main stream and the supplies the data for the dynamic columns.
-         *     </il>
-         *     The definition pipeline must provide four fields:
-         *     <ul>
-         *     <li>The ID for the dynamic column to be added - this value must correspond to the ID from the values pipeline.
-         *     <li>The name for the dynamic column - this will be the name of the newly created field.
-         *     <li>The type for the dynamic column - one of the{@link uk.co.spudsoft.query.defn.DataType} values.
-         *     <li>The name of the column in the values stream that will contain the actual value.
-         *     </ul>
-         *     The names of these four fields can be controlled using the field*Column properties on this processor (though they have sensible defaults).
-         *
-         *     The values pipeline must provide at least three fields:
-         *     <ul>
-         *     <li>The parent ID, that matches the ID of the data row in the main pipeline.
-         *     <li>The field ID, that matches one of the rows returned from the definition pipeline.
-         *     <li>The value field, whose name must match that defined for the selected field.
-         *     </ul>
-         *
-         *     As a streaming processor this processor requires the main pipeline and the values pipeline to be sorted by the same ID (the parent ID from the point of view of this processor).
-         *
-         *     The processor works by:
-         *     <ol>
-         *     <li>If the parent ID is greater than the values ID, skip through values until it isn't.
-         *     <li>If the values ID is greater than the parent ID, skip through parent rows until it isn't.
-         *     <li>While the two IDs match:
-         *     <ol>
-         *     <li>Find the definition for the current value.
-         *     <li>Get the name of the value field from the field definition.
-         *     <li>Add a new field to the parent data row with the name from the field definition and the value from the value field of the value row.
-         *     </ol>
-         *     </ol>
-         *      */
-        ProcessorDynamicField: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /** @description The inner join flag.
-             *     <P>
-             *     If set to true the parent row will only be output if the child feed has at least one matching row.
-             *      */
-            innerJoin?: boolean;
-            /**
-             * @description The inner join flag.
-             *     <P>
-             *     If set to true the parent row will only be output if the child feed has at least one matching row.
-             *     <P>
-             *     For the sake of clarity this should usually be left as false.
-             *
-             * @default false
-             */
-            useCaseInsensitiveFieldNames: boolean;
-            /** @description The name of the column in the field defns feed that is used to identify the extra column.
-             *      */
-            fieldIdColumn?: string;
-            /** @description The name of the column in the field defns feed that is used to name the extra column.
-             *      */
-            fieldNameColumn?: string;
-            /** @description The name of the column in the field defns feed that is used to determine the type of the extra column.
-             *      */
-            fieldTypeColumn?: string;
-            /** @description The name of the column in the field defns feed that is used to find the name of the field in the values feed that contains the actual value.
-             *      */
-            fieldColumnColumn?: string;
-            /** @description The parent ID column.
-             *     <P>
-             *     This is the name of the field in the main stream that is to be used to match against child rows.
-             *     The main stream must be sorted by this field.
-             *      */
-            parentIdColumns?: string[];
-            /** @description The name of the column in the values feed that contains the ID to match to the parent feed.
-             *     <P>
-             *     The values feed must be sorted by this column.
-             *      */
-            valuesParentIdColumns?: string[];
-            /** @description The name of the column in the values feed that contains the ID of the field represented by that row.
-             *      */
-            valuesFieldIdColumn?: string;
-            /** @description The list of fields to look in for the field value.
-             *     <P>
-             *     This should not be used, the correct approach is to identify the field value column in the field definition query - this approach only exists for backwards compatibility.
-             *     <P>
-             *     When set, this should be a comma separate list of field names from the values stream.
-             *     Even if this value is set, it will only be used if the field value column in the field definition query is not set.
-             *     At runtime the named columns in the values stream will be checked in order and the first one that is not null be be taken.
-             *      */
-            fieldValueColumnName?: string;
-            /** @description Get the feed for the field definitions.
-             *
-             *     This data feed should result in four columns:
-             *     <ul>
-             *     <li>fieldIdColumn - The ID value that will be used to refer to the field from the values feed.
-             *     <li>fieldNameColumn - The name that the resultant field will be given.
-             *     <li>fieldTypeColumn - The type of the resultant field (will be processed using {@link uk.co.spudsoft.query.defn.DataType#valueOf(java.lang.String)}/
-             *     <li>fieldColumnColumn - The column in the field values feed that contains the actual value for this field.
-             *     </ul>
-             *     The fields will be added to the parent feed in the order of the rows returned by this query (regardless of the ordering in the fieldValues feed).
-             *      */
-            fieldDefns?: components["schemas"]["SourcePipeline"];
-            /** @description The feed for the field values.
-             *     <P>
-             *     This data feed should result in at least three columns:
-             *     <ul>
-             *     <li>valuesParentIdColumn - ID of the parent row that is gaining a field value.
-             *     <li>valuesFieldIdColumn - ID of the field that this row relates to (used to define the type and name of the resulting field).
-             *     <li>Values - One or more fields that contain values, identified from the Column value in the FieldDefns feed.
-             *     </ul>
-             *      */
-            fieldValues?: components["schemas"]["SourcePipeline"];
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "DYNAMIC_FIELD";
-        };
-        /** @description Run an JEXL expression each row of the output.
-         *      */
-        ProcessorExpression: {
-            type: "ProcessorExpression";
-        } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /** @description A JEXL expression that is used to determine whether or not the row should be discarded.
-             *     <P>
-             *     The script should return a value that is either true or false, if the value is false the row will be discarded.
-             *     <p>
-             *     The context of the evaluation includes a variable of type {@link uk.co.spudsoft.query.exec.conditions.RequestContext} called &quot;req&quot; that includes:
-             *     <UL>
-             *     <LI>requestId
-             *     A unique ID for the request.  If Distributed Tracing is enabled this will be the Span ID, otherwise it will be a random UUID.
-             *     <LI>String url
-             *     The full URL of the request.
-             *     <LI>host
-             *     The host extracted from the URL.
-             *     <LI>arguments
-             *     <p>
-             *     An {@link com.google.common.collect.ImmutableMap} of query string arguments.
-             *     <p>
-             *     The arguments will be typed according to their specified {@link uk.co.spudsoft.query.defn.DataType} and will either be a single value or, if the argument is multi-valued, an {@link com.google.common.collect.ImmutableList} or typed values.
-             *     <p>
-             *     Note that the arguments are only typed when a pipeline instance is created, if the arguments field is access before (i.e. in a folder permissions.jexl file) all values will be strings.
-             *     <LI>params
-             *     <p>
-             *     A {@link io.vertx.core.MultiMap} of un-processed query string argumets.
-             *     <LI>headers
-             *     <p>
-             *     A {@link io.vertx.core.MultiMap} of request headers.
-             *     <LI>cookies
-             *     <p>
-             *     A {@link java.util.Map} map of request cookies.
-             *     <LI>clientIp
-             *     <p>
-             *     The IP address of client making the request, taken from the first of:
-             *     <UL>
-             *     <LI>The X-Cluster-Client-IP header.
-             *     <LI>The X-Forwarded-For header.
-             *     <LI>The actual IP address making the TCP connection.
-             *     </UL>
-             *     <LI>jwt
-             *     The <A href="https://jwt.io/" target="_blank">Json Web Token</A> associated with the request, if any.
-             *     <LI>clientIpIsIn
-             *     A function that receives an array of IP addresses or subnets (in slash notation) and returns true if the clientIp matches any of them.
-             *     </UL>
-             *      */
-            predicate?: string;
-            /** @description The field that is to be created/updated by the {@link Processor}.
-             *     <P>
-             *     If this value is set the fieldType and fieldValue must both also be set.
-             *      */
-            field?: string;
-            /**
-             * @description The type of the field that is to be created/updated.
-             *     <p>
-             *     It can be awkward to ensure the correct return type from a JEXL expression, so the result of the expression will be cast/parsed to this data type as appropriate.
-             *     If the field being set is an existing field then the type specified must be the same as the existing type of that field (or must be null).
-             *     <p>
-             *     If this value is set, but "field" is not set then it will be ignored.
-             *
-             * @enum {string}
-             */
-            fieldType?: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
-            /** @description A JEXL expression that is evaluated, then parsed/cast to the fieldType and then assigned to the field.
-             *     <P>
-             *     The context of the evaluation includes a variable of type {@link uk.co.spudsoft.query.exec.conditions.RequestContext} called &quot;req&quot; that includes:
-             *     <UL>
-             *     <LI>requestId
-             *     A unique ID for the request.  If Distributed Tracing is enabled this will be the Span ID, otherwise it will be a random UUID.
-             *     <LI>String url
-             *     The full URL of the request.
-             *     <LI>host
-             *     The host extracted from the URL.
-             *     <LI>arguments
-             *     <p>
-             *     An {@link com.google.common.collect.ImmutableMap} of query string arguments.
-             *     <p>
-             *     The arguments will be typed according to their specified {@link uk.co.spudsoft.query.defn.DataType} and will either be a single value or, if the argument is multi-valued, an {@link com.google.common.collect.ImmutableList} or typed values.
-             *     <p>
-             *     Note that the arguments are only typed when a pipeline instance is created, if the arguments field is access before (i.e. in a folder permissions.jexl file) all values will be strings.
-             *     <LI>params
-             *     <p>
-             *     A {@link io.vertx.core.MultiMap} of un-processed query string argumets.
-             *     <LI>headers
-             *     <p>
-             *     A {@link io.vertx.core.MultiMap} of request headers.
-             *     <LI>cookies
-             *     <p>
-             *     A {@link java.util.Map} map of request cookies.
-             *     <LI>clientIp
-             *     <p>
-             *     The IP address of client making the request, taken from the first of:
-             *     <UL>
-             *     <LI>The X-Cluster-Client-IP header.
-             *     <LI>The X-Forwarded-For header.
-             *     <LI>The actual IP address making the TCP connection.
-             *     </UL>
-             *     <LI>jwt
-             *     The <A href="https://jwt.io/" target="_blank">Json Web Token</A> associated with the request, if any.
-             *     <LI>clientIpIsIn
-             *     A function that receives an array of IP addresses or subnets (in slash notation) and returns true if the clientIp matches any of them.
-             *     </UL>
-             *      */
-            fieldValue?: string;
-        });
-        /** @description Processor that combines multiple values from a child query into a single concatenated string value.
-         *     <P>
-         *     There are three ways that the group concat can be performed:
-         *     <OL>
-         *     <LI>Specify the childValueColumn and the parentValueColumn.
-         *     A single field will be added to the parent stream, the value will be taken from the childValueColumns and the new field will be named parentValueColumn.
-         *     <LI>Specify only childValueColumn, do not specify parentValueColumn.
-         *     A single field will be added to the parent stream, the value will be taken from the childValueColumns and the new field will be named childValueColumn.
-         *     <LI>Do not specify childValueColumn.
-         *     All fields from the child stream will be (indepdently) concatenated and added to the parent stream (with the same names).
-         *     </OL>
-         *      */
-        ProcessorGroupConcat: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /** @description The data feed.
-             *     <P>
-             *     The data must be sorted by the childIdColumns (and the parent feed should be sorted by the parentIdColumns).
-             *      */
-            input?: components["schemas"]["SourcePipeline"];
-            /** @description The inner join flag.
-             *     <P>
-             *     If set to true the parent row will only be output if the child feed has at least one matching row.
-             *      */
-            innerJoin?: boolean;
-            /** @description The parent ID columns.
-             *     <P>
-             *     These are the names of the fields in the main stream that is to be used to match against child rows.
-             *     The main stream must be sorted by these fields.
-             *      */
-            parentIdColumns?: string[];
-            /** @description The child ID columns.
-             *     <P>
-             *     These are the names of the fields in the child stream that are to be used to match against parent rows.
-             *     The child stream must be sorted by these fields.
-             *      */
-            childIdColumns?: string[];
-            /** @description The child value column.
-             *     <P>
-             *     This is the name of the field in the child stream that contains the data to be extracted.
-             *     <P>
-             *     If this is not provided all fields in the child stream that are not in the childIdColumns will be individually concatenated and brought over.
-             *      */
-            childValueColumn?: string;
-            /** @description The parent value column.
-             *     <P>
-             *     This is the name of the field that will be created in the parent stream to contain the data from the child stream.
-             *     <P>
-             *     If this is not provided the parent stream fields will have the same name(s) as the child stream fields.
-             *     It is an error to provide this and not to provide childValueColumn.
-             *      */
-            parentValueColumn?: string;
-            /** @description The delimiter to place between each value returned.
-             *      */
-            delimiter?: string;
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "GROUP_CONCAT";
-        };
-        /** @description Processor that curtails the output after the configured number of rows.
-         *      */
-        ProcessorLimit: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /**
-             * Format: int32
-             * @description The limit on the number of rows that will be output by this processor.
-             *
-             */
-            limit?: number;
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "LIMIT";
-        };
-        /** @description <p>
-         *     Processor that runs an initial query to generate a map of key/value pairs, and then updates fields based on that map.
-         *     </p><p>
-         *     In most cases this processor is a bad idea, but in a few specific situations it can be a lot quicker to
-         *     find lookup values in memory rather than in SQL.
-         *     Consider using this processor with large datasets that access the same lookup data in multiple fields.
-         *     </p><p>
-         *     A child pipeline must be defined to generate the map.
-         *     This pipeline must result in two fields (additional fields will be ignored).
-         *     </p><p>
-         *     As there can only be a single value field in the initial query, all the field generated by this processor will be of the same type.
-         *     </p><p>
-         *     It is possible to specify an existing field to be the destination for the looked up value, but this cannot result in a change of the
-         *     field's type.
-         *     It is thus not usually possible to replace the key with the value and it us usually necessary to add an additional field.
-         *     If this is undesireable use the Map processor to remove the key field.
-         *     </p>
-         *      */
-        ProcessorLookup: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /** @description The name of the field in the lookupSource that provides the keys for the map.
-             *      */
-            lookupKeyField: string;
-            /** @description The name of the field in the lookupSource that provides the values for the map.
-             *      */
-            lookupValueField: string;
-            /** @description The fields in the main stream that are to be looked up and the fields that are to be created in the main stream for the values found.
-             *      */
-            lookupFields?: components["schemas"]["ProcessorLookupField"][];
-            /** @description Get the feed for the lookup key/value pairs.
-             *
-             *     This data feed should result in two columns:
-             *     <ul>
-             *     <li>lookupKeyField - The key that will be used to find values in the map.
-             *     <li>lookupValueField - The value that will be take from the map and put into the main feed.
-             *     </ul>
-             *      */
-            map?: components["schemas"]["SourcePipeline"];
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "LOOKUP";
-        };
-        /** @description Argument to the LookupProcessor that specifies the field containing the key to be looked up and the field that the value will be written to.
-         *      */
-        ProcessorLookupField: {
-            /** @description The name of the field in the primary stream that is to be looked up in the map.
-             *      */
-            keyField: string;
-            /** @description The name of the field to be created in the stream that is to be set by the value from the map.
-             *      */
-            valueField: string;
-            /** @description Any condition that applies to this field.
-             *     <P>
-             *     This can be used to exclude fields based upon input conditions.
-             *     The condition will be evaluated once at the beginning of the process and will not have access to each output row.
-             *      */
-            condition?: components["schemas"]["Condition"];
-        };
-        /** @description Processor that renames or removes fields in the output.
-         *      */
-        ProcessorMap: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /** @description The fields that will be renamed by this processor.
-             *      */
-            relabels: components["schemas"]["ProcessorMapLabel"][];
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "MAP";
-        };
-        /** @description Argument to the MapProcessor that renames or removes fields in the output.
-         *      */
-        ProcessorMapLabel: {
-            /** @description The name of the field to be renamed.
-             *      */
-            sourceLabel: string;
-            /** @description The new name of the field, may be null or blank, both of which will remove the field from the stream.
-             *      */
-            newLabel: string;
-        };
-        /** @description Processor that adds all fields from a child query into the primary stream.
-         *     <P>
-         *     If there are multiple rows in the child stream that match the parent row all except the first will be ignored.
-         *      */
-        ProcessorMerge: {
-            type: "ProcessorMerge";
-        } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /** @description The data feed.
-             *     <P>
-             *     This data feed should result in two columns childIdColumn and childValueColumn (any other columns will be ignored).
-             *     The data should be sorted by childIdColumn (and the parent feed should be sorted by parentIdColumn).
-             *     <P>
-             *     The values in childValueColumn for each value of childIdColumn will be concatenated together using delimiter as a delimiter and the result will be set as parentValueColumn in the parent feed.
-             *      */
-            input?: components["schemas"]["SourcePipeline"];
-            /** @description The inner join flag.
-             *     <P>
-             *     If set to true the parent row will only be output if the child feed has at least one matching row.
-             *      */
-            innerJoin?: boolean;
-            /** @description The parent ID columns.
-             *     <P>
-             *     These are the names of the fields in the main stream that is to be used to match against child rows.
-             *     The main stream must be sorted by these fields.
-             *      */
-            parentIdColumns?: string[];
-            /** @description The child ID columns.
-             *     <P>
-             *     These are the names of the fields in the child stream that are to be used to match against parent rows.
-             *     The child stream must be sorted by these fields.
-             *      */
-            childIdColumns?: string[];
-            /** @description The delimiter to place between each value returned.
-             *      */
-            delimiter?: string;
-        });
-        /** @description Processor that curtails the output after the configured number of rows.
-         *      */
-        ProcessorOffset: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /**
-             * Format: int32
-             * @description The number of rows that will be skipped by this processor.
-             *
-             */
-            offset?: number;
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "OFFSET";
-        };
-        /** @description Processor that filters output rows.
-         *      */
-        ProcessorQuery: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /** @description A valid FIQL expression that will be evaluated on each row.
-             *      */
-            expression: string;
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "QUERY";
-        };
-        /** @description Run a custom script on each row of the output.
-         *      */
-        ProcessorScript: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /** @description The language to use, as understood by GraalVM.
-             *     <P>
-             *     By default the only acceptable value is "js", but custom builds can use other lanaguages.
-             *      */
-            language?: string;
-            /** @description A predicate script is used to determine whether or not the row should be discarded.
-             *     <P>
-             *     The script should return a value that is either true or false, if the value is false the row will be discarded.
-             *      */
-            predicate?: string;
-            /** @description A process script can manipulate the row in any way it wants.
-             *     <P>
-             *      */
-            process?: string;
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "SCRIPT";
-        };
-        /** @description Processor that sorts the data stream.
-         *     <P>
-         *     Note that this pipeline, unlike most others, has to buffer the entire stream before it can sort it.
-         *     Additionally, if the data consists of too many rows it will be sorted on disc.
-         *     </P>
-         *     <P>
-         *     This processor is inherently slow, if you need to use it please discuss options with the pipeline designer.
-         *     </P>
-         *      */
-        ProcessorSort: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
-            /** @description The fields by which this processor will sort the data.
-             *      */
-            fields?: string[];
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "SORT";
-        };
-        /** @description <p>A definition of a rule that prevents a pipeline from running if previous runs that match the scope and time limit exceed the byte count.</p>
-         *     <p>Note that rate limit rules are only evaluated before running a pipeline and do not take the current run into consideration at all.</p>
-         *     <p>
-         *     * As an example a rateLimit defined as:
-         *     <pre>
-         *     * scope: [ "username", "path" ]
-         *     * timeLimit: PT10M
-         *     * byteLimit: 10000000
-         *     </pre>
-         *     says that if the current user has executed the current pipeline (same path) within the past ten minutes generating more than ten million bytes then this request should be refused.
-         *     </p>
-         *     <p>
-         *     Refused requests result in an HTTP status code 429 ("Too Many Requests").
-         *     </p>
-         *      */
-        RateLimitRule: {
-            /** @description <P>The scope of the rate limit rule.</P>
-             *     <P>At least one value must be provided.</P>
-             *      */
-            scope: ("host" | "path" | "clientip" | "issuer" | "subject" | "username")[];
-            /** @description <P>The duration of the rate limit.</P>
-             *     <P>Expressions in ISO8601 time period notication (e.g. PT10M for ten minutes).</P>
-             *      */
-            timeLimit: string;
-            /** @description <P>The limit on the number of pipeline runs matching the scope that may be initiated.</P>
-             *     <P>
-             *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
-             *     No other non-numeric characters are permitted.
-             *     </P>
-             *      */
-            runLimit?: string;
-            /** @description <P>The limit on the number of bytes that may be been sent by previous runs.</P>
-             *     <P>
-             *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
-             *     No other non-numeric characters are permitted.
-             *     </P>
-             *      */
-            byteLimit?: string;
-            /**
-             * Format: int32
-             * @description <P>The limit on the number of runs matching the scope that may have been started but not completed within the time limit.</P>
-             *
-             */
-            concurrencyLimit?: number;
-        };
-        /** @description A Source is the source of data for a pipeline.
-         *      */
-        Source: {
-            /** @description <P>Get the name of the Source, that will be used in logging.</P>
-             *     <P>
-             *     This is optional, if it is not set a numeric (or delimited numeric) name will be allocated.
-             *     </P>
-             *      */
-            name?: string;
-            /**
-             * @description <P>The type of Source being configured.</P>
-             *
-             * @enum {string}
-             */
-            type: "TEST" | "SQL" | "HTTP";
-        };
-        /** @description <P>A SourcePipeline is the core part of a Pipeline, without the globally defined elements.</P>
-         *     <P>
-         *     A SourcePipeline cannot be directly referenced externally, but is used within a Pipeline to declare the source and processing of the data.
-         *     </P>
-         *     <P>
-         *     Every Pipeline is also a SourcePipeline.
-         *     </P>
-         *      */
-        SourcePipeline: {
-            /** @description <P>
-             *     The query for the pipeline.
-             *     </P>
-             *      */
-            source: components["schemas"]["Source"];
-            /** @description <P>Processors to run on the data as it flows from the Source.</P>
-             *      */
-            processors?: components["schemas"]["Processor"][];
-        };
-        /** @description Pipeline data source that gets data from a SQL database.
-         *     <P>
-         *     This is the standard source of data for pipelines.
-         *      */
-        SourceSql: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
-            /** @description <P>The name of the endpoint that provides the data for the Source.</P>
-             *     <P>
-             *     The endpoint represents the SQL database that contains the actual data.
-             *     </P>
-             *     <P>
-             *     The endpoint must be specified as either a straight name (this field) or as a template value (endpointEmplate).
-             *     If both fields are provided it is an error.
-             *     </P>
-             *      */
-            endpoint?: string;
-            /** @description <P>A <a target="_blank" href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
-             *     <P>
-             *     The endpoint represents the SQL database that contains the actual data.
-             *     </P>
-             *     <P>
-             *     The endpoint must be specified as either a template value (this field) or as a straight name (endpoint).
-             *     If both fields are provided it is an error.
-             *     </P>
-             *      */
-            endpointTemplate?: string;
-            /** @description <P>The query to run against the Endpoint.</P>
-             *     <P>
-             *     A SQL statement.
-             *     </P>
-             *     <P>
-             *     The query must be specified as either a plain SQL statement (this field) or as a template value (queryTemplate).
-             *     If both fields are provided it is an error.
-             *     </P>
-             *      */
-            query?: string;
-            /** @description <P>The query to run against the Endpoint, as a <a target="_blank" href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
-             *     <P>
-             *     A StringTemplate that results in a SQL statement.
-             *     </P>
-             *     <p>
-             *     The query must be specified as either a templated value (this field) or as a plain SQL statement (query).
-             *     If both fields are provided it is an error.
-             *     </P>
-             *      */
-            queryTemplate?: string;
-            /**
-             * Format: int32
-             * @description <P>The number of rows to get from the Source at a time.</P>
-             *     <P>
-             *     A larger streaming fetch size will slow the initial data, but may be quicker overall (at the cost of more memory).
-             *     Experiment with values in the range 10-1000.
-             *     </P>
-             *
-             */
-            streamingFetchSize?: number;
-            /**
-             * Format: int32
-             * @description <P>The maximum number of connections to open to the Endpoint.</P>
-             *     <P>
-             *     If there are likely to be multiple concurrent pipelines running to the same Endpoint it can be beneficial to set this to a small number, otherwise leave it at the default.
-             *     </P>
-             *
-             */
-            maxPoolSize?: number;
-            /**
-             * Format: int32
-             * @description <P>The maximum number of connections have queued up for the Endpoint.</P>
-             *     <P>
-             *     This is unlikely to be useful.
-             *     </P>
-             *
-             */
-            maxPoolWaitQueueSize?: number;
-            /** @description <P>The idle timeout for the connection pool that will be created.</P>
-             *     <P>
-             *     After this time has passed the connection will be closed and a new one will be opened by subequent pipelines.
-             *     </P>
-             *     <P>
-             *     The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
-             *     The sections have suffixes in ASCII of "D", "H", "M" and "S" for days, hours, minutes and seconds, accepted in upper or lower case.
-             *     The suffixes must occur in order.
-             *     The ASCII letter "T" must occur before the first occurrence, if any, of an hour, minute or second section.
-             *     At least one of the four sections must be present, and if "T" is present there must be at least one section after the "T".
-             *     The number part of each section must consist of one or more ASCII digits.
-             *     The number of days, hours and minutes must parse to an long.
-             *     The number of seconds must parse to an long with optional fraction.
-             *     The decimal point may be either a dot or a comma.
-             *     The fractional part may have from zero to 9 digits.
-             *     </P>
-             *     <P>
-             *     The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
-             *     </P>
-             *      */
-            idleTimeout?: string;
-            /** @description <P>The connection timeout for the connections that will be created.</P>
-             *     </P>
-             *     <P>
-             *     The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
-             *     The sections have suffixes in ASCII of "D", "H", "M" and "S" for days, hours, minutes and seconds, accepted in upper or lower case.
-             *     The suffixes must occur in order.
-             *     The ASCII letter "T" must occur before the first occurrence, if any, of an hour, minute or second section.
-             *     At least one of the four sections must be present, and if "T" is present there must be at least one section after the "T".
-             *     The number part of each section must consist of one or more ASCII digits.
-             *     The number of days, hours and minutes must parse to an long.
-             *     The number of seconds must parse to an long with optional fraction.
-             *     The decimal point may be either a dot or a comma.
-             *     The fractional part may have from zero to 9 digits.
-             *     </P>
-             *     <P>
-             *     The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
-             *     </P>
-             *      */
-            connectionTimeout?: string;
-            /** @description <P>If set to true all double quotes in the query will be replaced with the identifier quoting character for the target.</P>
-             *     <P>
-             *     If the native quoting character is already a double quote no replacement will take place.
-             *     </P>
-             *     <P>
-             *     This enables queries for all database platforms to be defined using double quotes for identifiers, but it is a straight replacement
-             *     so if the query needs to contain a double quote that is not quoting an identifier then this must be set to false.
-             *     </P>
-             *     <P>
-             *     This is only useful when it is not known what flavour of database is being queried, which should be rare.
-             *     </P>
-             *      */
-            replaceDoubleQuotes?: boolean;
-            /** @description Get the overrides for column types.
-             *     <P>
-             *     This is a map of column names (from the results for this query) to the Query Engine {@link DataType} that should be used in the
-             *     result stream.
-             *     <P>
-             *     This facility is rarely required, but can be useful when a data base does not provide adequate information for Query Engine to correctly identify the type of a field.
-             *     <P>
-             *     This is known to be useful for boolean fields with MySQL.
-             *     <P>
-             *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
-             *      */
-            columnTypeOverrides?: components["schemas"]["ColumnTypeOverride"][];
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "SQL";
-        };
-        /** @description Source producing a fixed set of data without any need to communicate with a database.
-         *     <P>
-         *     The data stream will have two fields:
-         *     <UL>
-         *     <LI>value
-         *     A monotonically increasing integer.
-         *     <LI>name
-         *     The name of the source.
-         *     </UL>
-         *     The number of rows to be returned can be configured, as can a delay between each row returned.
-         *      */
-        SourceTest: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
-            /**
-             * Format: int32
-             * @description The number of rows that the source will return.
-             *
-             */
-            rowCount?: number;
-            /**
-             * Format: int32
-             * @description Get the number of milliseconds to delay between production of each data row.
-             *     <P>
-             *     Note that 0 explicitly outputs all rows in a single thread and any non-zero value will use a periodic timer to output rows.
-             *
-             */
-            delayMs?: number;
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "TEST";
-        };
         /** @description <P>
          *     A directory containing documentation files.
          *     </P>
          *      */
         DocDir: WithRequired<components["schemas"]["DocNode"], "children" | "name" | "path"> & {
-            /** @description <P>
-             *     The children of the node.
+            /** @description The children of the node.
+             *     <P>
+             *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
              *      */
             children: components["schemas"]["DocNode"][];
@@ -3259,6 +3224,12 @@ export interface components {
          *     </P>
          *      */
         DocFile: WithRequired<components["schemas"]["DocNode"], "name" | "path"> & {
+            /** @description The children of the node.
+             *     <P>
+             *     If this is null then the node is a file, otherwise it is a directory.
+             *     </P>
+             *      */
+            children?: components["schemas"]["DocNode"][];
             /** @description <P>
              *     The title of the document.
              *     </P>
@@ -3278,9 +3249,7 @@ export interface components {
              *     </P>
              *      */
             name: string;
-            /** @description <P>
-             *     The children of the node.
-             *     </P>
+            /** @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
@@ -3382,7 +3351,10 @@ export interface components {
          *     </P>
          *      */
         PipelineDir: WithRequired<components["schemas"]["PipelineNode"], "children" | "name" | "path"> & {
-            /** @description The children of the directory.
+            /** @description The children of the node.
+             *     <P>
+             *     If this is null then the node is a file, otherwise it is a directory.
+             *     </P>
              *      */
             children: components["schemas"]["PipelineNode"][];
         };
@@ -3391,6 +3363,12 @@ export interface components {
          *     </P>
          *      */
         PipelineFile: WithRequired<components["schemas"]["PipelineNode"], "name" | "path"> & {
+            /** @description The children of the node.
+             *     <P>
+             *     If this is null then the node is a file, otherwise it is a directory.
+             *     </P>
+             *      */
+            children?: components["schemas"]["PipelineNode"][];
             /** @description <P>
              *     The title of the pipeline, to be displayed in the UI.
              *     </P>
@@ -3412,7 +3390,7 @@ export interface components {
             name: string;
             /** @description The children of the node.
              *     <P>
-             *     If this is null then the node is a PipelineFile, otherwise it is a PipelineDir.
+             *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
              *      */
             children?: components["schemas"]["PipelineNode"][];
@@ -3548,7 +3526,7 @@ export interface components {
              *     the expression be run specifically for that run.
              *     <P>
              *      */
-            defaultValue?: Record<string, never>;
+            defaultValue?: string | number | boolean | unknown[];
             /** @description <P>The minimum value for the argument, as a string.</P>
              *     <P>
              *     The minimum value will be converted to the correct data type as it would be if it were received
