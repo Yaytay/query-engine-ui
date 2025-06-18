@@ -911,6 +911,9 @@ export interface components {
         /** @description Processors modify the data stream in flight.
          *      */
         Processor: {
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
              *      */
             name: string;
@@ -920,9 +923,6 @@ export interface components {
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
-            condition?: components["schemas"]["Condition"];
         };
         /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
          *
@@ -962,6 +962,15 @@ export interface components {
          *     </ol>
          *      */
         ProcessorDynamicField: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description The inner join flag.
              *     <P>
              *     If set to true the parent row will only be output if the child feed has at least one matching row.
@@ -1046,6 +1055,15 @@ export interface components {
         ProcessorExpression: {
             type: "ProcessorExpression";
         } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description A JEXL expression that is used to determine whether or not the row should be discarded.
              *     <P>
              *     The script should return a value that is either true or false, if the value is false the row will be discarded.
@@ -1160,6 +1178,15 @@ export interface components {
          *     </OL>
          *      */
         ProcessorGroupConcat: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description The data feed.
              *     <P>
              *     The data must be sorted by the childIdColumns (and the parent feed should be sorted by the parentIdColumns).
@@ -1211,6 +1238,15 @@ export interface components {
          *      */
         ProcessorLimit: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
+            /**
              * Format: int32
              * @description The limit on the number of rows that will be output by this processor.
              *
@@ -1242,6 +1278,15 @@ export interface components {
          *     </p>
          *      */
         ProcessorLookup: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description The name of the field in the lookupSource that provides the keys for the map.
              *      */
             lookupKeyField: string;
@@ -1286,6 +1331,15 @@ export interface components {
         /** @description Processor that renames or removes fields in the output.
          *      */
         ProcessorMap: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description The fields that will be renamed by this processor.
              *      */
             relabels: components["schemas"]["ProcessorMapLabel"][];
@@ -1313,6 +1367,15 @@ export interface components {
         ProcessorMerge: {
             type: "ProcessorMerge";
         } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description The data feed.
              *     <P>
              *     This data feed should result in two columns childIdColumn and childValueColumn (any other columns will be ignored).
@@ -1346,6 +1409,15 @@ export interface components {
          *      */
         ProcessorOffset: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
+            /**
              * Format: int32
              * @description The number of rows that will be skipped by this processor.
              *
@@ -1361,6 +1433,15 @@ export interface components {
         /** @description Processor that filters output rows.
          *      */
         ProcessorQuery: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description A valid FIQL expression that will be evaluated on each row.
              *      */
             expression: string;
@@ -1374,6 +1455,15 @@ export interface components {
         /** @description Run a custom script on each row of the output.
          *      */
         ProcessorScript: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description The language to use, as understood by GraalVM.
              *     <P>
              *     By default the only acceptable value is "js", but custom builds can use other lanaguages.
@@ -1405,6 +1495,15 @@ export interface components {
          *     </P>
          *      */
         ProcessorSort: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
+            /**
+             * @description <P>The type of Processor being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
             /** @description The fields by which this processor will sort the data.
              *      */
             fields?: string[];
@@ -1454,6 +1553,12 @@ export interface components {
          *     This is the standard source of data for pipelines.
          *      */
         SourceSql: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
+            /**
+             * @description <P>The type of Source being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "TEST" | "SQL" | "HTTP";
             /** @description <P>The name of the endpoint that provides the data for the Source.</P>
              *     <P>
              *     The endpoint represents the SQL database that contains the actual data.
@@ -1607,6 +1712,12 @@ export interface components {
          *      */
         SourceTest: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
             /**
+             * @description <P>The type of Source being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "TEST" | "SQL" | "HTTP";
+            /**
              * Format: int32
              * @description The number of rows that the source will return.
              *
@@ -1626,6 +1737,183 @@ export interface components {
              * @enum {string}
              */
             type: "TEST";
+        };
+        /** @description <P>The overrides for the formatting of specific columns.</P>
+         *     <P>
+         *     This is only required when two columns of the same type need to be formatted in different ways.
+         *     </P>
+         *     <P>
+         *     Given that a column can only be of one data type it is usually only appropriate to set one format
+         *     with this structure for a given column.
+         *     </P>
+         *     <P>
+         *     Any column not specified here will have the default format, so it is only necessary to specify the
+         *     odd columns here.
+         *     </P>
+         *      */
+        ColumnTextFormats: {
+            /** @description The column to be formatted.
+             *      */
+            column: string;
+            /**
+             * @description The Java format to use for date fields.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format dates.
+             *
+             * @default yyyy-MM-dd
+             */
+            dateFormat: string;
+            /** @description The Java format to use for date/time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format datetimes.
+             *     <P>
+             *     To value may be either a DateTimeFormatter pattern or one of the predefined formats:
+             *     <table class="striped" style="text-align:left">
+             *     <caption>Predefined Formatters</caption>
+             *     <thead>
+             *     <tr>
+             *     <th scope="col">Formatter</th>
+             *     <th scope="col">Description</th>
+             *     <th scope="col">Example</th>
+             *     </tr>
+             *     </thead>
+             *     <tbody>
+             *     <tr>
+             *     <th scope="row"> BASIC_ISO_DATE</th>
+             *     <td>Basic ISO date </td> <td>'20111203'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE</th>
+             *     <td> ISO Local Date </td>
+             *     <td>'2011-12-03'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_TIME</th>
+             *     <td> Time without offset </td>
+             *     <td>'10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_TIME</th>
+             *     <td> Time with or without offset </td>
+             *     <td>'10:15:30+01:00'; '10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
+             *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ORDINAL_DATE</th>
+             *     <td> Year and day of year </td>
+             *     <td>'2012-337'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_SECONDS</th>
+             *     <td> Seconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330L</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_MILLISECONDS</th>
+             *     <td> Milliseconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330120L</td>
+             *     </tr>
+             *     <tr colspan="3"><td>
+             *     The following predefined formats all require zone/offset data that will be assumed to be UTC.
+             *     </td></tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE</th>
+             *     <td> ISO Date with offset </td>
+             *     <td>'2023-05-15Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_TIME</th>
+             *     <td> Time with offset </td>
+             *     <td>'13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE_TIME</th>
+             *     <td> Date Time with Offset </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ZONED_DATE_TIME</th>
+             *     <td> Zoned Date Time </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_DATE_TIME</th>
+             *     <td> Date and time with ZoneId </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_INSTANT</th>
+             *     <td> Date and Time of an Instant </td>
+             *     <td>'2023-05-15T13:45:30.120Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> RFC_1123_DATE_TIME</th>
+             *     <td> RFC 1123 / RFC 822 </td>
+             *     <td>'Mon, 15 May 2023 13:45:30 GMT'</td>
+             *     </tr>
+             *     </table>
+             *     <P>
+             *     The predefined formatters have capabilities that the pattern formatting does not, specifically, if you want to output an ISO8601
+             *     date time with fractional seconds but only showing signficant figures in the fractional seconds, use ISO_LOCAL_DATE_TIME.
+             *     <P>
+             *     The default output (when the format is not set) is that of the java LocalDateTime.toString() method, specifically, the output will be one of the following ISO-8601 formats:
+             *     <ul>
+             *     <li>uuuu-MM-dd'T'HH:mm
+             *     <li>uuuu-MM-dd'T'HH:mm:ss
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
+             *     </ul>
+             *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *      */
+            dateTimeFormat?: string;
+            /** @description The Java format to use for time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format times.
+             *      */
+            timeFormat?: string;
+            /** @description The Java format to use for float and double columns.
+             *     <P>
+             *     This value will be used by the Java DecimalFormat to format floating point values.
+             *     <P>
+             *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
+             *     (i.e. it will include at least one digit after the decimal point).
+             *      */
+            decimalFormat?: string;
+            /** @description Get the format to use for Boolean columns.
+             *     <P>
+             *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
+             *     an array of two string values - the first being true and the second being false.
+             *     These strings will be inserted into the output stream as is, and thus must be valid JSON; specifically they can be:
+             *     <UL>
+             *     <LI>true  (any case)
+             *     <LI>false  (any case)
+             *     <LI>A numeric value
+             *     <LI>A string value
+             *     </UL>
+             *     The following are all examples of valid expressions:
+             *     <UL>
+             *     <LI>['true', 'false']
+             *     Valid, but pointless, because this is the default behaviour.
+             *     <LI>['True', 'False']
+             *     Python formatting.
+             *     <LI>['1', '0']
+             *     Output a numeric 1 or 0.
+             *     <LI>['"1"', '"0"']
+             *     Output a quoted "1" or "0".
+             *     <LI>['"yes"', '"no"']
+             *     Output a quoted "yes" or "no".
+             *     </UL>
+             *     <P>
+             *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
+             *     <P>
+             *     If not set Boolean values will be output as "true" or "false".
+             *      */
+            booleanFormat?: string;
         };
         /** @description <P>The configuration for the final WriteStream of a pipeline.</P>
          *     <P>
@@ -1663,6 +1951,28 @@ export interface components {
          *
          *      */
         Format: {
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
+            /** @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             *      */
+            filename?: string;
+            /** @description <P>The media type of the format.</P>
+             *     <P>
+             *     The media type is used to determine the format based upon the Accept header in the request.
+             *     If multiple formats have the same media type the first in the list will be used.
+             *     </P>
+             *     <P>
+             *     The media type will also be set as the Content-Type header in the response.
+             *     </P>
+             *      */
+            mediaType?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -1699,13 +2009,44 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
-            /** @description <P>The description of the format.</P>
+        };
+        /** @description Configuration for an output format of Atom.
+         *     There are no formatting options for Atom output.
+         *      */
+        FormatAtom: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
+            /**
+             * @description <P>The type of Format being configured.<P>
+             *
+             * @enum {string}
+             */
+            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
+            /**
+             * @description <P>The name of the format.</P>
              *     <P>
-             *     The description is used in UIs to help users choose which format to use.
+             *     The name is used to determine the format based upon the '_fmt' query string argument.
              *     </P>
-             *      */
-            description?: string;
-            /** @description <P>The media type of the format.</P>
+             *     <P>
+             *     It is an error for two Formats to have the same name.
+             *     This is different from the other Format determinators which can be repeated, the name is the
+             *     ultimate arbiter and must be unique.
+             *     This ensures that all configured Formats can be used.
+             *     </P>
+             *
+             * @default Atom
+             */
+            name: string;
+            /**
+             * @description <P>The extension of the format.</P>
+             *     <P>
+             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
+             *     If multiple formats have the same extension the first in the list will be used.
+             *     </P>
+             *
+             * @default xml
+             */
+            extension: string;
+            /**
+             * @description <P>The media type of the format.</P>
              *     <P>
              *     The media type is used to determine the format based upon the Accept header in the request.
              *     If multiple formats have the same media type the first in the list will be used.
@@ -1713,144 +2054,10 @@ export interface components {
              *     <P>
              *     The media type will also be set as the Content-Type header in the response.
              *     </P>
-             *      */
-            mediaType?: string;
-            /** @description <P>The filename to specify in the Content-Disposition header.</P>
-             *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
-             *     </P>
-             *      */
-            filename?: string;
-        };
-        /** @description Configuration for an output format of Atom.
-         *     There are no formatting options for Atom output.
-         *      */
-        FormatAtom: Omit<components["schemas"]["Format"], "type"> & {
-            /**
-             * @description The type of the format.
-             * @enum {string}
-             */
-            type?: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
-            /**
-             * @description <p>The name of the format.</p>
-             *     <p>The name is used to determine the format based upon the '_fmt' query
-             *     string argument.</p>
-             *     <p>It is an error for two Formats to have the same name. This is different
-             *     from the other Format determinators which can be repeated; the name is the
-             *     ultimate arbiter and must be unique.</p>
              *
-             * @default XML
-             */
-            name: string;
-            /**
-             * @description <p>The extension of the format.</p>
-             *     <p>This is used to determine the file extension for output files and
-             *     for URL paths.</p>
-             *
-             * @default .xml
-             */
-            extension: string;
-            /**
-             * @description The media type (e.g., application/atom+xml; charset=utf-8).
              * @default application/atom+xml; charset=utf-8
              */
             mediaType: string;
-            /**
-             * @description Fix applied to the initial letter of a field's name.
-             * @default F
-             */
-            fieldInitialLetterFix: string;
-            /**
-             * @description Fix applied to invalid letters in field names.
-             * @default _
-             */
-            fieldInvalidLetterFix: string;
-            /**
-             * @description The Java format to use for date fields.
-             *     <P>
-             *     This value will be used by the Java DateTimeFormatter to format dates.
-             *     <P>
-             *     The default behaviour is to use java.time.LocalDate#toString(), which will output in accordance with ISO 8601.
-             *
-             * @default yyyy-mm-dd
-             */
-            dateFormat: string;
-            /**
-             * @description The Java format to use for date/time columns.
-             *     <P>
-             *     This value will be used by the Java DateTimeFormatter to format datetimes.
-             *     <P>
-             *     The default behaviour is to use java.time.LocalDateTime#toString(), which will output in accordance with ISO 8601.
-             *
-             * @default yyyy-mm-ddThh:mm:ss
-             */
-            dateTimeFormat: string;
-            /**
-             * @description The Java format to use for time columns.
-             *     <P>
-             *     This value will be used by the Java DateTimeFormatter to format times.
-             *     <P>
-             *     The default behaviour is to use java.time.LocalTime#toString(), which will output in accordance with ISO 8601.
-             *
-             * @default hh:mm:ss
-             */
-            timeFormat: string;
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "Atom";
-        };
-        /** @description Configuration for an output format of delimited text.
-         *      */
-        FormatDelimited: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
-            /**
-             * @description If true date/time values will be surrounded by quotes, otherwise they will not.
-             *
-             * @default true
-             */
-            quoteTemporal: boolean;
-            /**
-             * @description The delimiter between field values in the output.
-             *
-             * @default ,
-             */
-            delimiter: string;
-            /**
-             * @description Any string values in the output will be prefixed by this value.
-             *
-             * @default "
-             */
-            openQuote: string;
-            /**
-             * @description Any string values in the output will be suffixed by this value.
-             *
-             * @default "
-             */
-            closeQuote: string;
-            /**
-             * @description If a string value contains the close quote string it will be prefixed by this string.
-             *     <P>
-             *     Do not set both this and replaceCloseQuote, this value will take preference.
-             *
-             * @default "
-             */
-            escapeCloseQuote: string;
-            /**
-             * @description If a string value contains the close quote string it will be replaced by this string.
-             *     <P>
-             *     Do not set both this and escapeCloseQuote, the value of escapeCloseQuote will take preference.
-             *
-             * @default "
-             */
-            replaceCloseQuote: string;
-            /**
-             * @description Each row in the output will be suffixed by this value.
-             *
-             * @default \r\n
-             */
-            newline: string;
             /**
              * @description The Java format to use for date fields.
              *     <P>
@@ -2013,6 +2220,297 @@ export interface components {
              *     If not set Boolean values will be output as "true" or "false".
              *      */
             booleanFormat?: string;
+            /** @description <P>The overrides for the formatting of specific columns.</P>
+             *     <P>
+             *     This is only required when two columns of the same type need to be formatted in different ways.
+             *     </P>
+             *     <P>
+             *     Given that a column can only be of one data type it is usually only appropriate to set one format
+             *     with this structure for a given column.
+             *     </P>
+             *     <P>
+             *     Any column not specified here will have the default format, so it is only necessary to specify the
+             *     odd columns here.
+             *     </P>
+             *      */
+            columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
+            /**
+             * @description Fix applied to the initial letter of a field's name.
+             * @default F
+             */
+            fieldInitialLetterFix: string;
+            /**
+             * @description Fix applied to invalid letters in field names.
+             * @default _
+             */
+            fieldInvalidLetterFix: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "Atom";
+        };
+        /** @description Configuration for an output format of delimited text.
+         *      */
+        FormatDelimited: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
+            /**
+             * @description <P>The type of Format being configured.<P>
+             *
+             * @enum {string}
+             */
+            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
+            /**
+             * @description <P>The name of the format.</P>
+             *     <P>
+             *     The name is used to determine the format based upon the '_fmt' query string argument.
+             *     </P>
+             *     <P>
+             *     It is an error for two Formats to have the same name.
+             *     This is different from the other Format determinators which can be repeated, the name is the
+             *     ultimate arbiter and must be unique.
+             *     This ensures that all configured Formats can be used.
+             *     </P>
+             *
+             * @default csv
+             */
+            name: string;
+            /**
+             * @description <P>The extension of the format.</P>
+             *     <P>
+             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
+             *     If multiple formats have the same extension the first in the list will be used.
+             *     </P>
+             *
+             * @default csv
+             */
+            extension: string;
+            /**
+             * @description <P>The media type of the format.</P>
+             *     <P>
+             *     The media type is used to determine the format based upon the Accept header in the request.
+             *     If multiple formats have the same media type the first in the list will be used.
+             *     </P>
+             *     <P>
+             *     The media type will also be set as the Content-Type header in the response.
+             *     </P>
+             *
+             * @default text/csv;charset=UTF-8
+             */
+            mediaType: string;
+            /**
+             * @description The Java format to use for date fields.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format dates.
+             *
+             * @default yyyy-MM-dd
+             */
+            dateFormat: string;
+            /** @description The Java format to use for date/time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format datetimes.
+             *     <P>
+             *     To value may be either a DateTimeFormatter pattern or one of the predefined formats:
+             *     <table class="striped" style="text-align:left">
+             *     <caption>Predefined Formatters</caption>
+             *     <thead>
+             *     <tr>
+             *     <th scope="col">Formatter</th>
+             *     <th scope="col">Description</th>
+             *     <th scope="col">Example</th>
+             *     </tr>
+             *     </thead>
+             *     <tbody>
+             *     <tr>
+             *     <th scope="row"> BASIC_ISO_DATE</th>
+             *     <td>Basic ISO date </td> <td>'20111203'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE</th>
+             *     <td> ISO Local Date </td>
+             *     <td>'2011-12-03'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_TIME</th>
+             *     <td> Time without offset </td>
+             *     <td>'10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_TIME</th>
+             *     <td> Time with or without offset </td>
+             *     <td>'10:15:30+01:00'; '10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
+             *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ORDINAL_DATE</th>
+             *     <td> Year and day of year </td>
+             *     <td>'2012-337'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_SECONDS</th>
+             *     <td> Seconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330L</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_MILLISECONDS</th>
+             *     <td> Milliseconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330120L</td>
+             *     </tr>
+             *     <tr colspan="3"><td>
+             *     The following predefined formats all require zone/offset data that will be assumed to be UTC.
+             *     </td></tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE</th>
+             *     <td> ISO Date with offset </td>
+             *     <td>'2023-05-15Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_TIME</th>
+             *     <td> Time with offset </td>
+             *     <td>'13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE_TIME</th>
+             *     <td> Date Time with Offset </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ZONED_DATE_TIME</th>
+             *     <td> Zoned Date Time </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_DATE_TIME</th>
+             *     <td> Date and time with ZoneId </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_INSTANT</th>
+             *     <td> Date and Time of an Instant </td>
+             *     <td>'2023-05-15T13:45:30.120Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> RFC_1123_DATE_TIME</th>
+             *     <td> RFC 1123 / RFC 822 </td>
+             *     <td>'Mon, 15 May 2023 13:45:30 GMT'</td>
+             *     </tr>
+             *     </table>
+             *     <P>
+             *     The predefined formatters have capabilities that the pattern formatting does not, specifically, if you want to output an ISO8601
+             *     date time with fractional seconds but only showing signficant figures in the fractional seconds, use ISO_LOCAL_DATE_TIME.
+             *     <P>
+             *     The default output (when the format is not set) is that of the java LocalDateTime.toString() method, specifically, the output will be one of the following ISO-8601 formats:
+             *     <ul>
+             *     <li>uuuu-MM-dd'T'HH:mm
+             *     <li>uuuu-MM-dd'T'HH:mm:ss
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
+             *     </ul>
+             *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *      */
+            dateTimeFormat?: string;
+            /**
+             * @description The Java format to use for time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format times.
+             *
+             * @default HH:mm
+             */
+            timeFormat: string;
+            /** @description The Java format to use for float and double columns.
+             *     <P>
+             *     This value will be used by the Java DecimalFormat to format floating point values.
+             *     <P>
+             *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
+             *     (i.e. it will include at least one digit after the decimal point).
+             *      */
+            decimalFormat?: string;
+            /** @description Get the format to use for Boolean columns.
+             *     <P>
+             *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
+             *     an array of two string values - the first being true and the second being false.
+             *     These strings will be inserted into the output stream as is, and thus must be valid JSON; specifically they can be:
+             *     <UL>
+             *     <LI>true  (any case)
+             *     <LI>false  (any case)
+             *     <LI>A numeric value
+             *     <LI>A string value
+             *     </UL>
+             *     The following are all examples of valid expressions:
+             *     <UL>
+             *     <LI>['true', 'false']
+             *     Valid, but pointless, because this is the default behaviour.
+             *     <LI>['True', 'False']
+             *     Python formatting.
+             *     <LI>['1', '0']
+             *     Output a numeric 1 or 0.
+             *     <LI>['"1"', '"0"']
+             *     Output a quoted "1" or "0".
+             *     <LI>['"yes"', '"no"']
+             *     Output a quoted "yes" or "no".
+             *     </UL>
+             *     <P>
+             *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
+             *     <P>
+             *     If not set Boolean values will be output as "true" or "false".
+             *      */
+            booleanFormat?: string;
+            /** @description <P>The overrides for the formatting of specific columns.</P>
+             *     <P>
+             *     This is only required when two columns of the same type need to be formatted in different ways.
+             *     </P>
+             *     <P>
+             *     Given that a column can only be of one data type it is usually only appropriate to set one format
+             *     with this structure for a given column.
+             *     </P>
+             *     <P>
+             *     Any column not specified here will have the default format, so it is only necessary to specify the
+             *     odd columns here.
+             *     </P>
+             *      */
+            columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
+            /**
+             * @description If true date/time values will be surrounded by quotes, otherwise they will not.
+             *
+             * @default true
+             */
+            quoteTemporal: boolean;
+            /**
+             * @description The delimiter between field values in the output.
+             *
+             * @default ,
+             */
+            delimiter: string;
+            /**
+             * @description Any string values in the output will be prefixed by this value.
+             *
+             * @default "
+             */
+            openQuote: string;
+            /**
+             * @description Any string values in the output will be suffixed by this value.
+             *
+             * @default "
+             */
+            closeQuote: string;
+            /** @description If a string value contains the close quote string it will be prefixed by this string.
+             *     <P>
+             *     Do not set both this and replaceCloseQuote, this value will take preference.
+             *      */
+            escapeCloseQuote?: string;
+            /** @description If a string value contains the close quote string it will be replaced by this string.
+             *     <P>
+             *     Do not set both this and escapeCloseQuote, the value of escapeCloseQuote will take preference.
+             *      */
+            replaceCloseQuote?: string;
+            /** @description Each row in the output will be suffixed by this value.
+             *      */
+            newline?: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -2045,43 +2543,11 @@ export interface components {
          *      */
         FormatHtml: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
-             * @description <P>The name of the format.</P>
-             *     <P>
-             *     The name is used to determine the format based upon the '_fmt' query string argument.
-             *     </P>
-             *     <P>
-             *     It is an error for two Formats to have the same name.
-             *     This is different from the other Format determinators which can be repeated, the name is the
-             *     ultimate arbiter and must be unique.
-             *     This ensures that all configured Formats can be used.
-             *     </P>
+             * @description <P>The type of Format being configured.<P>
              *
-             * @default html
+             * @enum {string}
              */
-            name: string;
-            /**
-             * @description <P>The extension of the format.</P>
-             *     <P>
-             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
-             *     If multiple formats have the same extension the first in the list will be used.
-             *     </P>
-             *
-             * @default html
-             */
-            extension: string;
-            /**
-             * @description <P>The media type of the format.</P>
-             *     <P>
-             *     The media type is used to determine the format based upon the Accept header in the request.
-             *     If multiple formats have the same media type the first in the list will be used.
-             *     </P>
-             *     <P>
-             *     The media type will also be set as the Content-Type header in the response.
-             *     </P>
-             *
-             * @default text/html
-             */
-            mediaType: string;
+            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
             /**
              * @description The Java format to use for date fields.
              *     <P>
@@ -2244,6 +2710,20 @@ export interface components {
              *     If not set Boolean values will be output as "true" or "false".
              *      */
             booleanFormat?: string;
+            /** @description <P>The overrides for the formatting of specific columns.</P>
+             *     <P>
+             *     This is only required when two columns of the same type need to be formatted in different ways.
+             *     </P>
+             *     <P>
+             *     Given that a column can only be of one data type it is usually only appropriate to set one format
+             *     with this structure for a given column.
+             *     </P>
+             *     <P>
+             *     Any column not specified here will have the default format, so it is only necessary to specify the
+             *     odd columns here.
+             *     </P>
+             *      */
+            columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -2256,24 +2736,15 @@ export interface components {
          *      */
         FormatJson: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
-             * @description <P>The name of the format.</P>
-             *     <P>
-             *     The name is used to determine the format based upon the '_fmt' query string argument.
-             *     </P>
-             *     <P>
-             *     It is an error for two Formats to have the same name.
-             *     This is different from the other Format determinators which can be repeated, the name is the
-             *     ultimate arbiter and must be unique.
-             *     This ensures that all configured Formats can be used.
-             *     </P>
+             * @description <P>The type of Format being configured.<P>
              *
-             * @default json
+             * @enum {string}
              */
-            name: string;
+            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
             /**
              * @description <P>The extension of the format.</P>
              *     <P>
-             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
+             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
              *     If multiple formats have the same extension the first in the list will be used.
              *     </P>
              *
@@ -2293,6 +2764,182 @@ export interface components {
              * @default application/json
              */
             mediaType: string;
+            /**
+             * @description The Java format to use for date fields.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format dates.
+             *
+             * @default yyyy-mm-dd
+             */
+            dateFormat: string;
+            /** @description The Java format to use for date/time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format datetimes.
+             *     <P>
+             *     To value may be either a DateTimeFormatter pattern or one of the predefined formats:
+             *     <table class="striped" style="text-align:left">
+             *     <caption>Predefined Formatters</caption>
+             *     <thead>
+             *     <tr>
+             *     <th scope="col">Formatter</th>
+             *     <th scope="col">Description</th>
+             *     <th scope="col">Example</th>
+             *     </tr>
+             *     </thead>
+             *     <tbody>
+             *     <tr>
+             *     <th scope="row"> BASIC_ISO_DATE</th>
+             *     <td>Basic ISO date </td> <td>'20111203'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE</th>
+             *     <td> ISO Local Date </td>
+             *     <td>'2011-12-03'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_TIME</th>
+             *     <td> Time without offset </td>
+             *     <td>'10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_TIME</th>
+             *     <td> Time with or without offset </td>
+             *     <td>'10:15:30+01:00'; '10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
+             *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ORDINAL_DATE</th>
+             *     <td> Year and day of year </td>
+             *     <td>'2012-337'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_SECONDS</th>
+             *     <td> Seconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330L</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_MILLISECONDS</th>
+             *     <td> Milliseconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330120L</td>
+             *     </tr>
+             *     <tr colspan="3"><td>
+             *     The following predefined formats all require zone/offset data that will be assumed to be UTC.
+             *     </td></tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE</th>
+             *     <td> ISO Date with offset </td>
+             *     <td>'2023-05-15Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_TIME</th>
+             *     <td> Time with offset </td>
+             *     <td>'13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE_TIME</th>
+             *     <td> Date Time with Offset </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ZONED_DATE_TIME</th>
+             *     <td> Zoned Date Time </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_DATE_TIME</th>
+             *     <td> Date and time with ZoneId </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_INSTANT</th>
+             *     <td> Date and Time of an Instant </td>
+             *     <td>'2023-05-15T13:45:30.120Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> RFC_1123_DATE_TIME</th>
+             *     <td> RFC 1123 / RFC 822 </td>
+             *     <td>'Mon, 15 May 2023 13:45:30 GMT'</td>
+             *     </tr>
+             *     </table>
+             *     <P>
+             *     The predefined formatters have capabilities that the pattern formatting does not, specifically, if you want to output an ISO8601
+             *     date time with fractional seconds but only showing signficant figures in the fractional seconds, use ISO_LOCAL_DATE_TIME.
+             *     <P>
+             *     The default output (when the format is not set) is that of the java LocalDateTime.toString() method, specifically, the output will be one of the following ISO-8601 formats:
+             *     <ul>
+             *     <li>uuuu-MM-dd'T'HH:mm
+             *     <li>uuuu-MM-dd'T'HH:mm:ss
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
+             *     </ul>
+             *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *      */
+            dateTimeFormat?: string;
+            /**
+             * @description The Java format to use for time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format times.
+             *
+             * @default hh:mm:ss
+             */
+            timeFormat: string;
+            /** @description The Java format to use for float and double columns.
+             *     <P>
+             *     This value will be used by the Java DecimalFormat to format floating point values.
+             *     <P>
+             *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
+             *     (i.e. it will include at least one digit after the decimal point).
+             *      */
+            decimalFormat?: string;
+            /** @description Get the format to use for Boolean columns.
+             *     <P>
+             *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
+             *     an array of two string values - the first being true and the second being false.
+             *     These strings will be inserted into the output stream as is, and thus must be valid JSON; specifically they can be:
+             *     <UL>
+             *     <LI>true  (any case)
+             *     <LI>false  (any case)
+             *     <LI>A numeric value
+             *     <LI>A string value
+             *     </UL>
+             *     The following are all examples of valid expressions:
+             *     <UL>
+             *     <LI>['true', 'false']
+             *     Valid, but pointless, because this is the default behaviour.
+             *     <LI>['True', 'False']
+             *     Python formatting.
+             *     <LI>['1', '0']
+             *     Output a numeric 1 or 0.
+             *     <LI>['"1"', '"0"']
+             *     Output a quoted "1" or "0".
+             *     <LI>['"yes"', '"no"']
+             *     Output a quoted "yes" or "no".
+             *     </UL>
+             *     <P>
+             *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
+             *     <P>
+             *     If not set Boolean values will be output as "true" or "false".
+             *      */
+            booleanFormat?: string;
+            /** @description <P>The overrides for the formatting of specific columns.</P>
+             *     <P>
+             *     This is only required when two columns of the same type need to be formatted in different ways.
+             *     </P>
+             *     <P>
+             *     Given that a column can only be of one data type it is usually only appropriate to set one format
+             *     with this structure for a given column.
+             *     </P>
+             *     <P>
+             *     Any column not specified here will have the default format, so it is only necessary to specify the
+             *     odd columns here.
+             *     </P>
+             *      */
+            columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
             /** @description The name of the parent data element in the output JSON.
              *     <P>
              *     JSON output consists of an array of objects, with an object for each row of the output.
@@ -2331,12 +2978,69 @@ export interface components {
              * @default false
              */
             compatibleTypeNames: boolean;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "JSON";
+        };
+        /** @description Configuration for an output format of RSS.
+         *     There are no formatting options for RSS output.
+         *      */
+        FormatRss: {
+            type: "FormatRss";
+        } & (Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
+            /**
+             * @description <P>The type of Format being configured.<P>
+             *
+             * @enum {string}
+             */
+            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
+            /**
+             * @description <P>The name of the format.</P>
+             *     <P>
+             *     The name is used to determine the format based upon the '_fmt' query string argument.
+             *     </P>
+             *     <P>
+             *     It is an error for two Formats to have the same name.
+             *     This is different from the other Format determinators which can be repeated, the name is the
+             *     ultimate arbiter and must be unique.
+             *     This ensures that all configured Formats can be used.
+             *     </P>
+             *
+             * @default RSS
+             */
+            name: string;
+            /**
+             * @description <P>The extension of the format.</P>
+             *     <P>
+             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
+             *     If multiple formats have the same extension the first in the list will be used.
+             *     </P>
+             *
+             * @default xml
+             */
+            extension: string;
+            /**
+             * @description <P>The media type of the format.</P>
+             *     <P>
+             *     The media type is used to determine the format based upon the Accept header in the request.
+             *     If multiple formats have the same media type the first in the list will be used.
+             *     </P>
+             *     <P>
+             *     The media type will also be set as the Content-Type header in the response.
+             *     </P>
+             *
+             * @default application/rss+xml; charset=utf-8
+             */
+            mediaType: string;
             /**
              * @description The Java format to use for date fields.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format dates.
              *
-             * @default yyyy-mm-dd
+             * @default yyyy-MM-dd
              */
             dateFormat: string;
             /** @description The Java format to use for date/time columns.
@@ -2452,7 +3156,7 @@ export interface components {
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format times.
              *
-             * @default hh:mm:ss
+             * @default HH:mm
              */
             timeFormat: string;
             /** @description The Java format to use for float and double columns.
@@ -2469,8 +3173,8 @@ export interface components {
              *     an array of two string values - the first being true and the second being false.
              *     These strings will be inserted into the output stream as is, and thus must be valid JSON; specifically they can be:
              *     <UL>
-             *     <LI>true
-             *     <LI>false
+             *     <LI>true  (any case)
+             *     <LI>false  (any case)
              *     <LI>A numeric value
              *     <LI>A string value
              *     </UL>
@@ -2478,6 +3182,8 @@ export interface components {
              *     <UL>
              *     <LI>['true', 'false']
              *     Valid, but pointless, because this is the default behaviour.
+             *     <LI>['True', 'False']
+             *     Python formatting.
              *     <LI>['1', '0']
              *     Output a numeric 1 or 0.
              *     <LI>['"1"', '"0"']
@@ -2486,53 +3192,25 @@ export interface components {
              *     Output a quoted "yes" or "no".
              *     </UL>
              *     <P>
-             *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce invalid JSON with a bad format.
+             *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
              *     <P>
-             *     If not set Boolean values will be output as standard JSON Boolean values.
+             *     If not set Boolean values will be output as "true" or "false".
              *      */
             booleanFormat?: string;
-        } & {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "JSON";
-        };
-        /** @description Configuration for an output format of RSS.
-         *     There are no formatting options for RSS output.
-         *      */
-        FormatRss: {
-            type: "FormatRss";
-        } & (Omit<components["schemas"]["Format"], "type"> & {
-            /**
-             * @description The type of the format.
-             * @enum {string}
-             */
-            type?: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
-            /**
-             * @description <p>The name of the format.</p>
-             *     <p>The name is used to determine the format based upon the '_fmt' query
-             *     string argument.</p>
-             *     <p>It is an error for two Formats to have the same name. This is different
-             *     from the other Format determinators which can be repeated; the name is the
-             *     ultimate arbiter and must be unique.</p>
-             *
-             * @default XML
-             */
-            name: string;
-            /**
-             * @description <p>The extension of the format.</p>
-             *     <p>This is used to determine the file extension for output files and
-             *     for URL paths.</p>
-             *
-             * @default .xml
-             */
-            extension: string;
-            /**
-             * @description The media type (e.g., application/xml).
-             * @default application/rss+xml; charset=utf-8
-             */
-            mediaType: string;
+            /** @description <P>The overrides for the formatting of specific columns.</P>
+             *     <P>
+             *     This is only required when two columns of the same type need to be formatted in different ways.
+             *     </P>
+             *     <P>
+             *     Given that a column can only be of one data type it is usually only appropriate to set one format
+             *     with this structure for a given column.
+             *     </P>
+             *     <P>
+             *     Any column not specified here will have the default format, so it is only necessary to specify the
+             *     odd columns here.
+             *     </P>
+             *      */
+            columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
             /**
              * @description The XML namespace to use for custom fields in the RSS output.
              * @default https://yaytay.github.io/query-engine/rss
@@ -2548,40 +3226,16 @@ export interface components {
              * @default _
              */
             fieldInvalidLetterFix: string;
-            /**
-             * @description The Java format to use for date fields.
-             *     <P>
-             *     This value will be used by the Java DateTimeFormatter to format dates.
-             *     <P>
-             *     The default behaviour is to use java.time.LocalDate#toString(), which will output in accordance with ISO 8601.
-             *
-             * @default yyyy-mm-dd
-             */
-            dateFormat: string;
-            /**
-             * @description The Java format to use for date/time columns.
-             *     <P>
-             *     This value will be used by the Java DateTimeFormatter to format datetimes.
-             *     <P>
-             *     The default behaviour is to use java.time.LocalDateTime#toString(), which will output in accordance with ISO 8601.
-             *
-             * @default yyyy-mm-ddThh:mm:ss
-             */
-            dateTimeFormat: string;
-            /**
-             * @description The Java format to use for time columns.
-             *     <P>
-             *     This value will be used by the Java DateTimeFormatter to format times.
-             *     <P>
-             *     The default behaviour is to use java.time.LocalTime#toString(), which will output in accordance with ISO 8601.
-             *
-             * @default hh:mm:ss
-             */
-            timeFormat: string;
         });
         /** @description Configuration for an output format of XLSX.
          *      */
         FormatXlsx: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
+            /**
+             * @description <P>The type of Format being configured.<P>
+             *
+             * @enum {string}
+             */
+            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
             /**
              * @description <P>The name of the format.</P>
              *     <P>
@@ -2832,43 +3486,234 @@ export interface components {
         /** @description Configuration for an output format of XML.
          *     There are no formatting options for XML output.
          *      */
-        FormatXml: Omit<components["schemas"]["Format"], "type"> & {
+        FormatXml: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
-             * @description The type of the format.
+             * @description <P>The type of Format being configured.<P>
+             *
              * @enum {string}
              */
-            type?: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
+            type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
             /**
-             * @description <p>The name of the format.</p>
-             *     <p>The name is used to determine the format based upon the '_fmt' query
-             *     string argument.</p>
-             *     <p>It is an error for two Formats to have the same name. This is different
-             *     from the other Format determinators which can be repeated; the name is the
-             *     ultimate arbiter and must be unique.</p>
+             * @description <P>The name of the format.</P>
+             *     <P>
+             *     The name is used to determine the format based upon the '_fmt' query string argument.
+             *     </P>
+             *     <P>
+             *     It is an error for two Formats to have the same name.
+             *     This is different from the other Format determinators which can be repeated, the name is the
+             *     ultimate arbiter and must be unique.
+             *     This ensures that all configured Formats can be used.
+             *     </P>
              *
              * @default XML
              */
             name: string;
             /**
-             * @description <p>The extension of the format.</p>
-             *     <p>This is used to determine the file extension for output files and
-             *     for URL paths.</p>
+             * @description <P>The extension of the format.</P>
+             *     <P>
+             *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
+             *     If multiple formats have the same extension the first in the list will be used.
+             *     </P>
              *
-             * @default .xml
+             * @default xml
              */
             extension: string;
             /**
-             * @description The media type (e.g., application/xml).
+             * @description <P>The media type of the format.</P>
+             *     <P>
+             *     The media type is used to determine the format based upon the Accept header in the request.
+             *     If multiple formats have the same media type the first in the list will be used.
+             *     </P>
+             *     <P>
+             *     The media type will also be set as the Content-Type header in the response.
+             *     </P>
+             *
              * @default application/xml; charset=utf-8
              */
             mediaType: string;
+            /**
+             * @description The Java format to use for date fields.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format dates.
+             *
+             * @default yyyy-MM-dd
+             */
+            dateFormat: string;
+            /** @description The Java format to use for date/time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format datetimes.
+             *     <P>
+             *     To value may be either a DateTimeFormatter pattern or one of the predefined formats:
+             *     <table class="striped" style="text-align:left">
+             *     <caption>Predefined Formatters</caption>
+             *     <thead>
+             *     <tr>
+             *     <th scope="col">Formatter</th>
+             *     <th scope="col">Description</th>
+             *     <th scope="col">Example</th>
+             *     </tr>
+             *     </thead>
+             *     <tbody>
+             *     <tr>
+             *     <th scope="row"> BASIC_ISO_DATE</th>
+             *     <td>Basic ISO date </td> <td>'20111203'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE</th>
+             *     <td> ISO Local Date </td>
+             *     <td>'2011-12-03'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_TIME</th>
+             *     <td> Time without offset </td>
+             *     <td>'10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_TIME</th>
+             *     <td> Time with or without offset </td>
+             *     <td>'10:15:30+01:00'; '10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
+             *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ORDINAL_DATE</th>
+             *     <td> Year and day of year </td>
+             *     <td>'2012-337'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_SECONDS</th>
+             *     <td> Seconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330L</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> EPOCH_MILLISECONDS</th>
+             *     <td> Milliseconds since the epoch (1970-01-01)</td>
+             *     <td>1684158330120L</td>
+             *     </tr>
+             *     <tr colspan="3"><td>
+             *     The following predefined formats all require zone/offset data that will be assumed to be UTC.
+             *     </td></tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE</th>
+             *     <td> ISO Date with offset </td>
+             *     <td>'2023-05-15Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_TIME</th>
+             *     <td> Time with offset </td>
+             *     <td>'13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_OFFSET_DATE_TIME</th>
+             *     <td> Date Time with Offset </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_ZONED_DATE_TIME</th>
+             *     <td> Zoned Date Time </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_DATE_TIME</th>
+             *     <td> Date and time with ZoneId </td>
+             *     <td>'2023-05-15T13:45:30.12Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> ISO_INSTANT</th>
+             *     <td> Date and Time of an Instant </td>
+             *     <td>'2023-05-15T13:45:30.120Z'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row"> RFC_1123_DATE_TIME</th>
+             *     <td> RFC 1123 / RFC 822 </td>
+             *     <td>'Mon, 15 May 2023 13:45:30 GMT'</td>
+             *     </tr>
+             *     </table>
+             *     <P>
+             *     The predefined formatters have capabilities that the pattern formatting does not, specifically, if you want to output an ISO8601
+             *     date time with fractional seconds but only showing signficant figures in the fractional seconds, use ISO_LOCAL_DATE_TIME.
+             *     <P>
+             *     The default output (when the format is not set) is that of the java LocalDateTime.toString() method, specifically, the output will be one of the following ISO-8601 formats:
+             *     <ul>
+             *     <li>uuuu-MM-dd'T'HH:mm
+             *     <li>uuuu-MM-dd'T'HH:mm:ss
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSS
+             *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
+             *     </ul>
+             *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *      */
+            dateTimeFormat?: string;
+            /**
+             * @description The Java format to use for time columns.
+             *     <P>
+             *     This value will be used by the Java DateTimeFormatter to format times.
+             *
+             * @default HH:mm
+             */
+            timeFormat: string;
+            /** @description The Java format to use for float and double columns.
+             *     <P>
+             *     This value will be used by the Java DecimalFormat to format floating point values.
+             *     <P>
+             *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
+             *     (i.e. it will include at least one digit after the decimal point).
+             *      */
+            decimalFormat?: string;
+            /** @description Get the format to use for Boolean columns.
+             *     <P>
+             *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
+             *     an array of two string values - the first being true and the second being false.
+             *     These strings will be inserted into the output stream as is, and thus must be valid JSON; specifically they can be:
+             *     <UL>
+             *     <LI>true  (any case)
+             *     <LI>false  (any case)
+             *     <LI>A numeric value
+             *     <LI>A string value
+             *     </UL>
+             *     The following are all examples of valid expressions:
+             *     <UL>
+             *     <LI>['true', 'false']
+             *     Valid, but pointless, because this is the default behaviour.
+             *     <LI>['True', 'False']
+             *     Python formatting.
+             *     <LI>['1', '0']
+             *     Output a numeric 1 or 0.
+             *     <LI>['"1"', '"0"']
+             *     Output a quoted "1" or "0".
+             *     <LI>['"yes"', '"no"']
+             *     Output a quoted "yes" or "no".
+             *     </UL>
+             *     <P>
+             *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
+             *     <P>
+             *     If not set Boolean values will be output as "true" or "false".
+             *      */
+            booleanFormat?: string;
+            /** @description <P>The overrides for the formatting of specific columns.</P>
+             *     <P>
+             *     This is only required when two columns of the same type need to be formatted in different ways.
+             *     </P>
+             *     <P>
+             *     Given that a column can only be of one data type it is usually only appropriate to set one format
+             *     with this structure for a given column.
+             *     </P>
+             *     <P>
+             *     Any column not specified here will have the default format, so it is only necessary to specify the
+             *     odd columns here.
+             *     </P>
+             *      */
+            columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
             /**
              * @description Whether the XML declaration should be included.
              * @default true
              */
             xmlDeclaration: boolean;
             /**
-             * @description The character encoding (e.g., UTF-8) for the XML.
+             * @description The character encoding (e.g., utf-8) for the XML.
              * @default utf-8
              */
             encoding: string;
@@ -2902,36 +3747,6 @@ export interface components {
              * @default _
              */
             fieldInvalidLetterFix: string;
-            /**
-             * @description The Java format to use for date fields.
-             *     <P>
-             *     This value will be used by the Java DateTimeFormatter to format dates.
-             *     <P>
-             *     The default behaviour is to use java.time.LocalDate#toString(), which will output in accordance with ISO 8601.
-             *
-             * @default yyyy-mm-dd
-             */
-            dateFormat: string;
-            /**
-             * @description The Java format to use for date/time columns.
-             *     <P>
-             *     This value will be used by the Java DateTimeFormatter to format datetimes.
-             *     <P>
-             *     The default behaviour is to use java.time.LocalDateTime#toString(), which will output in accordance with ISO 8601.
-             *
-             * @default yyyy-mm-ddThh:mm:ss
-             */
-            dateTimeFormat: string;
-            /**
-             * @description The Java format to use for time columns.
-             *     <P>
-             *     This value will be used by the Java DateTimeFormatter to format times.
-             *     <P>
-             *     The default behaviour is to use java.time.LocalTime#toString(), which will output in accordance with ISO 8601.
-             *
-             * @default hh:mm:ss
-             */
-            timeFormat: string;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
