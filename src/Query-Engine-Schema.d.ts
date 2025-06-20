@@ -594,6 +594,16 @@ export interface components {
              * @default true
              */
             validate: boolean;
+            /**
+             * @description <P>If set to true an empty query string argument should be considered to be absent.</P>
+             *     <P>
+             *     Some historical services call Query Engine with empty query string values, which can cause problems when they are passed to a database engine.
+             *     A BIND construct is no defence against this, because Query Engine considers the argument to have been passed in with a zero length string.
+             *     Setting this to true will make the engine ignore the blank query string value completely.
+             *
+             * @default false
+             */
+            emptyIsAbsent: boolean;
             /** @description <P>
              *     A list of the name(s) of another argument(s) that this argument requires.
              *     </P>
@@ -1951,18 +1961,6 @@ export interface components {
          *
          *      */
         Format: {
-            /** @description <P>The description of the format.</P>
-             *     <P>
-             *     The description is used in UIs to help users choose which format to use.
-             *     </P>
-             *      */
-            description?: string;
-            /** @description <P>The filename to specify in the Content-Disposition header.</P>
-             *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
-             *     </P>
-             *      */
-            filename?: string;
             /** @description <P>The media type of the format.</P>
              *     <P>
              *     The media type is used to determine the format based upon the Accept header in the request.
@@ -1973,6 +1971,12 @@ export interface components {
              *     </P>
              *      */
             mediaType?: string;
+            /** @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             *      */
+            filename?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -2009,6 +2013,12 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
