@@ -1961,6 +1961,18 @@ export interface components {
          *
          *      */
         Format: {
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
+            /** @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             *      */
+            filename?: string;
             /** @description <P>The media type of the format.</P>
              *     <P>
              *     The media type is used to determine the format based upon the Accept header in the request.
@@ -1971,12 +1983,6 @@ export interface components {
              *     </P>
              *      */
             mediaType?: string;
-            /** @description <P>The filename to specify in the Content-Disposition header.</P>
-             *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
-             *     </P>
-             *      */
-            filename?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -2013,12 +2019,6 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
-            /** @description <P>The description of the format.</P>
-             *     <P>
-             *     The description is used in UIs to help users choose which format to use.
-             *     </P>
-             *      */
-            description?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
