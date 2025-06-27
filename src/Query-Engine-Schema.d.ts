@@ -3757,12 +3757,32 @@ export interface components {
              * @default _
              */
             fieldInvalidLetterFix: string;
+            characterReferences?: components["schemas"]["FormatXmlCharacterReference"][];
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             type: "XML";
+        };
+        /** @description Configuration for character reference replacement in XML output.
+         *     Specifies a character or string to be replaced with a specific XML character reference.
+         *      */
+        FormatXmlCharacterReference: {
+            /**
+             * @description The character or string to be replaced in the XML output.
+             *
+             * @example –
+             */
+            replace: string;
+            /**
+             * @description The XML character reference to replace the character with.
+             *     This must be a valid XML entity reference without the leading & and trailing ; characters.
+             *     For example, use "#x2013" to produce "&#x2013;" in the output.
+             *
+             * @example #x2013
+             */
+            with: string;
         };
         /** @description <P>Definition of an endpoint that can be used for querying data.</P>
          *     <P>
