@@ -921,9 +921,6 @@ export interface components {
         /** @description Processors modify the data stream in flight.
          *      */
         Processor: {
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
-            condition?: components["schemas"]["Condition"];
             /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
              *      */
             name: string;
@@ -933,6 +930,9 @@ export interface components {
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
+            /** @description <P>Optional condition that controls whether the processor will be run.</P>
+             *      */
+            condition?: components["schemas"]["Condition"];
         };
         /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
          *
@@ -1961,28 +1961,6 @@ export interface components {
          *
          *      */
         Format: {
-            /** @description <P>The description of the format.</P>
-             *     <P>
-             *     The description is used in UIs to help users choose which format to use.
-             *     </P>
-             *      */
-            description?: string;
-            /** @description <P>The filename to specify in the Content-Disposition header.</P>
-             *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
-             *     </P>
-             *      */
-            filename?: string;
-            /** @description <P>The media type of the format.</P>
-             *     <P>
-             *     The media type is used to determine the format based upon the Accept header in the request.
-             *     If multiple formats have the same media type the first in the list will be used.
-             *     </P>
-             *     <P>
-             *     The media type will also be set as the Content-Type header in the response.
-             *     </P>
-             *      */
-            mediaType?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -2019,6 +1997,28 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
+            /** @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             *      */
+            filename?: string;
+            /** @description <P>The media type of the format.</P>
+             *     <P>
+             *     The media type is used to determine the format based upon the Accept header in the request.
+             *     If multiple formats have the same media type the first in the list will be used.
+             *     </P>
+             *     <P>
+             *     The media type will also be set as the Content-Type header in the response.
+             *     </P>
+             *      */
+            mediaType?: string;
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
@@ -2092,6 +2092,11 @@ export interface components {
              *     </thead>
              *     <tbody>
              *     <tr>
+             *     <th scope="row">DEFAULT</th>
+             *     <td>Output from java.time.LocalDateTime#toString(), trims seconds</td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
              *     <th scope="row"> BASIC_ISO_DATE</th>
              *     <td>Basic ISO date </td> <td>'20111203'</td>
              *     </tr>
@@ -2107,12 +2112,17 @@ export interface components {
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_TIME</th>
-             *     <td> Time with or without offset </td>
+             *     <td> Time with or without offset </th>
              *     <td>'10:15:30+01:00'; '10:15:30'</td>
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
              *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row">ISO_LOCAL_DATE_TIME_TRIM</th>
+             *     <td>ISO Local Date and Time, with trimmed seconds</td>
              *     <td>'2011-12-03T10:15:30'</td>
              *     </tr>
              *     <tr>
@@ -2182,6 +2192,7 @@ export interface components {
              *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
              *      */
             dateTimeFormat?: string;
             /**
@@ -2332,6 +2343,11 @@ export interface components {
              *     </thead>
              *     <tbody>
              *     <tr>
+             *     <th scope="row">DEFAULT</th>
+             *     <td>Output from java.time.LocalDateTime#toString(), trims seconds</td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
              *     <th scope="row"> BASIC_ISO_DATE</th>
              *     <td>Basic ISO date </td> <td>'20111203'</td>
              *     </tr>
@@ -2347,12 +2363,17 @@ export interface components {
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_TIME</th>
-             *     <td> Time with or without offset </td>
+             *     <td> Time with or without offset </th>
              *     <td>'10:15:30+01:00'; '10:15:30'</td>
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
              *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row">ISO_LOCAL_DATE_TIME_TRIM</th>
+             *     <td>ISO Local Date and Time, with trimmed seconds</td>
              *     <td>'2011-12-03T10:15:30'</td>
              *     </tr>
              *     <tr>
@@ -2422,6 +2443,7 @@ export interface components {
              *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
              *      */
             dateTimeFormat?: string;
             /**
@@ -2582,6 +2604,11 @@ export interface components {
              *     </thead>
              *     <tbody>
              *     <tr>
+             *     <th scope="row">DEFAULT</th>
+             *     <td>Output from java.time.LocalDateTime#toString(), trims seconds</td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
              *     <th scope="row"> BASIC_ISO_DATE</th>
              *     <td>Basic ISO date </td> <td>'20111203'</td>
              *     </tr>
@@ -2597,12 +2624,17 @@ export interface components {
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_TIME</th>
-             *     <td> Time with or without offset </td>
+             *     <td> Time with or without offset </th>
              *     <td>'10:15:30+01:00'; '10:15:30'</td>
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
              *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row">ISO_LOCAL_DATE_TIME_TRIM</th>
+             *     <td>ISO Local Date and Time, with trimmed seconds</td>
              *     <td>'2011-12-03T10:15:30'</td>
              *     </tr>
              *     <tr>
@@ -2672,6 +2704,7 @@ export interface components {
              *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
              *      */
             dateTimeFormat?: string;
             /**
@@ -2798,6 +2831,11 @@ export interface components {
              *     </thead>
              *     <tbody>
              *     <tr>
+             *     <th scope="row">DEFAULT</th>
+             *     <td>Output from java.time.LocalDateTime#toString(), trims seconds</td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
              *     <th scope="row"> BASIC_ISO_DATE</th>
              *     <td>Basic ISO date </td> <td>'20111203'</td>
              *     </tr>
@@ -2813,12 +2851,17 @@ export interface components {
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_TIME</th>
-             *     <td> Time with or without offset </td>
+             *     <td> Time with or without offset </th>
              *     <td>'10:15:30+01:00'; '10:15:30'</td>
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
              *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row">ISO_LOCAL_DATE_TIME_TRIM</th>
+             *     <td>ISO Local Date and Time, with trimmed seconds</td>
              *     <td>'2011-12-03T10:15:30'</td>
              *     </tr>
              *     <tr>
@@ -2888,6 +2931,7 @@ export interface components {
              *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
              *      */
             dateTimeFormat?: string;
             /**
@@ -2988,6 +3032,17 @@ export interface components {
              * @default false
              */
             compatibleTypeNames: boolean;
+            /**
+             * @description When set to true a JSON feed that has no data will be output as an empty JSON object.
+             *     <P>
+             *     This means that no metadata will be output, and no "data" field will be output - there will be nothing but an empty object
+             *     regardless of the rest of the configuration.
+             *     <P>
+             *     This is only relevant if the feed has no rows to output.
+             *
+             * @default false
+             */
+            compatibleEmpty: boolean;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -3019,7 +3074,7 @@ export interface components {
              *     This ensures that all configured Formats can be used.
              *     </P>
              *
-             * @default RSS
+             * @default rss
              */
             name: string;
             /**
@@ -3069,6 +3124,11 @@ export interface components {
              *     </thead>
              *     <tbody>
              *     <tr>
+             *     <th scope="row">DEFAULT</th>
+             *     <td>Output from java.time.LocalDateTime#toString(), trims seconds</td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
              *     <th scope="row"> BASIC_ISO_DATE</th>
              *     <td>Basic ISO date </td> <td>'20111203'</td>
              *     </tr>
@@ -3084,12 +3144,17 @@ export interface components {
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_TIME</th>
-             *     <td> Time with or without offset </td>
+             *     <td> Time with or without offset </th>
              *     <td>'10:15:30+01:00'; '10:15:30'</td>
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
              *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row">ISO_LOCAL_DATE_TIME_TRIM</th>
+             *     <td>ISO Local Date and Time, with trimmed seconds</td>
              *     <td>'2011-12-03T10:15:30'</td>
              *     </tr>
              *     <tr>
@@ -3159,6 +3224,7 @@ export interface components {
              *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
              *      */
             dateTimeFormat?: string;
             /**
@@ -3565,6 +3631,11 @@ export interface components {
              *     </thead>
              *     <tbody>
              *     <tr>
+             *     <th scope="row">DEFAULT</th>
+             *     <td>Output from java.time.LocalDateTime#toString(), trims seconds</td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
              *     <th scope="row"> BASIC_ISO_DATE</th>
              *     <td>Basic ISO date </td> <td>'20111203'</td>
              *     </tr>
@@ -3580,12 +3651,17 @@ export interface components {
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_TIME</th>
-             *     <td> Time with or without offset </td>
+             *     <td> Time with or without offset </th>
              *     <td>'10:15:30+01:00'; '10:15:30'</td>
              *     </tr>
              *     <tr>
              *     <th scope="row"> ISO_LOCAL_DATE_TIME</th>
              *     <td> ISO Local Date and Time </td>
+             *     <td>'2011-12-03T10:15:30'</td>
+             *     </tr>
+             *     <tr>
+             *     <th scope="row">ISO_LOCAL_DATE_TIME_TRIM</th>
+             *     <td>ISO Local Date and Time, with trimmed seconds</td>
              *     <td>'2011-12-03T10:15:30'</td>
              *     </tr>
              *     <tr>
@@ -3655,6 +3731,7 @@ export interface components {
              *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
+             *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
              *      */
             dateTimeFormat?: string;
             /**
@@ -3757,6 +3834,17 @@ export interface components {
              * @default _
              */
             fieldInvalidLetterFix: string;
+            /** @description Get any character references that should be explicitly set in the output.
+             *     <P>
+             *     The XML output factory will produce correct XML for the encoding specified and it is not usually necessary to
+             *     specify any character references to replace.
+             *     <P>
+             *     This facility should only be used when there is a specific requirement to encode some characters in a given way.
+             *     <P>
+             *     This is NOT a generic search and replace facility, the "with" value must be a valid XML character reference (without the &amp; and ;).
+             *     <P>
+             *     Note that character references cannot be set in attributes, so it is invalid to use character references when fieldsAsAttributes is true.
+             *      */
             characterReferences?: components["schemas"]["FormatXmlCharacterReference"][];
         } & {
             /**
