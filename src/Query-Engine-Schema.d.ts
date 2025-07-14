@@ -3043,6 +3043,17 @@ export interface components {
              * @default false
              */
             compatibleEmpty: boolean;
+            /**
+             * @description When set to true (the default) every object in a JSON feed will include every field.
+             *     <P>
+             *     The default JSON output can be very inefficient if the data contains a lot of null values.
+             *     By setting this to false, null fields will be omitted completely from the output.
+             *     <P>
+             *     In order to avoid confusing consumers of the stream the first row output will always contain all the fields.
+             *
+             * @default true
+             */
+            outputNullValues: boolean;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
