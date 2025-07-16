@@ -1997,6 +1997,12 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
             /** @description <P>The filename to specify in the Content-Disposition header.</P>
              *     <P>
              *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
@@ -2013,12 +2019,6 @@ export interface components {
              *     </P>
              *      */
             mediaType?: string;
-            /** @description <P>The description of the format.</P>
-             *     <P>
-             *     The description is used in UIs to help users choose which format to use.
-             *     </P>
-             *      */
-            description?: string;
         };
         /** @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
@@ -3978,6 +3978,33 @@ export interface components {
             /** @description <P>A condition that must be passed for the endpoint to be used.</P>
              *      */
             condition?: components["schemas"]["Condition"];
+            /**
+             * Format: int32
+             * @description <P>The idle timeout for the endpoint connection in milliseconds.</P>
+             *     <P>
+             *     This controls the maximum time a connection can remain idle before being closed.
+             *     </P>
+             *
+             */
+            idleTimeout?: number;
+            /**
+             * Format: int32
+             * @description <P>The read idle timeout for the endpoint connection in milliseconds.</P>
+             *     <P>
+             *     This controls the maximum time a connection can remain idle on read operations before being closed.
+             *     </P>
+             *
+             */
+            readIdleTimeout?: number;
+            /**
+             * Format: int32
+             * @description <P>The write idle timeout for the endpoint connection in milliseconds.</P>
+             *     <P>
+             *     This controls the maximum time a connection can remain idle on write operations before being closed.
+             *     </P>
+             *
+             */
+            writeIdleTimeout?: number;
         };
         /** @description <P>The Pipeline is the fundamental unit of processing in QueryEngine.</P>
          *     <P>
