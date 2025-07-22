@@ -1538,7 +1538,149 @@ export interface components {
              *
              * @enum {string}
              */
-            type: "TEST" | "SQL" | "HTTP";
+            type: "TEST" | "SQL" | "JDBC" | "HTTP";
+        };
+        /** @description Pipeline data source that gets data from a SQL database.
+         *     <P>
+         *     This is the standard source of data for pipelines.
+         *      */
+        SourceJdbc: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
+            /**
+             * @description <P>The type of Source being configured.</P>
+             *
+             * @enum {string}
+             */
+            type: "TEST" | "SQL" | "JDBC" | "HTTP";
+            /** @description <P>The name of the endpoint that provides the data for the Source.</P>
+             *     <P>
+             *     The endpoint represents the SQL database that contains the actual data.
+             *     </P>
+             *     <P>
+             *     The endpoint must be specified as either a straight name (this field) or as a template value (endpointEmplate).
+             *     If both fields are provided it is an error.
+             *     </P>
+             *      */
+            endpoint?: string;
+            /** @description <P>A <a target="_blank" href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
+             *     <P>
+             *     The endpoint represents the SQL database that contains the actual data.
+             *     </P>
+             *     <P>
+             *     The endpoint must be specified as either a template value (this field) or as a straight name (endpoint).
+             *     If both fields are provided it is an error.
+             *     </P>
+             *      */
+            endpointTemplate?: string;
+            /** @description <P>The query to run against the Endpoint.</P>
+             *     <P>
+             *     A SQL statement.
+             *     </P>
+             *     <P>
+             *     The query must be specified as either a plain SQL statement (this field) or as a template value (queryTemplate).
+             *     If both fields are provided it is an error.
+             *     </P>
+             *      */
+            query?: string;
+            /** @description <P>The query to run against the Endpoint, as a <a target="_blank" href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
+             *     <P>
+             *     A StringTemplate that results in a SQL statement.
+             *     </P>
+             *     <p>
+             *     The query must be specified as either a templated value (this field) or as a plain SQL statement (query).
+             *     If both fields are provided it is an error.
+             *     </P>
+             *      */
+            queryTemplate?: string;
+            /**
+             * Format: int32
+             * @description <P>The JDBC fetch size to use when retrieving data from the database.</P>
+             *     <P>
+             *     This should control how many rows are fetched from the database at once by the JDBC driver.
+             *     A larger fetch size can improve performance by reducing the number of round trips to the database,
+             *     but uses more memory.
+             *     </P>
+             *     <P>
+             *     In order to stream data reliably some JDBC drivers need specific values, i.e. for MySQL the value of -2147483648 is required for streaming.
+             *     If this value is set to any negative value the system will attempt to determine an appropriate value based on the URL, specifically choosing based on the start of the URL:
+             *     <UL>
+             *     <LI>jdbc:mysql:  -2147483648
+             *     <LI>jdbc:sqlserver:  1000
+             *     <LI>jdbc:postgres: 1000
+             *     <LI>otherwise: 1000
+             *     </UL>
+             *     This is intended to mean that a negative value does something appropriate for streaming.
+             *     </P>
+             *     <P>
+             *     Typical values are in the range 100-5000.
+             *     </P>
+             *
+             * @default -1
+             */
+            jdbcFetchSize: number;
+            /**
+             * Format: int32
+             * @description <P>The number of rows to buffer for processing in the pipeline.</P>
+             *     <P>
+             *     This controls how many rows are buffered in memory for processing by the pipeline.
+             *     A larger processing batch size can improve throughput but uses more memory.
+             *     </P>
+             *     <P>
+             *     Typical values are in the range 10-1000.
+             *     </P>
+             *
+             * @default 1000
+             */
+            processingBatchSize: number;
+            /** @description <P>The connection timeout for the connections that will be created.</P>
+             *     </P>
+             *     <P>
+             *     The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
+             *     The sections have suffixes in ASCII of "D", "H", "M" and "S" for days, hours, minutes and seconds, accepted in upper or lower case.
+             *     The suffixes must occur in order.
+             *     The ASCII letter "T" must occur before the first occurrence, if any, of an hour, minute or second section.
+             *     At least one of the four sections must be present, and if "T" is present there must be at least one section after the "T".
+             *     The number part of each section must consist of one or more ASCII digits.
+             *     The number of days, hours and minutes must parse to an long.
+             *     The number of seconds must parse to an long with optional fraction.
+             *     The decimal point may be either a dot or a comma.
+             *     The fractional part may have from zero to 9 digits.
+             *     </P>
+             *     <P>
+             *     The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
+             *     </P>
+             *      */
+            connectionTimeout?: string;
+            /** @description <P>If set to true all double quotes in the query will be replaced with the identifier quoting character for the target.</P>
+             *     <P>
+             *     If the native quoting character is already a double quote no replacement will take place.
+             *     </P>
+             *     <P>
+             *     This enables queries for all database platforms to be defined using double quotes for identifiers, but it is a straight replacement
+             *     so if the query needs to contain a double quote that is not quoting an identifier then this must be set to false.
+             *     </P>
+             *     <P>
+             *     This is only useful when it is not known what flavour of database is being queried, which should be rare.
+             *     </P>
+             *      */
+            replaceDoubleQuotes?: boolean;
+            /** @description Get the overrides for column types.
+             *     <P>
+             *     This is a map of column names (from the results for this query) to the Query Engine {@link DataType} that should be used in the
+             *     result stream.
+             *     <P>
+             *     This facility is rarely required, but can be useful when a data base does not provide adequate information for Query Engine to correctly identify the type of a field.
+             *     <P>
+             *     This is known to be useful for boolean fields with MySQL.
+             *     <P>
+             *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
+             *      */
+            columnTypeOverrides?: components["schemas"]["ColumnTypeOverride"][];
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "JDBC";
         };
         /** @description <P>A SourcePipeline is the core part of a Pipeline, without the globally defined elements.</P>
          *     <P>
@@ -1568,7 +1710,7 @@ export interface components {
              *
              * @enum {string}
              */
-            type: "TEST" | "SQL" | "HTTP";
+            type: "TEST" | "SQL" | "JDBC" | "HTTP";
             /** @description <P>The name of the endpoint that provides the data for the Source.</P>
              *     <P>
              *     The endpoint represents the SQL database that contains the actual data.
@@ -1726,7 +1868,7 @@ export interface components {
              *
              * @enum {string}
              */
-            type: "TEST" | "SQL" | "HTTP";
+            type: "TEST" | "SQL" | "JDBC" | "HTTP";
             /**
              * Format: int32
              * @description The number of rows that the source will return.
@@ -3916,7 +4058,7 @@ export interface components {
              *
              * @enum {string}
              */
-            type: "SQL" | "HTTP";
+            type: "SQL" | "JDBC" | "HTTP";
             /**
              * Format: uri
              * @description <P>A URL that defines the Endpoint.</P>
