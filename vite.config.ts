@@ -19,4 +19,7 @@ export default defineConfig({
     open: true,
     port: 5173,
   },
+  build: {
+    assetsInlineLimit: 0 // 👈 disables inlining of small assets
+  }
 })
