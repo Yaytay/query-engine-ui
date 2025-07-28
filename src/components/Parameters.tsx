@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { Form, FormType } from '@formio/react';
-import { Formio }  from '@formio/js';
 import { components } from "../Query-Engine-Schema";
 import { ArgsToArgs } from '../Test';
 import equal from 'fast-deep-equal/es6/react';
@@ -18,8 +17,6 @@ interface ParametersProps {
 }
 
 function Parameters(props : ParametersProps) {
-
-  Formio.requireLibrary('flatpickr-formio', 'flatpickr-formio', 'https://cdn.jsdelivr.net/npm/flatpickr');
 
   const [urlStr, setUrlStr] = useState('')
   const [sub, _] = useState({data: props.values})
