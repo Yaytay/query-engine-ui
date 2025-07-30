@@ -168,7 +168,7 @@ function Nav(props : NavProps) {
       { key: 'logout', caption: 'Logout', callback: () => {
         const logouturl = props.baseUrl + 'login/logout'
         props.clearProfile()
-        navigate(logouturl)
+        window.location.replace(logouturl)
       }}
     ]
     return items;
