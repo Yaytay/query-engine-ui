@@ -167,14 +167,8 @@ function Nav(props : NavProps) {
     const items : NestableMenuItemData[] = [
       { key: 'logout', caption: 'Logout', callback: () => {
         const logouturl = props.baseUrl + 'login/logout'
-        fetch(logouturl, fetchConfig)
-          .then(r => {
-            console.log('Logout result: ', r);
-          })
-          .finally(() => {
-            props.clearProfile()
-            navigate('/')
-          })
+        props.clearProfile()
+        navigate(logouturl)
       }}
     ]
     return items;
