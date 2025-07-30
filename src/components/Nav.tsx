@@ -164,9 +164,8 @@ function Nav(props : NavProps) {
   }
 
   function profileMenuItems(_ : components["schemas"]["Profile"]) : NestableMenuItemData[] {
-    const items : NestableMenuItemData[] = []
-    if (props.designMode) {
-      items.push({ key: 'logout', caption: 'Logout', callback: () => {
+    const items : NestableMenuItemData[] = [
+      { key: 'logout', caption: 'Logout', callback: () => {
         const logouturl = props.baseUrl + 'login/logout'
         fetch(logouturl, fetchConfig)
           .then(r => {
@@ -176,8 +175,8 @@ function Nav(props : NavProps) {
             props.clearProfile()
             navigate('/')
           })
-      }})
-    }
+      }}
+    ]
     return items;
   }
 
