@@ -12,7 +12,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@formio/react": "^6.0.2",
+    "@formio/react": "^6.1.0",
     "@mui/system": "^7.2.0",
     "@mui/x-tree-view": "^8.9.0",
     "@tailwindcss/vite": "^4.1.11",
@@ -31,8 +31,8 @@
     "@mui/material": "^7.2.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^24.1.0",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
     "@types/react-modal": "^3.16.3",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.21",
@@ -43,7 +43,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "react-expanding-textarea": "^2.3.6",
     "react-modal": "^3.16.3",
-    "react-router-dom": "^7.7.0",
+    "react-router-dom": "^7.7.1",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3",
     "vite": "^7.0.6",
