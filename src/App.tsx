@@ -66,6 +66,10 @@ function App() {
     setDisplayAuthSelection(true)
   }
 
+  function clearProfile() : void {
+    setProfile(null)
+  }
+
   useEffect(() => {
     function performProfileFetch(profurl: URL, resolve: (value: unknown) => void) {
       fetch(profurl, fetchConfig)
@@ -218,6 +222,7 @@ function App() {
           docs={docs}
           apiUrl={apiUrl}
           profile={profile}
+          clearProfile={clearProfile}
         />
       </div>
       {displayServiceUnavailable ?

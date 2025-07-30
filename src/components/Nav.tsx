@@ -42,12 +42,16 @@ interface NavProps {
   , window: Window
   , profile: components["schemas"]["Profile"] | null
   , docs: components["schemas"]["DocDir"] | null
+  , clearProfile: () => void;
 }
 
 function Nav(props : NavProps) {
 
+  const fetchConfig = {credentials: 'include' as RequestCredentials}
+
   const [dataMenuAnchor, setDataMenuAnchor] = useState<HTMLElement|null>(null)
   const [topMenuAnchor, setTopMenuAnchor] = useState<HTMLElement|null>(null)
+  const [profileMenuAnchor, setProfileMenuAnchor] = useState<HTMLElement|null>(null)  
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [args, setArgs] = useState({} as any);
   const [pipelineDetails, setPipelineDetails] = useState<components["schemas"]["PipelineDetails"] | null>();
@@ -102,7 +106,7 @@ function Nav(props : NavProps) {
     console.log(item);
 
     const pipelinedetailsurl = props.baseUrl + 'api/info/details/' + item.path
-    fetch(pipelinedetailsurl, {credentials: 'include'})
+    fetch(pipelinedetailsurl, fetchConfig)
       .then((response) => response.json())
       .then((data) => {
         setPipelineDetails(data)
@@ -143,7 +147,7 @@ function Nav(props : NavProps) {
     return items;
   }
 
-  function dataMenuItems(node: components["schemas"]["PipelineNode"], parent: string) : NestableMenuItemData {    
+  function dataMenuItems(node: components["schemas"]["PipelineNode"], parent: string) : NestableMenuItemData {
     const key = parent + '->' + node.name
     if (node.children) {
       const items : NestableMenuItemData[] = []
@@ -157,6 +161,24 @@ function Nav(props : NavProps) {
         displayParameters(node)
       }}
     }
+  }
+
+  function profileMenuItems(_ : components["schemas"]["Profile"]) : NestableMenuItemData[] {
+    const items : NestableMenuItemData[] = []
+    if (props.designMode) {
+      items.push({ key: 'logout', caption: 'Logout', callback: () => {
+        const logouturl = props.baseUrl + 'login/logout'
+        fetch(logouturl, fetchConfig)
+          .then(r => {
+            console.log('Logout result: ', r);
+          })
+          .finally(() => {
+            props.clearProfile()
+            navigate('/')
+          })
+      }})
+    }
+    return items;
   }
 
   let columns = 1
@@ -292,8 +314,20 @@ function Nav(props : NavProps) {
             </Box>
             {
               props.profile &&
-              <Box sx={{ 	alignSelf: 'flex-end', my: 2, color: 'white', p: '6px' }}>
-                {props.profile.fullname || props.profile.username}
+              <Box sx={{ alignSelf: 'flex-end', my: 2, color: 'white', p: '6px' }}>
+                <Button key='Profile' sx={{ my: 2, color: 'white' }} onClick={(event) => {
+                  setProfileMenuAnchor(event.currentTarget)
+                }}>
+                  {props.profile.fullname || props.profile.username}
+                </Button>
+                <NestableMenu menuItems={profileMenuItems(props.profile) || []}
+                  anchor={profileMenuAnchor}
+                  onClose={() => {
+                    setProfileMenuAnchor(null)
+                  }}
+                >
+                </NestableMenu>
+
               </Box>
             }
           </Toolbar>
