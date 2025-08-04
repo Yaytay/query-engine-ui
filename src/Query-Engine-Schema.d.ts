@@ -2103,6 +2103,12 @@ export interface components {
          *
          *      */
         Format: {
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -2139,12 +2145,6 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
-            /** @description <P>The description of the format.</P>
-             *     <P>
-             *     The description is used in UIs to help users choose which format to use.
-             *     </P>
-             *      */
-            description?: string;
             /** @description <P>The filename to specify in the Content-Disposition header.</P>
              *     <P>
              *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
@@ -4867,6 +4867,24 @@ export interface components {
             /** @description The version of the Query Engine backend.
              *      */
             version?: string;
+            /**
+             * @description The claims from the JWT representing the user.
+             *     The type will be an object with string keys.
+             *
+             * @example {
+             *       "sub": "user123",
+             *       "iss": "http://issuer-endpoint/token",
+             *       "exp": 1754310371,
+             *       "nbf": 1754306771,
+             *       "preferred_username": "john.doe",
+             *       "name": "John Doe",
+             *       "email": "john.doe@example.com",
+             *       "aud": "query-engine"
+             *     }
+             */
+            claims?: {
+                [key: string]: unknown;
+            };
         };
     };
     responses: never;
