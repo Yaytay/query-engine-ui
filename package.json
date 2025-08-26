@@ -44,7 +44,7 @@
     "react-expanding-textarea": "^2.3.6",
     "react-modal": "^3.16.3",
     "react-router-dom": "^7.7.1",
-    "tailwindcss": "^4.1.11",
+    "tailwindcss": "^4.1.12",
     "typescript": "^5.8.3",
     "vite": "^7.0.6",
     "vitest": "^3.2.4"
