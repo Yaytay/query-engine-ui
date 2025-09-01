@@ -2103,12 +2103,6 @@ export interface components {
          *
          *      */
         Format: {
-            /** @description <P>The description of the format.</P>
-             *     <P>
-             *     The description is used in UIs to help users choose which format to use.
-             *     </P>
-             *      */
-            description?: string;
             /** @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
@@ -2145,6 +2139,12 @@ export interface components {
              *     </P>
              *      */
             extension?: string;
+            /** @description <P>The description of the format.</P>
+             *     <P>
+             *     The description is used in UIs to help users choose which format to use.
+             *     </P>
+             *      */
+            description?: string;
             /** @description <P>The filename to specify in the Content-Disposition header.</P>
              *     <P>
              *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
@@ -3196,6 +3196,24 @@ export interface components {
              * @default true
              */
             outputNullValues: boolean;
+            /**
+             * Format: int32
+             * @description Controls the level of JSON formatting prettiness.
+             *     <P>
+             *     A value of 0 (or less) produces compact JSON output with no extra whitespace.
+             *     A value of 1 (the default) produces JSON with one newline character after each row.
+             *     A value of 2 (or more) outputs each field on a separate line and indents each field with whitespace.
+             *     <P>
+             *     Any values greater than 1 make use of Jackson PrettyPrinters and are inherently slower and a lot more verbose.
+             *     Avoid values greater than 1 for large datasets.
+             *     Furthermore there won't be any attempt to make values greater than 1 <em>increase</em> verbosity as numbers increase
+             *     - they will simply be used for different configurations of PrettyPrinter.
+             *     <P>
+             *     The current maximum value is 2.
+             *
+             * @default 0
+             */
+            prettiness: number;
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
