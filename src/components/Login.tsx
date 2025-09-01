@@ -59,7 +59,7 @@ function Login(props: LoginProps) {
             <Button
               key={ac.name}
               variant="outlined"
-              href={props.baseUrl + "login?provider=" + ac.name + "&return=/ui"}
+              href={props.baseUrl + "login?provider=" + ac.name + "&return=/ui/"}
               size="large"
               style={{ minWidth: "200px", marginTop: '10px', marginBottom: '10px' }}
               startIcon={
