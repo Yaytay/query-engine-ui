@@ -188,7 +188,6 @@ export interface paths {
          * @description Will only ever return data for the user making the request (token subject must match).
          *     <p>
          *     By default returns the first 1000000 rows sorted by timestsamp with the most recent data first.
-         *
          */
         get: operations["getHistory"];
         put?: never;
@@ -254,45 +253,50 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description <P>
+        /**
+         * @description <P>
          *     Configuration data for the display of authentication selection.
          *     </P>
-         *      */
+         */
         AuthConfig: {
-            /** @description <P>
+            /**
+             * @description <P>
              *     The name to use in the list of authentication providers.
              *     </P>
-             *      */
+             */
             name: string;
             /**
              * Format: uri
              * @description <P>
              *     The URL to the logo to use in the list of authentication providers.
              *     </P>
-             *
              */
             logo: string;
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     A directory containing pipeline files.
          *     </P>
-         *      */
+         */
         DesignDir: {
-            /** @description <P>
+            /**
+             * @description <P>
              *     The leaf name of the node.
              *     </P>
-             *      */
+             */
             name: string;
-            /** @description The children of the node.
+            /**
+             * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
-             *      */
+             */
             children: components["schemas"]["DesignNode"][];
-            /** @description <P>
+            /**
+             * @description <P>
              *     The relative path to the node from the root.
              *     </P>
-             *      */
+             */
             path: string;
             /**
              * Format: date-time
@@ -302,50 +306,54 @@ export interface components {
              *     <P>
              *     Design files must be stored on a filesystem that supports a last-modified timestamp.
              *     </P>
-             *
              */
             modified: string;
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     A pipeline definition file.
          *     </P>
-         *      */
+         */
         DesignFile: WithRequired<components["schemas"]["DesignNode"], "modified" | "name" | "path"> & {
-            /** @description The children of the node.
+            /**
+             * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
-             *      */
+             */
             children?: components["schemas"]["DesignNode"][];
             /**
              * Format: int64
              * @description <P>
              *     The size of the file on disc, in bytes.
              *     </P>
-             *
              */
             size: number;
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     Base class for pipeline design files and the directories that contain them.
          *     </P>
-         *      */
+         */
         DesignNode: {
-            /** @description <P>
+            /**
+             * @description <P>
              *     The leaf name of the node.
              *     </P>
-             *      */
+             */
             name: string;
-            /** @description The children of the node.
+            /**
+             * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
-             *      */
+             */
             children?: components["schemas"]["DesignNode"][];
-            /** @description <P>
+            /**
+             * @description <P>
              *     The relative path to the node from the root.
              *     </P>
-             *      */
+             */
             path: string;
             /**
              * Format: date-time
@@ -355,11 +363,11 @@ export interface components {
              *     <P>
              *     Design files must be stored on a filesystem that supports a last-modified timestamp.
              *     </P>
-             *
              */
             modified: string;
         };
-        /** @description <p>A definition of a rule that prevents a pipeline from running if previous runs that match the scope and time limit exceed the byte count.</p>
+        /**
+         * @description <p>A definition of a rule that prevents a pipeline from running if previous runs that match the scope and time limit exceed the byte count.</p>
          *     <p>Note that rate limit rules are only evaluated before running a pipeline and do not take the current run into consideration at all.</p>
          *     <p>
          *     * As an example a rateLimit defined as:
@@ -373,38 +381,42 @@ export interface components {
          *     <p>
          *     Refused requests result in an HTTP status code 429 ("Too Many Requests").
          *     </p>
-         *      */
+         */
         RateLimitRule: {
-            /** @description <P>The scope of the rate limit rule.</P>
+            /**
+             * @description <P>The scope of the rate limit rule.</P>
              *     <P>At least one value must be provided.</P>
-             *      */
+             */
             scope: ("host" | "path" | "clientip" | "issuer" | "subject" | "username")[];
-            /** @description <P>The duration of the rate limit.</P>
+            /**
+             * @description <P>The duration of the rate limit.</P>
              *     <P>Expressions in ISO8601 time period notication (e.g. PT10M for ten minutes).</P>
-             *      */
+             */
             timeLimit: string;
-            /** @description <P>The limit on the number of pipeline runs matching the scope that may be initiated.</P>
+            /**
+             * @description <P>The limit on the number of pipeline runs matching the scope that may be initiated.</P>
              *     <P>
              *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
              *     No other non-numeric characters are permitted.
              *     </P>
-             *      */
+             */
             runLimit?: string;
-            /** @description <P>The limit on the number of bytes that may be been sent by previous runs.</P>
+            /**
+             * @description <P>The limit on the number of bytes that may be been sent by previous runs.</P>
              *     <P>
              *     This value may be entered as a string ending in 'M', 'G', or 'K' to multiply the numeric value by 1000000, 1000000000 or 1000 respectively.
              *     No other non-numeric characters are permitted.
              *     </P>
-             *      */
+             */
             byteLimit?: string;
             /**
              * Format: int32
              * @description <P>The limit on the number of runs matching the scope that may have been started but not completed within the time limit.</P>
-             *
              */
             concurrencyLimit?: number;
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     An ArgumentGroup represents a group of {@link Argument} instances.
          *     </P>
          *     <P>
@@ -414,68 +426,73 @@ export interface components {
          *     Each {@link Argument} in the {@link Pipeline} can specify a group name.
          *     It is an error if the group does not also exist in the Pipeline.
          *     </P>
-         *      */
+         */
         ArgumentGroup: {
-            /** @description <P>The name of the argument group, should be specified by any arguments in this group.</P>
+            /**
+             * @description <P>The name of the argument group, should be specified by any arguments in this group.</P>
              *     <P>No two argument groups in a single pipeline should have the same name.</P>
              *     <P>
              *     The name must consist entirely of Unicode alpha-numeric characters, it is
              *     recommended that the name use only ASCII characters to avoid needing to encode it
              *     but this is not a requirement.
              *     </P>
-             *      */
+             */
             name: string;
-            /** @description <P>The title to be displayed for the argument group in any UI.</P>
+            /**
+             * @description <P>The title to be displayed for the argument group in any UI.</P>
              *     <P>
              *     If the title is not set the UI will display the name.
              *     </P>
-             *      */
+             */
             title?: string;
-            /** @description <P>The description to be displayed for the argument group in any UI.</P>
-             *      */
+            /** @description <P>The description to be displayed for the argument group in any UI.</P> */
             description?: string;
             /**
              * @description <P>The type of rendering to use for the argument group.</P>
              *     <P>
              *     The type of the argument group is optional, if it is not specified a default rendering will be used.
              *     </P>
-             *
              * @enum {string}
              */
             type?: "FIELD_SET" | "PANEL" | "COLLAPSIBLE_PANEL";
-            /** @description The theme used to display the argument group in the UI.
+            /**
+             * @description The theme used to display the argument group in the UI.
              *     <P>
              *     This should be any valid Bootstrap Panel Theme
              *     <P>
              *     Valid values include: default, primary, success, info, warning, danger.
-             *      */
+             */
             theme?: string;
         };
-        /** @description <P>An ArgumentValue represents a possible value for an Argument to a Pipeline.</P>
+        /**
+         * @description <P>An ArgumentValue represents a possible value for an Argument to a Pipeline.</P>
          *     <P>
          *     ArgumentValues are not validated by the Query Engine at all, they exist solely to make life nicer for UIs.
          *     The &quot;value&quot; in an ArgumentValue is the value that is to be passed in, the &quot;label&quot; field is purely for a UI to display.
          *     It is expected that a UI will display the &quot;value&quot; if the &quot;label&quot; field is null or blank.
-         *      */
+         */
         ArgumentValue: {
-            /** @description <P>
+            /**
+             * @description <P>
              *     The value that is the actual potential argument that the Pipeline expects to receive.
              *     </P>
              *     <P>
              *     The value is considered required, the label field is not.
              *     </P>
-             *      */
+             */
             value: string;
-            /** @description <P>
+            /**
+             * @description <P>
              *     The label that should be shown to the user for the given value.
              *     </P>
              *     <P>
              *     This label  is nullable, in which case the value should be displayed to the user.
              *     </P>
-             *      */
+             */
             label?: string;
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     An Argument represents a named piece of data that will be passed in to a pipeline.
          *     </P>
          *     <P>
@@ -484,51 +501,55 @@ export interface components {
          *     <P>
          *     Every argument that a pipeline expects <em>should</em> be specified.
          *     </P>
-         *      */
+         */
         Argument: {
             /**
              * @description <P>The data type of the argument</P>
-             *
              * @enum {string}
              */
             type: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
-            /** @description <P>The name of the group that the argument should be presented in.</P>
+            /**
+             * @description <P>The name of the group that the argument should be presented in.</P>
              *     <P>The group will be used in the presentation of arguments in the UI but otherwise serves no purpose for the processing.</P>
-             *      */
+             */
             group: string;
-            /** @description <P>The name of the argument.</P>
+            /**
+             * @description <P>The name of the argument.</P>
              *     <P>No two arguments in a single pipeline should have the same name.</P>
              *     <P>
              *     The name must consist entirely of Unicode alpha-numeric characters, it is
              *     recommended that the name use only ASCII characters to avoid needing to encode it
              *     but this is not a requirement.
              *     </P>
-             *      */
+             */
             name: string;
-            /** @description <P>The title to be displayed for the argument in any UI.</P>
+            /**
+             * @description <P>The title to be displayed for the argument in any UI.</P>
              *     <P>
              *     The title serves no purpose in the processing of the pipeline.
              *     If the title is not set the UI will display the name.
              *     </P>
-             *      */
+             */
             title?: string;
-            /** @description <P>The prompt to be displayed for the argument in any UI.</P>
+            /**
+             * @description <P>The prompt to be displayed for the argument in any UI.</P>
              *     <P>
              *     The prompt serves no purpose in the processing of the pipeline.
              *     </P>
              *     <P>
              *     The prompt should be kept short (a single word or phrase) so as to fit in the Input field on the UI parameter form.
              *     </P>
-             *      */
+             */
             prompt?: string;
-            /** @description <P>The description to be displayed for the argument in any UI.</P>
+            /**
+             * @description <P>The description to be displayed for the argument in any UI.</P>
              *     <P>
              *     The description serves no purpose in the processing of the pipeline.
              *     </P>
              *     <P>
              *     The description should be kept short (one short sentence) so as to fit above the Input field on the UI parameter form.
              *     </P>
-             *      */
+             */
             description?: string;
             /**
              * @description <P>If set to false the pipeline will fail if the argument is not supplied.</P>
@@ -536,7 +557,6 @@ export interface components {
              *     Declaring mandatory arguments to not be optional results in a better user experience when
              *     the users fail to provide it.
              *     </P>
-             *
              * @default false
              */
             optional: boolean;
@@ -546,7 +566,6 @@ export interface components {
              *     The purpose of hidden arguments is to use the defaultValueExpression to present dynamic data to the query.
              *     Suggested uses include dynamic limits on a query or values extracted from the token.
              *     </P>
-             *
              * @default false
              */
             hidden: boolean;
@@ -559,7 +578,6 @@ export interface components {
              *     <P>
              *     If an argument that is not multi-valued is provided multiple times the Query Engine will fail to run the Pipeline.
              *     </P>
-             *
              * @default false
              */
             multiValued: boolean;
@@ -571,7 +589,6 @@ export interface components {
              *     <P>
              *     If an argument that should be ignored is provided the Query Engine will fail to run the Pipeline.
              *     </P>
-             *
              * @default false
              */
             ignored: boolean;
@@ -590,7 +607,6 @@ export interface components {
              *     against the possible values list or the permitted values regexe if the default values generated by the expression
              *     are Strings.
              *     This does not prevent them being converted to the relevant data type after being generated and validated.
-             *
              * @default true
              */
             validate: boolean;
@@ -600,11 +616,11 @@ export interface components {
              *     Some historical services call Query Engine with empty query string values, which can cause problems when they are passed to a database engine.
              *     A BIND construct is no defence against this, because Query Engine considers the argument to have been passed in with a zero length string.
              *     Setting this to true will make the engine ignore the blank query string value completely.
-             *
              * @default false
              */
             emptyIsAbsent: boolean;
-            /** @description <P>
+            /**
+             * @description <P>
              *     A list of the name(s) of another argument(s) that this argument requires.
              *     </P>
              *     <P>
@@ -613,9 +629,10 @@ export interface components {
              *     <P>
              *     This serves no purpose in the processing of the pipeline (it is explicitly not validated at runtime).
              *     </P>
-             *      */
+             */
             dependsUpon?: string[];
-            /** @description The default value for the argument, as a <a target="_blank" href="https://commons.apache.org/proper/commons-jexl/">JEXL</a> <a target="_blank" href="https://commons.apache.org/proper/commons-jexl/reference/syntax.html">expression</a>.
+            /**
+             * @description The default value for the argument, as a <a target="_blank" href="https://commons.apache.org/proper/commons-jexl/">JEXL</a> <a target="_blank" href="https://commons.apache.org/proper/commons-jexl/reference/syntax.html">expression</a>.
              *     <P>
              *     The expression will be evaluated in the same context as a <a target="_blank" href="/ui/help/Parameters/uk.co.spudsoft.query.defn.Condition.html">Condition</a> would be, but the result is not constrained to being a boolean value.
              *     The evaluation may result in multiple values (as either an array or a Collection) or a single value.
@@ -634,9 +651,10 @@ export interface components {
              *     Note that the default value should <em>not</em> be URL encoded.
              *     <P>
              *     The default value can only be used if the argument is optional (or conditional, where it will be used if the condition is false).
-             *      */
+             */
             defaultValueExpression?: string;
-            /** @description <P>The minimum value for the argument, as a string.</P>
+            /**
+             * @description <P>The minimum value for the argument, as a string.</P>
              *     <P>
              *     The minimum value will be converted to the correct data type as it would be if it were received
              *     as the argument.
@@ -646,9 +664,10 @@ export interface components {
              *     If an argument is provided that is less than the minimum value (using an appropriate comparison for the
              *     datatype, not a string comparison) then it will be refused.
              *     </P>
-             *      */
+             */
             minimumValue?: string;
-            /** @description <P>The maximum value for the argument, as a string.</P>
+            /**
+             * @description <P>The maximum value for the argument, as a string.</P>
              *     <P>
              *     The maximum value will be converted to the correct data type as it would be if it were received
              *     as the argument.
@@ -658,9 +677,10 @@ export interface components {
              *     If an argument is provided that is greater than the mimum value (using an appropriate comparison for the
              *     datatype, not a string comparison) then it will be refused.
              *     </P>
-             *      */
+             */
             maximumValue?: string;
-            /** @description <P>A list of possible values that the argument may have.</P>
+            /**
+             * @description <P>A list of possible values that the argument may have.</P>
              *     <P>
              *     The possible values are not validated, if an invalid value is provided the pipeline will still
              *     attempt to run with it.
@@ -668,9 +688,10 @@ export interface components {
              *     <P>
              *     If more than a few values are possible the possibleValuesUrl (or possibleValuesRegex) should be used instead.
              *     </P>
-             *      */
+             */
             possibleValues?: components["schemas"]["ArgumentValue"][];
-            /** @description <P>A URL that will provide a list of possible values that the argument may have.</P>
+            /**
+             * @description <P>A URL that will provide a list of possible values that the argument may have.</P>
              *     <P>
              *     The URL should be called using the same credentials as the Pipeline was (it is expected, but not required, that the URL will be another Pipeline).
              *     </P><P>
@@ -696,23 +717,26 @@ export interface components {
              *     The possible values are not validated, if an invalid value is provided the pipeline will still
              *     attempt to run with it.
              *     </P>
-             *      */
+             */
             possibleValuesUrl?: string;
-            /** @description <P>A regular expression that all values of the argument must match.</P>
+            /**
+             * @description <P>A regular expression that all values of the argument must match.</P>
              *     <P>
              *     All values passed in are validated and the Query Engine will fail to run if the values does not match the reguarl expression.
              *     </P>
              *     <P>
              *     At runtime expression will be treated as a standard Java regular expression, but well written UI should also validate
              *     values against the expression so Interactive Pipelines should only use expressions that are compatible with JavaScrtip.
-             *      */
+             */
             permittedValuesRegex?: string;
-            /** @description <P>Optional condition that controls whether the argument will be used, and will appear as an argument in the form.</P>
+            /**
+             * @description <P>Optional condition that controls whether the argument will be used, and will appear as an argument in the form.</P>
              *     <P>If the condition is not met the argument will not appear in the pipeline form and it will be as if the argument was not supplied on the command line (even if it is).</p>
-             *      */
+             */
             condition?: components["schemas"]["Condition"];
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     Conditions are expressions using <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> that control access to something.
          *     <P>
          *     Conditions can be applied to entire directories (in the permissions.jexl file); to Pipelines or to Endpoints.
@@ -757,32 +781,31 @@ export interface components {
          *     <LI><PRE>requestContext.host == 'localhost'</PRE>
          *     Checks that the host on the request is localhost.
          *     </UL>
-         *      */
+         */
         Condition: {
-            /** @description The expression that makes up the condition.
-             *      */
+            /** @description The expression that makes up the condition. */
             expression: string;
         };
-        /** @description Override of the data type for a specific column.
+        /**
+         * @description Override of the data type for a specific column.
          *
          *     This facility is rarely required, but can be useful when a database does not provide adequate information for Query Engine to correctly identify the type of a field.
          *
          *     This is known to be useful for boolean fields with MySQL.
          *
          *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
-         *      */
+         */
         ColumnTypeOverride: {
-            /** @description <P>The name of the column that is to have its data type set.</P>
-             *      */
+            /** @description <P>The name of the column that is to have its data type set.</P> */
             column?: string;
             /**
              * @description <P>The desired type of the column.</P>
-             *
              * @enum {string}
              */
             type?: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     Represents a pipeline that can used to generate endpoints before the main pipeline is run.
          *     </P>
          *     <P>
@@ -808,15 +831,17 @@ export interface components {
          *     The recommendation would be to not start storing credentials in a database in order to satisfy the needs of the Query Engine,
          *     but if the credentials are already there then there is no reason to avoid using them.
          *     </P>
-         *      */
+         */
         DynamicEndpoint: {
-            /** @description <P>Get the name of the PreProcessor, that will be used in logging and tracking..</P>
+            /**
+             * @description <P>Get the name of the PreProcessor, that will be used in logging and tracking..</P>
              *     <P>
              *     This is optional, if it is not set a generated name will be allocated.
              *     </P>
-             *      */
+             */
             name?: string;
-            /** @description <P>Get the pipeline used to generate the endpoints.</P>
+            /**
+             * @description <P>Get the pipeline used to generate the endpoints.</P>
              *     <P>
              *     This pipeline can only use endpoints already in existence.
              *     This usually means those defined statically in the outer pipeline, but there is nothing to prevent a series of DynamicEndpointSource configurations
@@ -835,26 +860,27 @@ export interface components {
              *     If multiple endpoints are returned they should specify the keyField and have a unique key for each endpoint.
              *     In the absence of this all the key value will be used for all of the endpoints and only the last will be accessible.
              *     </P>
-             *      */
+             */
             input: components["schemas"]["SourcePipeline"];
-            /** @description <P>The key used to identify all endpoints found by this DynamicEndpointSource.</P>
+            /**
+             * @description <P>The key used to identify all endpoints found by this DynamicEndpointSource.</P>
              *     <P>
              *     To be used when the source is only going to return a single endpoint and the key is not part of the query.
              *     There is no default value, either key or the keyField must be set.
              *     </P>
-             *      */
+             */
             key?: string;
             /**
              * @description <P>The name of the field that will contain the type of each endpoint.</P>
-             *
              * @default type
              */
             typeField: string;
-            /** @description <P>The name of the field that will contain the key for each endpoint.</P>
+            /**
+             * @description <P>The name of the field that will contain the key for each endpoint.</P>
              *     <P>
              *     There is no default value, either key or the keyField must be set.
              *     </P>
-             *      */
+             */
             keyField?: string;
             /**
              * @description <P>The name of the field that will contain the URL for each endpoint.</P>
@@ -863,7 +889,6 @@ export interface components {
              *     , but if the pipeline produces rows in which both fields have values the resulting Endpoint
              *     will be invalid.
              *     </P>
-             *
              * @default url
              */
             urlField: string;
@@ -874,7 +899,6 @@ export interface components {
              *     , but if the pipeline produces rows in which both fields have values the resulting Endpoint
              *     will be invalid.
              *     </P>
-             *
              * @default urlTemplate
              */
             urlTemplateField: string;
@@ -885,7 +909,6 @@ export interface components {
              *     , but if the pipeline produces rows in which both secretField and either of the other two have values
              *     the resulting Endpoint will be invalid.
              *     </P>
-             *
              * @default secret
              */
             secretField: string;
@@ -896,7 +919,6 @@ export interface components {
              *     , but if the pipeline produces rows in which both secretField and either of the other two have values
              *     the resulting Endpoint will be invalid.
              *     </P>
-             *
              * @default username
              */
             usernameField: string;
@@ -907,34 +929,29 @@ export interface components {
              *     , but if the pipeline produces rows in which both secretField and either of the other two have values
              *     the resulting Endpoint will be invalid.
              *     </P>
-             *
              * @default password
              */
             passwordField: string;
             /**
              * @description <P>The name of the field that will contain the condition for each endpoint.</P>
-             *
              * @default condition
              */
             conditionField: string;
         };
-        /** @description Processors modify the data stream in flight.
-         *      */
+        /** @description Processors modify the data stream in flight. */
         Processor: {
-            /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P>
-             *      */
+            /** @description <P>Name that uniquely idenfities this processor within the pipeline.</P> */
             name: string;
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
         };
-        /** @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
+        /**
+         * @description Processor that takes in multiple streams and uses them to dynamically add fields to the primary stream.
          *
          *     Two child pipelines must be defined:
          *     <ul>
@@ -970,21 +987,20 @@ export interface components {
          *     <li>Add a new field to the parent data row with the name from the field definition and the value from the value field of the value row.
          *     </ol>
          *     </ol>
-         *      */
+         */
         ProcessorDynamicField: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
-            /** @description The inner join flag.
+            /**
+             * @description The inner join flag.
              *     <P>
              *     If set to true the parent row will only be output if the child feed has at least one matching row.
-             *      */
+             */
             innerJoin?: boolean;
             /**
              * @description The inner join flag.
@@ -992,46 +1008,44 @@ export interface components {
              *     If set to true the parent row will only be output if the child feed has at least one matching row.
              *     <P>
              *     For the sake of clarity this should usually be left as false.
-             *
              * @default false
              */
             useCaseInsensitiveFieldNames: boolean;
-            /** @description The name of the column in the field defns feed that is used to identify the extra column.
-             *      */
+            /** @description The name of the column in the field defns feed that is used to identify the extra column. */
             fieldIdColumn?: string;
-            /** @description The name of the column in the field defns feed that is used to name the extra column.
-             *      */
+            /** @description The name of the column in the field defns feed that is used to name the extra column. */
             fieldNameColumn?: string;
-            /** @description The name of the column in the field defns feed that is used to determine the type of the extra column.
-             *      */
+            /** @description The name of the column in the field defns feed that is used to determine the type of the extra column. */
             fieldTypeColumn?: string;
-            /** @description The name of the column in the field defns feed that is used to find the name of the field in the values feed that contains the actual value.
-             *      */
+            /** @description The name of the column in the field defns feed that is used to find the name of the field in the values feed that contains the actual value. */
             fieldColumnColumn?: string;
-            /** @description The parent ID column.
+            /**
+             * @description The parent ID column.
              *     <P>
              *     This is the name of the field in the main stream that is to be used to match against child rows.
              *     The main stream must be sorted by this field.
-             *      */
+             */
             parentIdColumns?: string[];
-            /** @description The name of the column in the values feed that contains the ID to match to the parent feed.
+            /**
+             * @description The name of the column in the values feed that contains the ID to match to the parent feed.
              *     <P>
              *     The values feed must be sorted by this column.
-             *      */
+             */
             valuesParentIdColumns?: string[];
-            /** @description The name of the column in the values feed that contains the ID of the field represented by that row.
-             *      */
+            /** @description The name of the column in the values feed that contains the ID of the field represented by that row. */
             valuesFieldIdColumn?: string;
-            /** @description The list of fields to look in for the field value.
+            /**
+             * @description The list of fields to look in for the field value.
              *     <P>
              *     This should not be used, the correct approach is to identify the field value column in the field definition query - this approach only exists for backwards compatibility.
              *     <P>
              *     When set, this should be a comma separate list of field names from the values stream.
              *     Even if this value is set, it will only be used if the field value column in the field definition query is not set.
              *     At runtime the named columns in the values stream will be checked in order and the first one that is not null be be taken.
-             *      */
+             */
             fieldValueColumnName?: string;
-            /** @description Get the feed for the field definitions.
+            /**
+             * @description Get the feed for the field definitions.
              *
              *     This data feed should result in four columns:
              *     <ul>
@@ -1041,9 +1055,10 @@ export interface components {
              *     <li>fieldColumnColumn - The column in the field values feed that contains the actual value for this field.
              *     </ul>
              *     The fields will be added to the parent feed in the order of the rows returned by this query (regardless of the ordering in the fieldValues feed).
-             *      */
+             */
             fieldDefns?: components["schemas"]["SourcePipeline"];
-            /** @description The feed for the field values.
+            /**
+             * @description The feed for the field values.
              *     <P>
              *     This data feed should result in at least three columns:
              *     <ul>
@@ -1051,7 +1066,7 @@ export interface components {
              *     <li>valuesFieldIdColumn - ID of the field that this row relates to (used to define the type and name of the resulting field).
              *     <li>Values - One or more fields that contain values, identified from the Column value in the FieldDefns feed.
              *     </ul>
-             *      */
+             */
             fieldValues?: components["schemas"]["SourcePipeline"];
         } & {
             /**
@@ -1060,21 +1075,19 @@ export interface components {
              */
             type: "DYNAMIC_FIELD";
         };
-        /** @description Run an JEXL expression each row of the output.
-         *      */
+        /** @description Run an JEXL expression each row of the output. */
         ProcessorExpression: {
             type: "ProcessorExpression";
         } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
-            /** @description A JEXL expression that is used to determine whether or not the row should be discarded.
+            /**
+             * @description A JEXL expression that is used to determine whether or not the row should be discarded.
              *     <P>
              *     The script should return a value that is either true or false, if the value is false the row will be discarded.
              *     <p>
@@ -1115,12 +1128,13 @@ export interface components {
              *     <LI>clientIpIsIn
              *     A function that receives an array of IP addresses or subnets (in slash notation) and returns true if the clientIp matches any of them.
              *     </UL>
-             *      */
+             */
             predicate?: string;
-            /** @description The field that is to be created/updated by the {@link Processor}.
+            /**
+             * @description The field that is to be created/updated by the {@link Processor}.
              *     <P>
              *     If this value is set the fieldType and fieldValue must both also be set.
-             *      */
+             */
             field?: string;
             /**
              * @description The type of the field that is to be created/updated.
@@ -1129,11 +1143,11 @@ export interface components {
              *     If the field being set is an existing field then the type specified must be the same as the existing type of that field (or must be null).
              *     <p>
              *     If this value is set, but "field" is not set then it will be ignored.
-             *
              * @enum {string}
              */
             fieldType?: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
-            /** @description A JEXL expression that is evaluated, then parsed/cast to the fieldType and then assigned to the field.
+            /**
+             * @description A JEXL expression that is evaluated, then parsed/cast to the fieldType and then assigned to the field.
              *     <P>
              *     The context of the evaluation includes a variable of type {@link uk.co.spudsoft.query.exec.conditions.RequestContext} called &quot;req&quot; that includes:
              *     <UL>
@@ -1172,10 +1186,11 @@ export interface components {
              *     <LI>clientIpIsIn
              *     A function that receives an array of IP addresses or subnets (in slash notation) and returns true if the clientIp matches any of them.
              *     </UL>
-             *      */
+             */
             fieldValue?: string;
         });
-        /** @description Processor that combines multiple values from a child query into a single concatenated string value.
+        /**
+         * @description Processor that combines multiple values from a child query into a single concatenated string value.
          *     <P>
          *     There are three ways that the group concat can be performed:
          *     <OL>
@@ -1186,56 +1201,59 @@ export interface components {
          *     <LI>Do not specify childValueColumn.
          *     All fields from the child stream will be (indepdently) concatenated and added to the parent stream (with the same names).
          *     </OL>
-         *      */
+         */
         ProcessorGroupConcat: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
-            /** @description The data feed.
+            /**
+             * @description The data feed.
              *     <P>
              *     The data must be sorted by the childIdColumns (and the parent feed should be sorted by the parentIdColumns).
-             *      */
+             */
             input?: components["schemas"]["SourcePipeline"];
-            /** @description The inner join flag.
+            /**
+             * @description The inner join flag.
              *     <P>
              *     If set to true the parent row will only be output if the child feed has at least one matching row.
-             *      */
+             */
             innerJoin?: boolean;
-            /** @description The parent ID columns.
+            /**
+             * @description The parent ID columns.
              *     <P>
              *     These are the names of the fields in the main stream that is to be used to match against child rows.
              *     The main stream must be sorted by these fields.
-             *      */
+             */
             parentIdColumns?: string[];
-            /** @description The child ID columns.
+            /**
+             * @description The child ID columns.
              *     <P>
              *     These are the names of the fields in the child stream that are to be used to match against parent rows.
              *     The child stream must be sorted by these fields.
-             *      */
+             */
             childIdColumns?: string[];
-            /** @description The child value column.
+            /**
+             * @description The child value column.
              *     <P>
              *     This is the name of the field in the child stream that contains the data to be extracted.
              *     <P>
              *     If this is not provided all fields in the child stream that are not in the childIdColumns will be individually concatenated and brought over.
-             *      */
+             */
             childValueColumn?: string;
-            /** @description The parent value column.
+            /**
+             * @description The parent value column.
              *     <P>
              *     This is the name of the field that will be created in the parent stream to contain the data from the child stream.
              *     <P>
              *     If this is not provided the parent stream fields will have the same name(s) as the child stream fields.
              *     It is an error to provide this and not to provide childValueColumn.
-             *      */
+             */
             parentValueColumn?: string;
-            /** @description The delimiter to place between each value returned.
-             *      */
+            /** @description The delimiter to place between each value returned. */
             delimiter?: string;
         } & {
             /**
@@ -1244,22 +1262,18 @@ export interface components {
              */
             type: "GROUP_CONCAT";
         };
-        /** @description Processor that curtails the output after the configured number of rows.
-         *      */
+        /** @description Processor that curtails the output after the configured number of rows. */
         ProcessorLimit: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
             /**
              * Format: int32
              * @description The limit on the number of rows that will be output by this processor.
-             *
              */
             limit?: number;
         } & {
@@ -1269,7 +1283,8 @@ export interface components {
              */
             type: "LIMIT";
         };
-        /** @description <p>
+        /**
+         * @description <p>
          *     Processor that runs an initial query to generate a map of key/value pairs, and then updates fields based on that map.
          *     </p><p>
          *     In most cases this processor is a bad idea, but in a few specific situations it can be a lot quicker to
@@ -1286,34 +1301,30 @@ export interface components {
          *     It is thus not usually possible to replace the key with the value and it us usually necessary to add an additional field.
          *     If this is undesireable use the Map processor to remove the key field.
          *     </p>
-         *      */
+         */
         ProcessorLookup: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
-            /** @description The name of the field in the lookupSource that provides the keys for the map.
-             *      */
+            /** @description The name of the field in the lookupSource that provides the keys for the map. */
             lookupKeyField: string;
-            /** @description The name of the field in the lookupSource that provides the values for the map.
-             *      */
+            /** @description The name of the field in the lookupSource that provides the values for the map. */
             lookupValueField: string;
-            /** @description The fields in the main stream that are to be looked up and the fields that are to be created in the main stream for the values found.
-             *      */
+            /** @description The fields in the main stream that are to be looked up and the fields that are to be created in the main stream for the values found. */
             lookupFields?: components["schemas"]["ProcessorLookupField"][];
-            /** @description Get the feed for the lookup key/value pairs.
+            /**
+             * @description Get the feed for the lookup key/value pairs.
              *
              *     This data feed should result in two columns:
              *     <ul>
              *     <li>lookupKeyField - The key that will be used to find values in the map.
              *     <li>lookupValueField - The value that will be take from the map and put into the main feed.
              *     </ul>
-             *      */
+             */
             map?: components["schemas"]["SourcePipeline"];
         } & {
             /**
@@ -1322,36 +1333,30 @@ export interface components {
              */
             type: "LOOKUP";
         };
-        /** @description Argument to the LookupProcessor that specifies the field containing the key to be looked up and the field that the value will be written to.
-         *      */
+        /** @description Argument to the LookupProcessor that specifies the field containing the key to be looked up and the field that the value will be written to. */
         ProcessorLookupField: {
-            /** @description The name of the field in the primary stream that is to be looked up in the map.
-             *      */
+            /** @description The name of the field in the primary stream that is to be looked up in the map. */
             keyField: string;
-            /** @description The name of the field to be created in the stream that is to be set by the value from the map.
-             *      */
+            /** @description The name of the field to be created in the stream that is to be set by the value from the map. */
             valueField: string;
-            /** @description Any condition that applies to this field.
+            /**
+             * @description Any condition that applies to this field.
              *     <P>
              *     This can be used to exclude fields based upon input conditions.
              *     The condition will be evaluated once at the beginning of the process and will not have access to each output row.
-             *      */
+             */
             condition?: components["schemas"]["Condition"];
         };
-        /** @description Processor that renames or removes fields in the output.
-         *      */
+        /** @description Processor that renames or removes fields in the output. */
         ProcessorMap: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
-            /** @description The fields that will be renamed by this processor.
-             *      */
+            /** @description The fields that will be renamed by this processor. */
             relabels: components["schemas"]["ProcessorMapLabel"][];
         } & {
             /**
@@ -1360,77 +1365,72 @@ export interface components {
              */
             type: "MAP";
         };
-        /** @description Argument to the MapProcessor that renames or removes fields in the output.
-         *      */
+        /** @description Argument to the MapProcessor that renames or removes fields in the output. */
         ProcessorMapLabel: {
-            /** @description The name of the field to be renamed.
-             *      */
+            /** @description The name of the field to be renamed. */
             sourceLabel: string;
-            /** @description The new name of the field, may be null or blank, both of which will remove the field from the stream.
-             *      */
+            /** @description The new name of the field, may be null or blank, both of which will remove the field from the stream. */
             newLabel: string;
         };
-        /** @description Processor that adds all fields from a child query into the primary stream.
+        /**
+         * @description Processor that adds all fields from a child query into the primary stream.
          *     <P>
          *     If there are multiple rows in the child stream that match the parent row all except the first will be ignored.
-         *      */
+         */
         ProcessorMerge: {
             type: "ProcessorMerge";
         } & (Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
-            /** @description The data feed.
+            /**
+             * @description The data feed.
              *     <P>
              *     This data feed should result in two columns childIdColumn and childValueColumn (any other columns will be ignored).
              *     The data should be sorted by childIdColumn (and the parent feed should be sorted by parentIdColumn).
              *     <P>
              *     The values in childValueColumn for each value of childIdColumn will be concatenated together using delimiter as a delimiter and the result will be set as parentValueColumn in the parent feed.
-             *      */
+             */
             input?: components["schemas"]["SourcePipeline"];
-            /** @description The inner join flag.
+            /**
+             * @description The inner join flag.
              *     <P>
              *     If set to true the parent row will only be output if the child feed has at least one matching row.
-             *      */
+             */
             innerJoin?: boolean;
-            /** @description The parent ID columns.
+            /**
+             * @description The parent ID columns.
              *     <P>
              *     These are the names of the fields in the main stream that is to be used to match against child rows.
              *     The main stream must be sorted by these fields.
-             *      */
+             */
             parentIdColumns?: string[];
-            /** @description The child ID columns.
+            /**
+             * @description The child ID columns.
              *     <P>
              *     These are the names of the fields in the child stream that are to be used to match against parent rows.
              *     The child stream must be sorted by these fields.
-             *      */
+             */
             childIdColumns?: string[];
-            /** @description The delimiter to place between each value returned.
-             *      */
+            /** @description The delimiter to place between each value returned. */
             delimiter?: string;
         });
-        /** @description Processor that curtails the output after the configured number of rows.
-         *      */
+        /** @description Processor that curtails the output after the configured number of rows. */
         ProcessorOffset: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
             /**
              * Format: int32
              * @description The number of rows that will be skipped by this processor.
-             *
              */
             offset?: number;
         } & {
@@ -1440,20 +1440,16 @@ export interface components {
              */
             type: "OFFSET";
         };
-        /** @description Processor that filters output rows.
-         *      */
+        /** @description Processor that filters output rows. */
         ProcessorQuery: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
-            /** @description A valid FIQL expression that will be evaluated on each row.
-             *      */
+            /** @description A valid FIQL expression that will be evaluated on each row. */
             expression: string;
         } & {
             /**
@@ -1462,31 +1458,31 @@ export interface components {
              */
             type: "QUERY";
         };
-        /** @description Run a custom script on each row of the output.
-         *      */
+        /** @description Run a custom script on each row of the output. */
         ProcessorScript: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
-            /** @description The language to use, as understood by GraalVM.
+            /**
+             * @description The language to use, as understood by GraalVM.
              *     <P>
              *     By default the only acceptable value is "js", but custom builds can use other lanaguages.
-             *      */
+             */
             language?: string;
-            /** @description A predicate script is used to determine whether or not the row should be discarded.
+            /**
+             * @description A predicate script is used to determine whether or not the row should be discarded.
              *     <P>
              *     The script should return a value that is either true or false, if the value is false the row will be discarded.
-             *      */
+             */
             predicate?: string;
-            /** @description A process script can manipulate the row in any way it wants.
+            /**
+             * @description A process script can manipulate the row in any way it wants.
              *     <P>
-             *      */
+             */
             process?: string;
         } & {
             /**
@@ -1495,7 +1491,8 @@ export interface components {
              */
             type: "SCRIPT";
         };
-        /** @description Processor that sorts the data stream.
+        /**
+         * @description Processor that sorts the data stream.
          *     <P>
          *     Note that this pipeline, unlike most others, has to buffer the entire stream before it can sort it.
          *     Additionally, if the data consists of too many rows it will be sorted on disc.
@@ -1503,19 +1500,16 @@ export interface components {
          *     <P>
          *     This processor is inherently slow, if you need to use it please discuss options with the pipeline designer.
          *     </P>
-         *      */
+         */
         ProcessorSort: Omit<WithRequired<components["schemas"]["Processor"], "name" | "type">, "type"> & {
             /**
              * @description <P>The type of Processor being configured.</P>
-             *
              * @enum {string}
              */
             type: "LIMIT" | "OFFSET" | "MERGE" | "GROUP_CONCAT" | "DYNAMIC_FIELD" | "LOOKUP" | "SCRIPT" | "EXPRESSION" | "QUERY" | "MAP" | "SORT";
-            /** @description <P>Optional condition that controls whether the processor will be run.</P>
-             *      */
+            /** @description <P>Optional condition that controls whether the processor will be run.</P> */
             condition?: components["schemas"]["Condition"];
-            /** @description The fields by which this processor will sort the data.
-             *      */
+            /** @description The fields by which this processor will sort the data. */
             fields?: string[];
         } & {
             /**
@@ -1524,34 +1518,34 @@ export interface components {
              */
             type: "SORT";
         };
-        /** @description A Source is the source of data for a pipeline.
-         *      */
+        /** @description A Source is the source of data for a pipeline. */
         Source: {
-            /** @description <P>Get the name of the Source, that will be used in logging.</P>
+            /**
+             * @description <P>Get the name of the Source, that will be used in logging.</P>
              *     <P>
              *     This is optional, if it is not set a numeric (or delimited numeric) name will be allocated.
              *     </P>
-             *      */
+             */
             name?: string;
             /**
              * @description <P>The type of Source being configured.</P>
-             *
              * @enum {string}
              */
             type: "TEST" | "SQL" | "JDBC" | "HTTP";
         };
-        /** @description Pipeline data source that gets data from a SQL database.
+        /**
+         * @description Pipeline data source that gets data from a SQL database.
          *     <P>
          *     This is the standard source of data for pipelines.
-         *      */
+         */
         SourceJdbc: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
             /**
              * @description <P>The type of Source being configured.</P>
-             *
              * @enum {string}
              */
             type: "TEST" | "SQL" | "JDBC" | "HTTP";
-            /** @description <P>The name of the endpoint that provides the data for the Source.</P>
+            /**
+             * @description <P>The name of the endpoint that provides the data for the Source.</P>
              *     <P>
              *     The endpoint represents the SQL database that contains the actual data.
              *     </P>
@@ -1559,9 +1553,10 @@ export interface components {
              *     The endpoint must be specified as either a straight name (this field) or as a template value (endpointEmplate).
              *     If both fields are provided it is an error.
              *     </P>
-             *      */
+             */
             endpoint?: string;
-            /** @description <P>A <a target="_blank" href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
+            /**
+             * @description <P>A <a target="_blank" href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
              *     <P>
              *     The endpoint represents the SQL database that contains the actual data.
              *     </P>
@@ -1569,9 +1564,10 @@ export interface components {
              *     The endpoint must be specified as either a template value (this field) or as a straight name (endpoint).
              *     If both fields are provided it is an error.
              *     </P>
-             *      */
+             */
             endpointTemplate?: string;
-            /** @description <P>The query to run against the Endpoint.</P>
+            /**
+             * @description <P>The query to run against the Endpoint.</P>
              *     <P>
              *     A SQL statement.
              *     </P>
@@ -1579,9 +1575,10 @@ export interface components {
              *     The query must be specified as either a plain SQL statement (this field) or as a template value (queryTemplate).
              *     If both fields are provided it is an error.
              *     </P>
-             *      */
+             */
             query?: string;
-            /** @description <P>The query to run against the Endpoint, as a <a target="_blank" href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
+            /**
+             * @description <P>The query to run against the Endpoint, as a <a target="_blank" href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
              *     <P>
              *     A StringTemplate that results in a SQL statement.
              *     </P>
@@ -1589,7 +1586,7 @@ export interface components {
              *     The query must be specified as either a templated value (this field) or as a plain SQL statement (query).
              *     If both fields are provided it is an error.
              *     </P>
-             *      */
+             */
             queryTemplate?: string;
             /**
              * Format: int32
@@ -1613,7 +1610,6 @@ export interface components {
              *     <P>
              *     Typical values are in the range 100-5000.
              *     </P>
-             *
              * @default -1
              */
             jdbcFetchSize: number;
@@ -1627,11 +1623,11 @@ export interface components {
              *     <P>
              *     Typical values are in the range 10-1000.
              *     </P>
-             *
              * @default 1000
              */
             processingBatchSize: number;
-            /** @description <P>The connection timeout for the connections that will be created.</P>
+            /**
+             * @description <P>The connection timeout for the connections that will be created.</P>
              *     </P>
              *     <P>
              *     The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
@@ -1648,9 +1644,10 @@ export interface components {
              *     <P>
              *     The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
              *     </P>
-             *      */
+             */
             connectionTimeout?: string;
-            /** @description <P>If set to true all double quotes in the query will be replaced with the identifier quoting character for the target.</P>
+            /**
+             * @description <P>If set to true all double quotes in the query will be replaced with the identifier quoting character for the target.</P>
              *     <P>
              *     If the native quoting character is already a double quote no replacement will take place.
              *     </P>
@@ -1661,9 +1658,10 @@ export interface components {
              *     <P>
              *     This is only useful when it is not known what flavour of database is being queried, which should be rare.
              *     </P>
-             *      */
+             */
             replaceDoubleQuotes?: boolean;
-            /** @description Get the overrides for column types.
+            /**
+             * @description Get the overrides for column types.
              *     <P>
              *     This is a map of column names (from the results for this query) to the Query Engine {@link DataType} that should be used in the
              *     result stream.
@@ -1673,7 +1671,7 @@ export interface components {
              *     This is known to be useful for boolean fields with MySQL.
              *     <P>
              *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
-             *      */
+             */
             columnTypeOverrides?: components["schemas"]["ColumnTypeOverride"][];
         } & {
             /**
@@ -1682,36 +1680,38 @@ export interface components {
              */
             type: "JDBC";
         };
-        /** @description <P>A SourcePipeline is the core part of a Pipeline, without the globally defined elements.</P>
+        /**
+         * @description <P>A SourcePipeline is the core part of a Pipeline, without the globally defined elements.</P>
          *     <P>
          *     A SourcePipeline cannot be directly referenced externally, but is used within a Pipeline to declare the source and processing of the data.
          *     </P>
          *     <P>
          *     Every Pipeline is also a SourcePipeline.
          *     </P>
-         *      */
+         */
         SourcePipeline: {
-            /** @description <P>
+            /**
+             * @description <P>
              *     The query for the pipeline.
              *     </P>
-             *      */
+             */
             source: components["schemas"]["Source"];
-            /** @description <P>Processors to run on the data as it flows from the Source.</P>
-             *      */
+            /** @description <P>Processors to run on the data as it flows from the Source.</P> */
             processors?: components["schemas"]["Processor"][];
         };
-        /** @description Pipeline data source that gets data from a SQL database.
+        /**
+         * @description Pipeline data source that gets data from a SQL database.
          *     <P>
          *     This is the standard source of data for pipelines.
-         *      */
+         */
         SourceSql: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
             /**
              * @description <P>The type of Source being configured.</P>
-             *
              * @enum {string}
              */
             type: "TEST" | "SQL" | "JDBC" | "HTTP";
-            /** @description <P>The name of the endpoint that provides the data for the Source.</P>
+            /**
+             * @description <P>The name of the endpoint that provides the data for the Source.</P>
              *     <P>
              *     The endpoint represents the SQL database that contains the actual data.
              *     </P>
@@ -1719,9 +1719,10 @@ export interface components {
              *     The endpoint must be specified as either a straight name (this field) or as a template value (endpointEmplate).
              *     If both fields are provided it is an error.
              *     </P>
-             *      */
+             */
             endpoint?: string;
-            /** @description <P>A <a target="_blank" href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
+            /**
+             * @description <P>A <a target="_blank" href="http://www.stringtemplate.org">String Template</a> version of the name of the endpoint that provides the data for the Source.</P>
              *     <P>
              *     The endpoint represents the SQL database that contains the actual data.
              *     </P>
@@ -1729,9 +1730,10 @@ export interface components {
              *     The endpoint must be specified as either a template value (this field) or as a straight name (endpoint).
              *     If both fields are provided it is an error.
              *     </P>
-             *      */
+             */
             endpointTemplate?: string;
-            /** @description <P>The query to run against the Endpoint.</P>
+            /**
+             * @description <P>The query to run against the Endpoint.</P>
              *     <P>
              *     A SQL statement.
              *     </P>
@@ -1739,9 +1741,10 @@ export interface components {
              *     The query must be specified as either a plain SQL statement (this field) or as a template value (queryTemplate).
              *     If both fields are provided it is an error.
              *     </P>
-             *      */
+             */
             query?: string;
-            /** @description <P>The query to run against the Endpoint, as a <a target="_blank" href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
+            /**
+             * @description <P>The query to run against the Endpoint, as a <a target="_blank" href="http://www.stringtemplate.org">String Template</a> that will be rendered first.</P>
              *     <P>
              *     A StringTemplate that results in a SQL statement.
              *     </P>
@@ -1749,7 +1752,7 @@ export interface components {
              *     The query must be specified as either a templated value (this field) or as a plain SQL statement (query).
              *     If both fields are provided it is an error.
              *     </P>
-             *      */
+             */
             queryTemplate?: string;
             /**
              * Format: int32
@@ -1758,7 +1761,6 @@ export interface components {
              *     A larger streaming fetch size will slow the initial data, but may be quicker overall (at the cost of more memory).
              *     Experiment with values in the range 10-1000.
              *     </P>
-             *
              */
             streamingFetchSize?: number;
             /**
@@ -1767,7 +1769,6 @@ export interface components {
              *     <P>
              *     If there are likely to be multiple concurrent pipelines running to the same Endpoint it can be beneficial to set this to a small number, otherwise leave it at the default.
              *     </P>
-             *
              */
             maxPoolSize?: number;
             /**
@@ -1776,10 +1777,10 @@ export interface components {
              *     <P>
              *     This is unlikely to be useful.
              *     </P>
-             *
              */
             maxPoolWaitQueueSize?: number;
-            /** @description <P>The idle timeout for the connection pool that will be created.</P>
+            /**
+             * @description <P>The idle timeout for the connection pool that will be created.</P>
              *     <P>
              *     After this time has passed the connection will be closed and a new one will be opened by subequent pipelines.
              *     </P>
@@ -1798,9 +1799,10 @@ export interface components {
              *     <P>
              *     The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
              *     </P>
-             *      */
+             */
             idleTimeout?: string;
-            /** @description <P>The connection timeout for the connections that will be created.</P>
+            /**
+             * @description <P>The connection timeout for the connections that will be created.</P>
              *     </P>
              *     <P>
              *     The value is an ISO8601 period string:  - the ASCII letter "P" in upper or lower case followed by four sections, each consisting of a number and a suffix.
@@ -1817,9 +1819,10 @@ export interface components {
              *     <P>
              *     The ISO8601 period format permits negative values, but they make no sense for timeouts and will cause an error.
              *     </P>
-             *      */
+             */
             connectionTimeout?: string;
-            /** @description <P>If set to true all double quotes in the query will be replaced with the identifier quoting character for the target.</P>
+            /**
+             * @description <P>If set to true all double quotes in the query will be replaced with the identifier quoting character for the target.</P>
              *     <P>
              *     If the native quoting character is already a double quote no replacement will take place.
              *     </P>
@@ -1830,9 +1833,10 @@ export interface components {
              *     <P>
              *     This is only useful when it is not known what flavour of database is being queried, which should be rare.
              *     </P>
-             *      */
+             */
             replaceDoubleQuotes?: boolean;
-            /** @description Get the overrides for column types.
+            /**
+             * @description Get the overrides for column types.
              *     <P>
              *     This is a map of column names (from the results for this query) to the Query Engine {@link DataType} that should be used in the
              *     result stream.
@@ -1842,7 +1846,7 @@ export interface components {
              *     This is known to be useful for boolean fields with MySQL.
              *     <P>
              *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
-             *      */
+             */
             columnTypeOverrides?: components["schemas"]["ColumnTypeOverride"][];
         } & {
             /**
@@ -1851,7 +1855,8 @@ export interface components {
              */
             type: "SQL";
         };
-        /** @description Source producing a fixed set of data without any need to communicate with a database.
+        /**
+         * @description Source producing a fixed set of data without any need to communicate with a database.
          *     <P>
          *     The data stream will have two fields:
          *     <UL>
@@ -1861,18 +1866,16 @@ export interface components {
          *     The name of the source.
          *     </UL>
          *     The number of rows to be returned can be configured, as can a delay between each row returned.
-         *      */
+         */
         SourceTest: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
             /**
              * @description <P>The type of Source being configured.</P>
-             *
              * @enum {string}
              */
             type: "TEST" | "SQL" | "JDBC" | "HTTP";
             /**
              * Format: int32
              * @description The number of rows that the source will return.
-             *
              */
             rowCount?: number;
             /**
@@ -1880,7 +1883,6 @@ export interface components {
              * @description Get the number of milliseconds to delay between production of each data row.
              *     <P>
              *     Note that 0 explicitly outputs all rows in a single thread and any non-zero value will use a periodic timer to output rows.
-             *
              */
             delayMs?: number;
         } & {
@@ -1890,7 +1892,8 @@ export interface components {
              */
             type: "TEST";
         };
-        /** @description <P>The overrides for the formatting of specific columns.</P>
+        /**
+         * @description <P>The overrides for the formatting of specific columns.</P>
          *     <P>
          *     This is only required when two columns of the same type need to be formatted in different ways.
          *     </P>
@@ -1902,20 +1905,19 @@ export interface components {
          *     Any column not specified here will have the default format, so it is only necessary to specify the
          *     odd columns here.
          *     </P>
-         *      */
+         */
         ColumnTextFormats: {
-            /** @description The column to be formatted.
-             *      */
+            /** @description The column to be formatted. */
             column: string;
             /**
              * @description The Java format to use for date fields.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format dates.
-             *
              * @default yyyy-MM-dd
              */
             dateFormat: string;
-            /** @description The Java format to use for date/time columns.
+            /**
+             * @description The Java format to use for date/time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format datetimes.
              *     <P>
@@ -2021,22 +2023,25 @@ export interface components {
              *     <li>uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
-             *      */
+             */
             dateTimeFormat?: string;
-            /** @description The Java format to use for time columns.
+            /**
+             * @description The Java format to use for time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format times.
-             *      */
+             */
             timeFormat?: string;
-            /** @description The Java format to use for float and double columns.
+            /**
+             * @description The Java format to use for float and double columns.
              *     <P>
              *     This value will be used by the Java DecimalFormat to format floating point values.
              *     <P>
              *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
              *     (i.e. it will include at least one digit after the decimal point).
-             *      */
+             */
             decimalFormat?: string;
-            /** @description Get the format to use for Boolean columns.
+            /**
+             * @description Get the format to use for Boolean columns.
              *     <P>
              *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
              *     an array of two string values - the first being true and the second being false.
@@ -2064,10 +2069,11 @@ export interface components {
              *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
              *     <P>
              *     If not set Boolean values will be output as "true" or "false".
-             *      */
+             */
             booleanFormat?: string;
         };
-        /** @description <P>The configuration for the final WriteStream of a pipeline.</P>
+        /**
+         * @description <P>The configuration for the final WriteStream of a pipeline.</P>
          *     <P>
          *     Typically the final WriteStream is the HttpResponse.
          *     </P>
@@ -2100,10 +2106,10 @@ export interface components {
          *     If the request does not use any of these mechanisms then the first Format specified in the Pipeline will be used.
          *     </ol>
          *     <p>
-         *
-         *      */
+         */
         Format: {
-            /** @description <P>The name of the format.</P>
+            /**
+             * @description <P>The name of the format.</P>
              *     <P>
              *     The name is used to determine the format based upon the '_fmt' query string argument.
              *     </P>
@@ -2113,7 +2119,7 @@ export interface components {
              *     ultimate arbiter and must be unique.
              *     This ensures that all configured Formats can be used.
              *     </P>
-             *      */
+             */
             name?: string;
             /**
              * @description <P>Whether the format should be removed from the list when presented as an option to users.
@@ -2122,36 +2128,31 @@ export interface components {
              *     <P>
              *     When hidden is true the format should removed from any UI presenting formats to the user.
              *     </P>
-             *
              * @default false
              */
             hidden: boolean;
             /**
              * @description <P>The type of Format being configured.<P>
-             *
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
-            /** @description <P>The extension of the format.</P>
+            /**
+             * @description <P>The extension of the format.</P>
              *     <P>
              *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
              *     If multiple formats have the same extension the first in the list will be used.
              *     </P>
-             *      */
+             */
             extension?: string;
-            /** @description <P>The description of the format.</P>
+            /**
+             * @description <P>The description of the format.</P>
              *     <P>
              *     The description is used in UIs to help users choose which format to use.
              *     </P>
-             *      */
+             */
             description?: string;
-            /** @description <P>The filename to specify in the Content-Disposition header.</P>
-             *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
-             *     </P>
-             *      */
-            filename?: string;
-            /** @description <P>The media type of the format.</P>
+            /**
+             * @description <P>The media type of the format.</P>
              *     <P>
              *     The media type is used to determine the format based upon the Accept header in the request.
              *     If multiple formats have the same media type the first in the list will be used.
@@ -2159,16 +2160,23 @@ export interface components {
              *     <P>
              *     The media type will also be set as the Content-Type header in the response.
              *     </P>
-             *      */
+             */
             mediaType?: string;
+            /**
+             * @description <P>The filename to specify in the Content-Disposition header.</P>
+             *     <P>
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     </P>
+             */
+            filename?: string;
         };
-        /** @description Configuration for an output format of Atom.
+        /**
+         * @description Configuration for an output format of Atom.
          *     There are no formatting options for Atom output.
-         *      */
+         */
         FormatAtom: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
              * @description <P>The type of Format being configured.<P>
-             *
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
@@ -2183,7 +2191,6 @@ export interface components {
              *     ultimate arbiter and must be unique.
              *     This ensures that all configured Formats can be used.
              *     </P>
-             *
              * @default Atom
              */
             name: string;
@@ -2193,7 +2200,6 @@ export interface components {
              *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
              *     If multiple formats have the same extension the first in the list will be used.
              *     </P>
-             *
              * @default xml
              */
             extension: string;
@@ -2206,7 +2212,6 @@ export interface components {
              *     <P>
              *     The media type will also be set as the Content-Type header in the response.
              *     </P>
-             *
              * @default application/atom+xml; charset=utf-8
              */
             mediaType: string;
@@ -2214,11 +2219,11 @@ export interface components {
              * @description The Java format to use for date fields.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format dates.
-             *
              * @default yyyy-MM-dd
              */
             dateFormat: string;
-            /** @description The Java format to use for date/time columns.
+            /**
+             * @description The Java format to use for date/time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format datetimes.
              *     <P>
@@ -2335,25 +2340,26 @@ export interface components {
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
              *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
-             *      */
+             */
             dateTimeFormat?: string;
             /**
              * @description The Java format to use for time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format times.
-             *
              * @default HH:mm
              */
             timeFormat: string;
-            /** @description The Java format to use for float and double columns.
+            /**
+             * @description The Java format to use for float and double columns.
              *     <P>
              *     This value will be used by the Java DecimalFormat to format floating point values.
              *     <P>
              *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
              *     (i.e. it will include at least one digit after the decimal point).
-             *      */
+             */
             decimalFormat?: string;
-            /** @description Get the format to use for Boolean columns.
+            /**
+             * @description Get the format to use for Boolean columns.
              *     <P>
              *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
              *     an array of two string values - the first being true and the second being false.
@@ -2381,9 +2387,10 @@ export interface components {
              *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
              *     <P>
              *     If not set Boolean values will be output as "true" or "false".
-             *      */
+             */
             booleanFormat?: string;
-            /** @description <P>The overrides for the formatting of specific columns.</P>
+            /**
+             * @description <P>The overrides for the formatting of specific columns.</P>
              *     <P>
              *     This is only required when two columns of the same type need to be formatted in different ways.
              *     </P>
@@ -2395,7 +2402,7 @@ export interface components {
              *     Any column not specified here will have the default format, so it is only necessary to specify the
              *     odd columns here.
              *     </P>
-             *      */
+             */
             columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
             /**
              * @description Fix applied to the initial letter of a field's name.
@@ -2414,12 +2421,10 @@ export interface components {
              */
             type: "Atom";
         };
-        /** @description Configuration for an output format of delimited text.
-         *      */
+        /** @description Configuration for an output format of delimited text. */
         FormatDelimited: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
              * @description <P>The type of Format being configured.<P>
-             *
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
@@ -2434,7 +2439,6 @@ export interface components {
              *     ultimate arbiter and must be unique.
              *     This ensures that all configured Formats can be used.
              *     </P>
-             *
              * @default csv
              */
             name: string;
@@ -2444,7 +2448,6 @@ export interface components {
              *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
              *     If multiple formats have the same extension the first in the list will be used.
              *     </P>
-             *
              * @default csv
              */
             extension: string;
@@ -2457,7 +2460,6 @@ export interface components {
              *     <P>
              *     The media type will also be set as the Content-Type header in the response.
              *     </P>
-             *
              * @default text/csv;charset=UTF-8
              */
             mediaType: string;
@@ -2465,11 +2467,11 @@ export interface components {
              * @description The Java format to use for date fields.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format dates.
-             *
              * @default yyyy-MM-dd
              */
             dateFormat: string;
-            /** @description The Java format to use for date/time columns.
+            /**
+             * @description The Java format to use for date/time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format datetimes.
              *     <P>
@@ -2586,25 +2588,26 @@ export interface components {
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
              *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
-             *      */
+             */
             dateTimeFormat?: string;
             /**
              * @description The Java format to use for time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format times.
-             *
              * @default HH:mm
              */
             timeFormat: string;
-            /** @description The Java format to use for float and double columns.
+            /**
+             * @description The Java format to use for float and double columns.
              *     <P>
              *     This value will be used by the Java DecimalFormat to format floating point values.
              *     <P>
              *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
              *     (i.e. it will include at least one digit after the decimal point).
-             *      */
+             */
             decimalFormat?: string;
-            /** @description Get the format to use for Boolean columns.
+            /**
+             * @description Get the format to use for Boolean columns.
              *     <P>
              *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
              *     an array of two string values - the first being true and the second being false.
@@ -2632,9 +2635,10 @@ export interface components {
              *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
              *     <P>
              *     If not set Boolean values will be output as "true" or "false".
-             *      */
+             */
             booleanFormat?: string;
-            /** @description <P>The overrides for the formatting of specific columns.</P>
+            /**
+             * @description <P>The overrides for the formatting of specific columns.</P>
              *     <P>
              *     This is only required when two columns of the same type need to be formatted in different ways.
              *     </P>
@@ -2646,44 +2650,41 @@ export interface components {
              *     Any column not specified here will have the default format, so it is only necessary to specify the
              *     odd columns here.
              *     </P>
-             *      */
+             */
             columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
             /**
              * @description If true date/time values will be surrounded by quotes, otherwise they will not.
-             *
              * @default true
              */
             quoteTemporal: boolean;
             /**
              * @description The delimiter between field values in the output.
-             *
              * @default ,
              */
             delimiter: string;
             /**
              * @description Any string values in the output will be prefixed by this value.
-             *
              * @default "
              */
             openQuote: string;
             /**
              * @description Any string values in the output will be suffixed by this value.
-             *
              * @default "
              */
             closeQuote: string;
-            /** @description If a string value contains the close quote string it will be prefixed by this string.
+            /**
+             * @description If a string value contains the close quote string it will be prefixed by this string.
              *     <P>
              *     Do not set both this and replaceCloseQuote, this value will take preference.
-             *      */
+             */
             escapeCloseQuote?: string;
-            /** @description If a string value contains the close quote string it will be replaced by this string.
+            /**
+             * @description If a string value contains the close quote string it will be replaced by this string.
              *     <P>
              *     Do not set both this and escapeCloseQuote, the value of escapeCloseQuote will take preference.
-             *      */
+             */
             replaceCloseQuote?: string;
-            /** @description Each row in the output will be suffixed by this value.
-             *      */
+            /** @description Each row in the output will be suffixed by this value. */
             newline?: string;
         } & {
             /**
@@ -2692,7 +2693,8 @@ export interface components {
              */
             type: "Delimited";
         };
-        /** @description <P>The definition of an HTML output format.</P>
+        /**
+         * @description <P>The definition of an HTML output format.</P>
          *     <P>
          *     The HTML output format produces an HTML snippet containing a table.
          *     The output itself has no formatting, but a number of CSS classes are applied to the elements enabling the UI to format them as they wish.
@@ -2714,11 +2716,10 @@ export interface components {
          *     An odd numbered column (header or dataRow, the first column is 0, which is even).
          *     </UL>
          *     </P>
-         *      */
+         */
         FormatHtml: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
              * @description <P>The type of Format being configured.<P>
-             *
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
@@ -2726,11 +2727,11 @@ export interface components {
              * @description The Java format to use for date fields.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format dates.
-             *
              * @default yyyy-MM-dd
              */
             dateFormat: string;
-            /** @description The Java format to use for date/time columns.
+            /**
+             * @description The Java format to use for date/time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format datetimes.
              *     <P>
@@ -2847,25 +2848,26 @@ export interface components {
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
              *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
-             *      */
+             */
             dateTimeFormat?: string;
             /**
              * @description The Java format to use for time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format times.
-             *
              * @default HH:mm
              */
             timeFormat: string;
-            /** @description The Java format to use for float and double columns.
+            /**
+             * @description The Java format to use for float and double columns.
              *     <P>
              *     This value will be used by the Java DecimalFormat to format floating point values.
              *     <P>
              *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
              *     (i.e. it will include at least one digit after the decimal point).
-             *      */
+             */
             decimalFormat?: string;
-            /** @description Get the format to use for Boolean columns.
+            /**
+             * @description Get the format to use for Boolean columns.
              *     <P>
              *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
              *     an array of two string values - the first being true and the second being false.
@@ -2893,9 +2895,10 @@ export interface components {
              *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
              *     <P>
              *     If not set Boolean values will be output as "true" or "false".
-             *      */
+             */
             booleanFormat?: string;
-            /** @description <P>The overrides for the formatting of specific columns.</P>
+            /**
+             * @description <P>The overrides for the formatting of specific columns.</P>
              *     <P>
              *     This is only required when two columns of the same type need to be formatted in different ways.
              *     </P>
@@ -2907,7 +2910,7 @@ export interface components {
              *     Any column not specified here will have the default format, so it is only necessary to specify the
              *     odd columns here.
              *     </P>
-             *      */
+             */
             columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
         } & {
             /**
@@ -2916,13 +2919,13 @@ export interface components {
              */
             type: "HTML";
         };
-        /** @description Configuration for an output format of JSON.
+        /**
+         * @description Configuration for an output format of JSON.
          *     There are no formatting options for JSON output.
-         *      */
+         */
         FormatJson: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
              * @description <P>The type of Format being configured.<P>
-             *
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
@@ -2932,7 +2935,6 @@ export interface components {
              *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
              *     If multiple formats have the same extension the first in the list will be used.
              *     </P>
-             *
              * @default json
              */
             extension: string;
@@ -2945,7 +2947,6 @@ export interface components {
              *     <P>
              *     The media type will also be set as the Content-Type header in the response.
              *     </P>
-             *
              * @default application/json
              */
             mediaType: string;
@@ -2953,11 +2954,11 @@ export interface components {
              * @description The Java format to use for date fields.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format dates.
-             *
              * @default yyyy-mm-dd
              */
             dateFormat: string;
-            /** @description The Java format to use for date/time columns.
+            /**
+             * @description The Java format to use for date/time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format datetimes.
              *     <P>
@@ -3074,25 +3075,26 @@ export interface components {
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
              *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
-             *      */
+             */
             dateTimeFormat?: string;
             /**
              * @description The Java format to use for time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format times.
-             *
              * @default hh:mm:ss
              */
             timeFormat: string;
-            /** @description The Java format to use for float and double columns.
+            /**
+             * @description The Java format to use for float and double columns.
              *     <P>
              *     This value will be used by the Java DecimalFormat to format floating point values.
              *     <P>
              *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
              *     (i.e. it will include at least one digit after the decimal point).
-             *      */
+             */
             decimalFormat?: string;
-            /** @description Get the format to use for Boolean columns.
+            /**
+             * @description Get the format to use for Boolean columns.
              *     <P>
              *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
              *     an array of two string values - the first being true and the second being false.
@@ -3120,9 +3122,10 @@ export interface components {
              *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
              *     <P>
              *     If not set Boolean values will be output as "true" or "false".
-             *      */
+             */
             booleanFormat?: string;
-            /** @description <P>The overrides for the formatting of specific columns.</P>
+            /**
+             * @description <P>The overrides for the formatting of specific columns.</P>
              *     <P>
              *     This is only required when two columns of the same type need to be formatted in different ways.
              *     </P>
@@ -3134,9 +3137,10 @@ export interface components {
              *     Any column not specified here will have the default format, so it is only necessary to specify the
              *     odd columns here.
              *     </P>
-             *      */
+             */
             columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
-            /** @description The name of the parent data element in the output JSON.
+            /**
+             * @description The name of the parent data element in the output JSON.
              *     <P>
              *     JSON output consists of an array of objects, with an object for each row of the output.
              *     <P>
@@ -3144,9 +3148,10 @@ export interface components {
              *     <P>
              *     If dataName is set the output will instead be an object containing the array.
              *     </P>
-             *      */
+             */
             dataName?: string;
-            /** @description The name of the metadata element in the output JSON.
+            /**
+             * @description The name of the metadata element in the output JSON.
              *     <P>
              *     JSON output consists of an array of objects, with an object for each row of the output.
              *     <P>
@@ -3158,7 +3163,7 @@ export interface components {
              *     <LI>The name of the feed.
              *     <LI>An object describing the type of each field in the output.
              *     </UL>
-             *      */
+             */
             metadataName?: string;
             /**
              * @description When set to true the types output in the metadata will be recorded in lowercase and with Boolean shortened to bool.
@@ -3170,7 +3175,6 @@ export interface components {
              *     If compatibleTypeNames is true the type names will all be in lower case and boolean will be shortened to bool.
              *     <p>
              *     The default is to not output metadata at all, and to not change the case of type names if metadata is output.
-             *
              * @default false
              */
             compatibleTypeNames: boolean;
@@ -3181,7 +3185,6 @@ export interface components {
              *     regardless of the rest of the configuration.
              *     <P>
              *     This is only relevant if the feed has no rows to output.
-             *
              * @default false
              */
             compatibleEmpty: boolean;
@@ -3192,7 +3195,6 @@ export interface components {
              *     By setting this to false, null fields will be omitted completely from the output.
              *     <P>
              *     In order to avoid confusing consumers of the stream the first row output will always contain all the fields.
-             *
              * @default true
              */
             outputNullValues: boolean;
@@ -3210,7 +3212,6 @@ export interface components {
              *     - they will simply be used for different configurations of PrettyPrinter.
              *     <P>
              *     The current maximum value is 2.
-             *
              * @default 0
              */
             prettiness: number;
@@ -3221,15 +3222,15 @@ export interface components {
              */
             type: "JSON";
         };
-        /** @description Configuration for an output format of RSS.
+        /**
+         * @description Configuration for an output format of RSS.
          *     There are no formatting options for RSS output.
-         *      */
+         */
         FormatRss: {
             type: "FormatRss";
         } & (Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
              * @description <P>The type of Format being configured.<P>
-             *
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
@@ -3244,7 +3245,6 @@ export interface components {
              *     ultimate arbiter and must be unique.
              *     This ensures that all configured Formats can be used.
              *     </P>
-             *
              * @default rss
              */
             name: string;
@@ -3254,7 +3254,6 @@ export interface components {
              *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
              *     If multiple formats have the same extension the first in the list will be used.
              *     </P>
-             *
              * @default xml
              */
             extension: string;
@@ -3267,7 +3266,6 @@ export interface components {
              *     <P>
              *     The media type will also be set as the Content-Type header in the response.
              *     </P>
-             *
              * @default application/rss+xml; charset=utf-8
              */
             mediaType: string;
@@ -3275,11 +3273,11 @@ export interface components {
              * @description The Java format to use for date fields.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format dates.
-             *
              * @default yyyy-MM-dd
              */
             dateFormat: string;
-            /** @description The Java format to use for date/time columns.
+            /**
+             * @description The Java format to use for date/time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format datetimes.
              *     <P>
@@ -3396,25 +3394,26 @@ export interface components {
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
              *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
-             *      */
+             */
             dateTimeFormat?: string;
             /**
              * @description The Java format to use for time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format times.
-             *
              * @default HH:mm
              */
             timeFormat: string;
-            /** @description The Java format to use for float and double columns.
+            /**
+             * @description The Java format to use for float and double columns.
              *     <P>
              *     This value will be used by the Java DecimalFormat to format floating point values.
              *     <P>
              *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
              *     (i.e. it will include at least one digit after the decimal point).
-             *      */
+             */
             decimalFormat?: string;
-            /** @description Get the format to use for Boolean columns.
+            /**
+             * @description Get the format to use for Boolean columns.
              *     <P>
              *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
              *     an array of two string values - the first being true and the second being false.
@@ -3442,9 +3441,10 @@ export interface components {
              *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
              *     <P>
              *     If not set Boolean values will be output as "true" or "false".
-             *      */
+             */
             booleanFormat?: string;
-            /** @description <P>The overrides for the formatting of specific columns.</P>
+            /**
+             * @description <P>The overrides for the formatting of specific columns.</P>
              *     <P>
              *     This is only required when two columns of the same type need to be formatted in different ways.
              *     </P>
@@ -3456,7 +3456,7 @@ export interface components {
              *     Any column not specified here will have the default format, so it is only necessary to specify the
              *     odd columns here.
              *     </P>
-             *      */
+             */
             columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
             /**
              * @description The XML namespace to use for custom fields in the RSS output.
@@ -3474,12 +3474,10 @@ export interface components {
              */
             fieldInvalidLetterFix: string;
         });
-        /** @description Configuration for an output format of XLSX.
-         *      */
+        /** @description Configuration for an output format of XLSX. */
         FormatXlsx: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
              * @description <P>The type of Format being configured.<P>
-             *
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
@@ -3494,7 +3492,6 @@ export interface components {
              *     ultimate arbiter and must be unique.
              *     This ensures that all configured Formats can be used.
              *     </P>
-             *
              * @default xlsx
              */
             name: string;
@@ -3504,7 +3501,6 @@ export interface components {
              *     The extension is used to determine the format based upon the URL path and also to set the default filename for the content-disposition header.
              *     If multiple formats have the same extension the first in the list will be used.
              *     </P>
-             *
              * @default xlsx
              */
             extension: string;
@@ -3517,22 +3513,21 @@ export interface components {
              *     <P>
              *     The media type will also be set as the Content-Type header in the response.
              *     </P>
-             *
              * @default application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
              */
             mediaType: string;
             /**
              * @description <P>The name of the sheet that will contain the data in the Excel Workbook.</P>
-             *
              * @default data
              */
             sheetName: string;
-            /** @description <P>The name of the creator of the data, as it will appear in the properties of the Excel Workbook file.</P>
+            /**
+             * @description <P>The name of the creator of the data, as it will appear in the properties of the Excel Workbook file.</P>
              *     <P>
              *     If no value is provided the system will attempt to extract the username from the access token used in the request.
              *     If there is not value in the access token the value &quot;Unknown&quot; will be used.
              *     </P>
-             *      */
+             */
             creator?: string;
             /**
              * @description <P>Whether or not grid lines should be shown on the Excel Worksheet.</P>
@@ -3540,7 +3535,6 @@ export interface components {
              *     If the value is true all cells in the output will have a thin black border.
              *     This includes cells with a null value, but excludes cells outside the range of the data.
              *     </P>
-             *
              * @default true
              */
             gridLines: boolean;
@@ -3549,47 +3543,47 @@ export interface components {
              *     <P>
              *     If the value is true the first row on the Worksheet will contain the field names (or the overriding names from the columns defined here).
              *     </P>
-             *
              * @default true
              */
             headers: boolean;
             /**
              * @description The Excel format to use for date columns if no other format is specified.
-             *
              * @default yyyy-mm-dd
              */
             defaultDateFormat: string;
             /**
              * @description The Excel format to use for date/time columns if no other format is specified.
-             *
              * @default yyyy-mm-dd hh:mm:ss
              */
             defaultDateTimeFormat: string;
             /**
              * @description The Excel format to use for time columns if no other format is specified.
-             *
              * @default hh:mm:ss
              */
             defaultTimeFormat: string;
-            /** @description <P>The font to use for the header row.</P>
+            /**
+             * @description <P>The font to use for the header row.</P>
              *     <P>
              *     There is no default value in the format, but if not specified the font used will be Calibri, 11pt.
              *     </P>
-             *      */
+             */
             headerFont?: components["schemas"]["FormatXlsxFont"];
-            /** @description <P>The font to use for the body rows (all rows after the header row).</P>
+            /**
+             * @description <P>The font to use for the body rows (all rows after the header row).</P>
              *     <P>
              *     There is no default value in the format, but if not specified the font used will be Calibri, 11pt.
              *     </P>
-             *      */
+             */
             bodyFont?: components["schemas"]["FormatXlsxFont"];
-            /** @description <P>The foreground and background colours to use for the header row.</P>
+            /**
+             * @description <P>The foreground and background colours to use for the header row.</P>
              *     <P>
              *     There is no default value in the format, but if not specified the output will have black text on white background.
              *     </P>
-             *      */
+             */
             headerColours?: components["schemas"]["FormatXlsxColours"];
-            /** @description <P>The foreground and background colours to use for even numbered body rows.</P>
+            /**
+             * @description <P>The foreground and background colours to use for even numbered body rows.</P>
              *     <P>
              *     Even rows are defined to be those where the row number is even.
              *     This means that if there is a header row the first data row is even, but if there is no header row then the first data row is odd.
@@ -3597,9 +3591,10 @@ export interface components {
              *     <P>
              *     There is no default value in the format, but if not specified the output will have black text on white background.
              *     </P>
-             *      */
+             */
             evenColours?: components["schemas"]["FormatXlsxColours"];
-            /** @description <P>The foreground and background colours to use for odd numbered body rows.</P>
+            /**
+             * @description <P>The foreground and background colours to use for odd numbered body rows.</P>
              *     <P>
              *     Odd rows are defined to be those where the row number is odd.
              *     This means that if there is a header row the first data row is even, but if there is no header row then the first data row is odd.
@@ -3607,9 +3602,10 @@ export interface components {
              *     <P>
              *     There is no default value in the format, but if not specified the output will have black text on white background.
              *     </P>
-             *      */
+             */
             oddColours?: components["schemas"]["FormatXlsxColours"];
-            /** @description <P>The overrides for the formatting of specific columns.</P>
+            /**
+             * @description <P>The overrides for the formatting of specific columns.</P>
              *     <P>
              *     Usually the default formatting of a column is adequate, but this can be overridden if there is a specific need.
              *     </P>
@@ -3624,7 +3620,7 @@ export interface components {
              *     <P>
              *     There is no capability for changing the order of output columns, this will always be set as the order they appear in the data.
              *     </P>
-             *      */
+             */
             columns?: components["schemas"]["FormatXlsxColumn"][];
         } & {
             /**
@@ -3633,7 +3629,8 @@ export interface components {
              */
             type: "XLSX";
         };
-        /** @description Specification of colours used in XLSX output.
+        /**
+         * @description Specification of colours used in XLSX output.
          *     <P>
          *     Colours should be specified as 3 or 4 pairs of hexadecimal digits.
          *     <P>
@@ -3647,7 +3644,7 @@ export interface components {
          *     <LI>000099: Blue
          *     <LI>0A5F42: I hope to get around to making these colours more descriptive!
          *     </UL>
-         *      */
+         */
         FormatXlsxColours: {
             /**
              * @description <P>The foreground colour to use.</P>
@@ -3664,7 +3661,6 @@ export interface components {
              *     <LI><font style="color: #0A5F42">0A5F42</font>
              *     </UL>
              *     </P>
-             *
              * @default 000000
              */
             fgColour: string;
@@ -3683,26 +3679,25 @@ export interface components {
              *     <LI><font style="background-color: #0A5F42">0A5F42</font>
              *     </UL>
              *     </P>
-             *
              * @default FFFFFF
              */
             bgColour: string;
         };
-        /** @description Specification of the formatting of a column in XLSX output.
-         *      */
+        /** @description Specification of the formatting of a column in XLSX output. */
         FormatXlsxColumn: {
-            /** @description <P>The the name of the column that this definition applies to.</P>
+            /**
+             * @description <P>The the name of the column that this definition applies to.</P>
              *     <P>This should match one of the field names in the output.</P>
-             *      */
+             */
             name: string;
-            /** @description <P>The title to put in the header row instead of the field name.</P>
-             *      */
+            /** @description <P>The title to put in the header row instead of the field name.</P> */
             header?: string;
-            /** @description <P>The Excel format to apply to body cells instead of the default.</P>
+            /**
+             * @description <P>The Excel format to apply to body cells instead of the default.</P>
              *     <P>
              *     This is an Excel format as would be entered in the Format Cells -> Number -> Custom box.
              *     </P>
-             *      */
+             */
             format?: string;
             /**
              * Format: double
@@ -3710,15 +3705,12 @@ export interface components {
              *     <P>
              *     One unit of column width is equal to the width of one character in the Normal style. For proportional fonts, the width of the character 0 (zero) is used.
              *     </P>
-             *
              */
             width?: number;
         };
-        /** @description Specification of a font to use in XLSX output.
-         *      */
+        /** @description Specification of a font to use in XLSX output. */
         FormatXlsxFont: {
-            /** @description <P>The name of the font.</P>
-             *      */
+            /** @description <P>The name of the font.</P> */
             fontName?: string;
             /**
              * Format: int32
@@ -3726,17 +3718,16 @@ export interface components {
              *     <P>
              *     Font size is measured in points (approximately 1/72 of an inch).
              *     </P>
-             *
              */
             fontSize?: number;
         };
-        /** @description Configuration for an output format of XML.
+        /**
+         * @description Configuration for an output format of XML.
          *     There are no formatting options for XML output.
-         *      */
+         */
         FormatXml: Omit<WithRequired<components["schemas"]["Format"], "type">, "type"> & {
             /**
              * @description <P>The type of Format being configured.<P>
-             *
              * @enum {string}
              */
             type: "JSON" | "XML" | "XLSX" | "Delimited" | "HTML" | "Atom" | "RSS";
@@ -3751,7 +3742,6 @@ export interface components {
              *     ultimate arbiter and must be unique.
              *     This ensures that all configured Formats can be used.
              *     </P>
-             *
              * @default XML
              */
             name: string;
@@ -3761,7 +3751,6 @@ export interface components {
              *     The extension is used to determine the format based upon the URL path and also to set the default filename for the Content-Disposition header.
              *     If multiple formats have the same extension the first in the list will be used.
              *     </P>
-             *
              * @default xml
              */
             extension: string;
@@ -3774,7 +3763,6 @@ export interface components {
              *     <P>
              *     The media type will also be set as the Content-Type header in the response.
              *     </P>
-             *
              * @default application/xml; charset=utf-8
              */
             mediaType: string;
@@ -3782,11 +3770,11 @@ export interface components {
              * @description The Java format to use for date fields.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format dates.
-             *
              * @default yyyy-MM-dd
              */
             dateFormat: string;
-            /** @description The Java format to use for date/time columns.
+            /**
+             * @description The Java format to use for date/time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format datetimes.
              *     <P>
@@ -3903,25 +3891,26 @@ export interface components {
              *     </ul>
              *     The format used will be the shortest that outputs the full value of the time where the omitted parts are implied to be zero.
              *     The difference between DEFAULT and ISO_LOCAL_DATE_TIME_TRIM is that DEFAULT will always output fractions of seconds in groups of three, whereas ISO_LOCAL_DATE_TIME_TRIM will simply output as many as necessary.
-             *      */
+             */
             dateTimeFormat?: string;
             /**
              * @description The Java format to use for time columns.
              *     <P>
              *     This value will be used by the Java DateTimeFormatter to format times.
-             *
              * @default HH:mm
              */
             timeFormat: string;
-            /** @description The Java format to use for float and double columns.
+            /**
+             * @description The Java format to use for float and double columns.
              *     <P>
              *     This value will be used by the Java DecimalFormat to format floating point values.
              *     <P>
              *     If not set the default toString() method will be called, which will result in a format equivalent to "0.0"
              *     (i.e. it will include at least one digit after the decimal point).
-             *      */
+             */
             decimalFormat?: string;
-            /** @description Get the format to use for Boolean columns.
+            /**
+             * @description Get the format to use for Boolean columns.
              *     <P>
              *     This must be a <A href="https://commons.apache.org/proper/commons-jexl/" target="_blank">JEXL</A> expression that evaluates to
              *     an array of two string values - the first being true and the second being false.
@@ -3949,9 +3938,10 @@ export interface components {
              *     Validation is carried out on the output from the expression, but this validation is not perfect and it is possible to produce an invalid output with a bad format.
              *     <P>
              *     If not set Boolean values will be output as "true" or "false".
-             *      */
+             */
             booleanFormat?: string;
-            /** @description <P>The overrides for the formatting of specific columns.</P>
+            /**
+             * @description <P>The overrides for the formatting of specific columns.</P>
              *     <P>
              *     This is only required when two columns of the same type need to be formatted in different ways.
              *     </P>
@@ -3963,7 +3953,7 @@ export interface components {
              *     Any column not specified here will have the default format, so it is only necessary to specify the
              *     odd columns here.
              *     </P>
-             *      */
+             */
             columnSpecificTextFormats?: components["schemas"]["ColumnTextFormats"][];
             /**
              * @description Whether the XML declaration should be included.
@@ -4005,7 +3995,8 @@ export interface components {
              * @default _
              */
             fieldInvalidLetterFix: string;
-            /** @description Get any character references that should be explicitly set in the output.
+            /**
+             * @description Get any character references that should be explicitly set in the output.
              *     <P>
              *     The XML output factory will produce correct XML for the encoding specified and it is not usually necessary to
              *     specify any character references to replace.
@@ -4015,7 +4006,7 @@ export interface components {
              *     This is NOT a generic search and replace facility, the "with" value must be a valid XML character reference (without the &amp; and ;).
              *     <P>
              *     Note that character references cannot be set in attributes, so it is invalid to use character references when fieldsAsAttributes is true.
-             *      */
+             */
             characterReferences?: components["schemas"]["FormatXmlCharacterReference"][];
         } & {
             /**
@@ -4024,13 +4015,13 @@ export interface components {
              */
             type: "XML";
         };
-        /** @description Configuration for character reference replacement in XML output.
+        /**
+         * @description Configuration for character reference replacement in XML output.
          *     Specifies a character or string to be replaced with a specific XML character reference.
-         *      */
+         */
         FormatXmlCharacterReference: {
             /**
              * @description The character or string to be replaced in the XML output.
-             *
              * @example –
              */
             replace: string;
@@ -4038,12 +4029,12 @@ export interface components {
              * @description The XML character reference to replace the character with.
              *     This must be a valid XML entity reference without the leading & and trailing ; characters.
              *     For example, use "#x2013" to produce "&#x2013;" in the output.
-             *
              * @example #x2013
              */
             with: string;
         };
-        /** @description <P>Definition of an endpoint that can be used for querying data.</P>
+        /**
+         * @description <P>Definition of an endpoint that can be used for querying data.</P>
          *     <P>
          *     An Endpoint represents a connection to a data source, where a Source represents an actual data query.
          *     For EndpointType.HTTP Sources there is often a one-to-one relationship between Source and Endpoint, but for EndpointType.SQL Sources there
@@ -4066,14 +4057,12 @@ export interface components {
          *     The same does not apply to the condition field, that can be set on both the Endpoint and the Secret (and both conditions
          *     must be met for the Endpoint to work).
          *     </P>
-         *      */
+         */
         Endpoint: {
-            /** @description <P>The name of the Endpoint, that will be used to refer to it in Sources.
-             *      */
+            /** @description <P>The name of the Endpoint, that will be used to refer to it in Sources. */
             name: string;
             /**
              * @description <P>The type of Endpoint being configured</P>
-             *
              * @enum {string}
              */
             type: "SQL" | "JDBC" | "HTTP";
@@ -4087,10 +4076,10 @@ export interface components {
              *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
              *     fields of the Endpoint will not be.
              *     </P>
-             *
              */
             url?: string;
-            /** @description <P>A StringTemplate that will be rendered as the URL that defines the Endpoint.</P>
+            /**
+             * @description <P>A StringTemplate that will be rendered as the URL that defines the Endpoint.</P>
              *     <P>
              *     Invalid if the URL field is provided.
              *     </P>
@@ -4098,9 +4087,10 @@ export interface components {
              *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
              *     fields of the Endpoint will not be.
              *     </P>
-             *      */
+             */
             urlTemplate?: string;
-            /** @description <P>The name of the secret that contains the credentials to be used for the connection.</P>
+            /**
+             * @description <P>The name of the secret that contains the credentials to be used for the connection.</P>
              *     <P>
              *     Invalid if the username or password fields are provided.
              *     </P>
@@ -4110,18 +4100,20 @@ export interface components {
              *     which unfortuantely means it is not possible to list the known secrets of your live instance here.
              *     Please ask your systems administrator for this information.
              *     </P>
-             *      */
+             */
             secret?: string;
-            /** @description <P>The username that should be used when communicating with the endpoint.</P>
+            /**
+             * @description <P>The username that should be used when communicating with the endpoint.</P>
              *     <P>
              *     Invalid if the secret field  provided.
              *     </P>
              *     <P>
              *     The username will be logged.
              *     </P>
-             *      */
+             */
             username?: string;
-            /** @description <P>The password that should be used when communicating with the endpoint.</P>
+            /**
+             * @description <P>The password that should be used when communicating with the endpoint.</P>
              *     <P>
              *     Invalid if the secret field  provided.
              *     </P>
@@ -4133,40 +4125,27 @@ export interface components {
              *     This is not a security best practice.
              *     Please use secrets instead of username/password for live deployments.
              *     </P>
-             *      */
+             */
             password?: string;
-            /** @description <P>A condition that must be passed for the endpoint to be used.</P>
-             *      */
+            /** @description <P>A condition that must be passed for the endpoint to be used.</P> */
             condition?: components["schemas"]["Condition"];
             /**
-             * Format: int32
+             * @description <P>The connection timeout for the endpoint connection in milliseconds.</P>
+             *     <P>
+             *     This controls the maximum time a connection can remain connection before being closed.
+             *     </P>
+             */
+            connectionTimeout?: string;
+            /**
              * @description <P>The idle timeout for the endpoint connection in milliseconds.</P>
              *     <P>
              *     This controls the maximum time a connection can remain idle before being closed.
              *     </P>
-             *
              */
-            idleTimeout?: number;
-            /**
-             * Format: int32
-             * @description <P>The read idle timeout for the endpoint connection in milliseconds.</P>
-             *     <P>
-             *     This controls the maximum time a connection can remain idle on read operations before being closed.
-             *     </P>
-             *
-             */
-            readIdleTimeout?: number;
-            /**
-             * Format: int32
-             * @description <P>The write idle timeout for the endpoint connection in milliseconds.</P>
-             *     <P>
-             *     This controls the maximum time a connection can remain idle on write operations before being closed.
-             *     </P>
-             *
-             */
-            writeIdleTimeout?: number;
+            idleTimeout?: string;
         };
-        /** @description <P>The Pipeline is the fundamental unit of processing in QueryEngine.</P>
+        /**
+         * @description <P>The Pipeline is the fundamental unit of processing in QueryEngine.</P>
          *     <P>
          *      A single Pipeline takes data from a single Source, passes it through any number of Processors and finally delivers it to a Format.
          *      The Processors within a Pipeline may pull in data from other Sources.
@@ -4184,25 +4163,27 @@ export interface components {
          *     A Non-Interactive Pipeline is either used programatically or by being configured in some client system (such as PowerBI).
          *     A Non-Interactive Pipeline can be distinguished by the user having to know or construct the URL for it at some point.
          *     The distinctino is irrelevant to the Query Engine itself, but can help when configuring Pipelines.
-         *      */
+         */
         Pipeline: {
-            /** @description <P>
+            /**
+             * @description <P>
              *     The query for the pipeline.
              *     </P>
-             *      */
+             */
             source: components["schemas"]["Source"];
-            /** @description <P>Processors to run on the data as it flows from the Source.</P>
-             *      */
+            /** @description <P>Processors to run on the data as it flows from the Source.</P> */
             processors?: components["schemas"]["Processor"][];
-            /** @description <P>
+            /**
+             * @description <P>
              *     The title of the Pipeline that will be used in the UI in preference to the filename.
              *     </P>
              *     <P>
              *     The title is optional, but should usually be provided, particularly for Interactive Pipelines.
              *     </P>
-             *      */
+             */
             title?: string;
-            /** @description <P>
+            /**
+             * @description <P>
              *     A description of the Pipeline that will be used in the UI to provide information to the user.
              *     </P>
              *     <P>
@@ -4211,14 +4192,16 @@ export interface components {
              *     <P>
              *     The description should be kept relatively short as it will be included, in full, in the parameter gathering form for Interactive Pipelines.
              *     </P>
-             *      */
+             */
             description?: string;
-            /** @description <P>
+            /**
+             * @description <P>
              *     A condition that constrains who can use the Pipeline.
              *     </P>
-             *      */
+             */
             condition?: string;
-            /** @description <P>
+            /**
+             * @description <P>
              *     The time for which the results of this pipeline should be cached.
              *     </P>
              *     <P>
@@ -4243,20 +4226,23 @@ export interface components {
              *     </P>
              *     <P>
              *     Note that the fileHash must also match, but isn't built into the key (should usually match because of the use of the inclusion of full URL).
-             *      */
+             */
             cacheDuration?: string;
-            /** @description <P>
+            /**
+             * @description <P>
              *     Rate limit rules that constrain how frequently pipelines can be run.
              *     </P>
-             *      */
+             */
             rateLimitRules?: components["schemas"]["RateLimitRule"][];
-            /** @description <P>Declared arguments to the Pipeline.</P>
+            /**
+             * @description <P>Declared arguments to the Pipeline.</P>
              *     <P>
              *     Arguments may be placed into groups in the user interface, outside of the user interface groups serve no purpose.
              *     </P>
-             *      */
+             */
             argumentGroups?: components["schemas"]["ArgumentGroup"][];
-            /** @description <P>Declared arguments to the Pipeline.</P>
+            /**
+             * @description <P>Declared arguments to the Pipeline.</P>
              *     <P>
              *     Pipelines can receive arguments via the HTTP query string.
              *     Any arguments may be provided and may be processed by the templates of the pipeline, even if they are not
@@ -4270,9 +4256,10 @@ export interface components {
              *     case they will be presented to the query in the order that they appear in the query string, regardless of any other arguments appearing
              *     between them).
              *     </P>
-             *      */
+             */
             arguments?: components["schemas"]["Argument"][];
-            /** @description <P>
+            /**
+             * @description <P>
              *     The endpoints used by the sources in the pipeline.
              *     </P>
              *     <P>
@@ -4282,9 +4269,10 @@ export interface components {
              *     <P>
              *     The segregation between Source and Endpoint allows a single Source to work with multiple Endpoints.
              *     </P>
-             *      */
+             */
             sourceEndpoints?: components["schemas"]["Endpoint"][];
-            /** @description <P>Sub-Pipelines that can be run prior to the main Pipeline in order to generate more SourceEndpoints.</P>
+            /**
+             * @description <P>Sub-Pipelines that can be run prior to the main Pipeline in order to generate more SourceEndpoints.</P>
              *     <P>
              *     The expected use is for the source to query a database that contains connection strings (in vertx format, not JDBC format)
              *     based on information contained in the request (usually extracted from a JWT).
@@ -4303,9 +4291,10 @@ export interface components {
              *     The original endpoints that existed before the DynamicEndpointSource do not have special protection
              *     , if the DynamicEndpointSource generates endpoints with the same key as existing endpoints they will be overwritten.
              *     </P>
-             *      */
+             */
             dynamicEndpoints?: components["schemas"]["DynamicEndpoint"][];
-            /** @description <P>The outputs that this Pipeline supports.</P>
+            /**
+             * @description <P>The outputs that this Pipeline supports.</P>
              *     <P>
              *     The format to use for a pipeline is chosen by according to the following rules:
              *     <ol>
@@ -4335,253 +4324,258 @@ export interface components {
              *     If the request does not use any of these mechanisms then the first Format specified in the Pipeline will be used.
              *     </ol>
              *     <p>
-             *      */
+             */
             formats?: components["schemas"]["Format"][];
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     A directory containing documentation files.
          *     </P>
-         *      */
+         */
         DocDir: WithRequired<components["schemas"]["DocNode"], "children" | "name" | "path"> & {
-            /** @description The children of the node.
+            /**
+             * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
-             *      */
+             */
             children: components["schemas"]["DocNode"][];
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     A documentation file.
          *     </P>
-         *      */
+         */
         DocFile: WithRequired<components["schemas"]["DocNode"], "name" | "path"> & {
-            /** @description The children of the node.
+            /**
+             * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
-             *      */
+             */
             children?: components["schemas"]["DocNode"][];
-            /** @description <P>
+            /**
+             * @description <P>
              *     The title of the document.
              *     </P>
              *     <P>
              *     The title is what should be displayed in any UI.
              *     </P>
-             *      */
+             */
             title: string;
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     Base class for documentation files and the directories that contain them.
          *     </P>
-         *      */
+         */
         DocNode: {
-            /** @description <P>
+            /**
+             * @description <P>
              *     The leaf name of the node.
              *     </P>
-             *      */
+             */
             name: string;
-            /** @description The children of the node.
+            /**
+             * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
-             *      */
+             */
             children?: components["schemas"]["DocNode"][];
-            /** @description <P>
+            /**
+             * @description <P>
              *     The relative path to the node from the root.
              *     </P>
-             *      */
+             */
             path: string;
         } & (components["schemas"]["DocDir"] | components["schemas"]["DocFile"]);
-        /** @description Information about requests made to the query engine by a single user.
-         *      */
+        /** @description Information about requests made to the query engine by a single user. */
         AuditHistory: {
             /**
              * Format: int64
              * @description <P>The index of the first row (out of all those for the current user) present in this dataset.</P>
              *     <P>This should equal the skipsRows argument passed in the request for history.</P>
-             *
              */
             firstRow: number;
             /**
              * Format: int64
              * @description <P>The total number of history records that the current user has.</P>
-             *
              */
             totalRows: number;
-            /** @description <P>Details of specific requests to the query engine for the current user.</P>
+            /**
+             * @description <P>Details of specific requests to the query engine for the current user.</P>
              *     <P>The number of entries in this array should be no greater than the maxRows argument passed in the request for history.</P>
-             *      */
+             */
             rows: components["schemas"]["AuditHistoryRow"][];
         };
-        /** @description Record of a request made against the Query Engine.
-         *      */
+        /** @description Record of a request made against the Query Engine. */
         AuditHistoryRow: {
             /**
              * Format: date-time
              * @description Timestamp of the request.
-             *
              */
             timestamp: string;
-            /** @description Unique ID for the request.
-             *      */
+            /** @description Unique ID for the request. */
             id: string;
-            /** @description Path to the pipeline.
-             *      */
+            /** @description Path to the pipeline. */
             path: string;
-            /** @description Arguments passed to the pipeline.
-             *      */
+            /** @description Arguments passed to the pipeline. */
             arguments: Record<string, never>;
-            /** @description The host from the request.
-             *      */
+            /** @description The host from the request. */
             host: string;
-            /** @description The issuer of the token used to authenticate the user.
-             *      */
+            /** @description The issuer of the token used to authenticate the user. */
             issuer: string;
-            /** @description The subject from the token (unique ID for the user within the issuer).
-             *      */
+            /** @description The subject from the token (unique ID for the user within the issuer). */
             subject: string;
-            /** @description The user name of the user making the request.
-             *      */
+            /** @description The user name of the user making the request. */
             username: string;
-            /** @description The human name of the user making the request.
-             *      */
+            /** @description The human name of the user making the request. */
             name: string;
             /**
              * Format: int32
              * @description The HTTP response code that the request generated.
-             *
              */
             responseCode: number;
             /**
              * Format: int64
              * @description The number of rows returned by the request.
-             *
              */
             responseRows: number;
             /**
              * Format: int64
              * @description The number of bytes returned by the request.
-             *
              */
             responseSize: number;
             /**
              * Format: double
              * @description The time between the request being made and the first row being returned.
-             *
              */
             responseStreamStart: number;
             /**
              * Format: double
              * @description The time between the request being made and the final row being returned.
-             *
              */
             responseDuration: number;
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     A directory containing pipelines.
          *     </P>
-         *      */
+         */
         PipelineDir: WithRequired<components["schemas"]["PipelineNode"], "children" | "name" | "path"> & {
-            /** @description The children of the node.
+            /**
+             * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
-             *      */
+             */
             children: components["schemas"]["PipelineNode"][];
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     A pipeline.
          *     </P>
-         *      */
+         */
         PipelineFile: WithRequired<components["schemas"]["PipelineNode"], "name" | "path"> & {
-            /** @description The children of the node.
+            /**
+             * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
-             *      */
+             */
             children?: components["schemas"]["PipelineNode"][];
-            /** @description <P>
+            /**
+             * @description <P>
              *     The title of the pipeline, to be displayed in the UI.
              *     </P>
-             *      */
+             */
             title?: string;
-            /** @description <P>
+            /**
+             * @description <P>
              *     The description of the pipeline.
              *     </P>
-             *      */
+             */
             description?: string;
         };
-        /** @description Base class for pipelines and the directories that contain them.
-         *      */
+        /** @description Base class for pipelines and the directories that contain them. */
         PipelineNode: {
-            /** @description <P>
+            /**
+             * @description <P>
              *     The leaf name of the node.
              *     </P>
-             *      */
+             */
             name: string;
-            /** @description The children of the node.
+            /**
+             * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
-             *      */
+             */
             children?: components["schemas"]["PipelineNode"][];
-            /** @description <P>
+            /**
+             * @description <P>
              *     The relative path to the node from the root.
              *     </P>
-             *      */
+             */
             path: string;
         } & (components["schemas"]["PipelineDir"] | components["schemas"]["PipelineFile"]);
-        /** @description <P>
+        /**
+         * @description <P>
          *     An Argument represents a named piece of data that will be passed in to a pipeline.
          *     </P>
          *     <P>
          *     Typically these correspond to query string arguments.
          *     </P>
-         *      */
+         */
         ArgumentDetails: {
             /**
              * @description <P>The data type of the argument</P>
-             *
              * @enum {string}
              */
             type: "Null" | "Integer" | "Long" | "Float" | "Double" | "String" | "Boolean" | "Date" | "DateTime" | "Time";
-            /** @description <P>The name of the group that the argument should be presented in.</P>
+            /**
+             * @description <P>The name of the group that the argument should be presented in.</P>
              *     <P>The group will be used in the presentation of arguments in the UI but otherwise serves no purpose for the processing.</P>
-             *      */
+             */
             group: string;
-            /** @description <P>The name of the argument.</P>
+            /**
+             * @description <P>The name of the argument.</P>
              *     <P>No two arguments in a single pipeline should have the same name.</P>
              *     <P>
              *     The name must consist entirely of Unicode alpha-numeric characters, it is
              *     recommended that the name use only ASCII characters to avoid needing to encode it
              *     but this is not a requirement.
              *     </P>
-             *      */
+             */
             name: string;
-            /** @description <P>The title to be displayed for the argument in any UI.</P>
+            /**
+             * @description <P>The title to be displayed for the argument in any UI.</P>
              *     <P>
              *     The title serves no purpose in the processing of the pipeline.
              *     If the title is not set the UI will display the name.
              *     </P>
-             *      */
+             */
             title?: string;
-            /** @description <P>The prompt to be displayed for the argument in any UI.</P>
+            /**
+             * @description <P>The prompt to be displayed for the argument in any UI.</P>
              *     <P>
              *     The prompt serves no purpose in the processing of the pipeline.
              *     </P>
              *     <P>
              *     The prompt should be kept short (a single word or phrase) so as to fit in the Input field on the UI parameter form.
              *     </P>
-             *      */
+             */
             prompt?: string;
-            /** @description <P>The description to be displayed for the argument in any UI.</P>
+            /**
+             * @description <P>The description to be displayed for the argument in any UI.</P>
              *     <P>
              *     The description serves no purpose in the processing of the pipeline.
              *     </P>
              *     <P>
              *     The description should be kept short (one short sentence) so as to fit above the Input field on the UI parameter form.
              *     </P>
-             *      */
+             */
             description?: string;
             /**
              * @description <P>If set to false the pipeline will fail if the argument is not supplied.</P>
@@ -4589,7 +4583,6 @@ export interface components {
              *     Declaring mandatory arguments to not be optional results in a better user experience when
              *     the users fail to provide it.
              *     </P>
-             *
              * @default false
              */
             optional: boolean;
@@ -4602,7 +4595,6 @@ export interface components {
              *     <P>
              *     If an argument that is not multi-valued is provided multiple times the Query Engine will fail to run the Pipeline.
              *     </P>
-             *
              * @default false
              */
             multiValued: boolean;
@@ -4614,7 +4606,6 @@ export interface components {
              *     <P>
              *     If an argument that should be ignored is provided the Query Engine will fail to run the Pipeline.
              *     </P>
-             *
              * @default false
              */
             ignored: boolean;
@@ -4633,11 +4624,11 @@ export interface components {
              *     against the possible values list or the permitted values regexe if the default values generated by the expression
              *     are Strings.
              *     This does not prevent them being converted to the relevant data type after being generated and validated.
-             *
              * @default true
              */
             validate: boolean;
-            /** @description <P>
+            /**
+             * @description <P>
              *     A list of the name(s) of another argument(s) that this argument requires.
              *     </P>
              *     <P>
@@ -4646,9 +4637,10 @@ export interface components {
              *     <P>
              *     This serves no purpose in the processing of the pipeline (it is explicitly not validated at runtime).
              *     </P>
-             *      */
+             */
             dependsUpon?: string[];
-            /** @description The default value for the argument.
+            /**
+             * @description The default value for the argument.
              *     <P>
              *     This value is calculated at runtime by evaluating an expression in the Pipeline definition.
              *     <P>
@@ -4656,9 +4648,10 @@ export interface components {
              *     If the default value is required no value should be passed in (the argument should be omitted from the query string) in order that
              *     the expression be run specifically for that run.
              *     <P>
-             *      */
+             */
             defaultValue?: string | number | boolean | unknown[];
-            /** @description <P>The minimum value for the argument, as a string.</P>
+            /**
+             * @description <P>The minimum value for the argument, as a string.</P>
              *     <P>
              *     The minimum value will be converted to the correct data type as it would be if it were received
              *     as the argument.
@@ -4668,9 +4661,10 @@ export interface components {
              *     If an argument is provided that is less than the minimum value (using an appropriate comparison for the
              *     datatype, not a string comparison) then it will be refused.
              *     </P>
-             *      */
+             */
             minimumValue?: string;
-            /** @description <P>The maximum value for the argument, as a string.</P>
+            /**
+             * @description <P>The maximum value for the argument, as a string.</P>
              *     <P>
              *     The maximum value will be converted to the correct data type as it would be if it were received
              *     as the argument.
@@ -4680,9 +4674,10 @@ export interface components {
              *     If an argument is provided that is greater than the mimum value (using an appropriate comparison for the
              *     datatype, not a string comparison) then it will be refused.
              *     </P>
-             *      */
+             */
             maximumValue?: string;
-            /** @description <P>A list of possible values that the argument may have.</P>
+            /**
+             * @description <P>A list of possible values that the argument may have.</P>
              *     <P>
              *     The possible values are not validated, if an invalid value is provided the pipeline will still
              *     attempt to run with it.
@@ -4690,9 +4685,10 @@ export interface components {
              *     <P>
              *     If more than a few values are possible the possibleValuesUrl (or possibleValuesRegex) should be used instead.
              *     </P>
-             *      */
+             */
             possibleValues?: components["schemas"]["ArgumentValue"][];
-            /** @description <P>A URL that will provide a list of possible values that the argument may have.</P>
+            /**
+             * @description <P>A URL that will provide a list of possible values that the argument may have.</P>
              *     <P>
              *     The URL should be called using the same credentials as the Pipeline was (it is expected, but not required, that the URL will be another Pipeline).
              *     </P><P>
@@ -4718,25 +4714,27 @@ export interface components {
              *     The possible values are not validated, if an invalid value is provided the pipeline will still
              *     attempt to run with it.
              *     </P>
-             *      */
+             */
             possibleValuesUrl?: string;
-            /** @description <P>A regular expression that all values of the argument must match.</P>
+            /**
+             * @description <P>A regular expression that all values of the argument must match.</P>
              *     <P>
              *     All values passed in are validated and the Query Engine will fail to run if the values does not match the reguarl expression.
              *     </P>
              *     <P>
              *     At runtime expression will be treated as a standard Java regular expression, but well written UI should also validate
              *     values against the expression so Interactive Pipelines should only use expressions that are compatible with JavaScrtip.
-             *      */
+             */
             permittedValuesRegex?: string;
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     An Argument represents a named piece of data that will be passed in to a pipeline.
          *     </P>
          *     <P>
          *     Typically these correspond to query string arguments.
          *     </P>
-         *      */
+         */
         FormatDetails: {
             /**
              * @description The type of the format.
@@ -4750,21 +4748,20 @@ export interface components {
              *     <p>It is an error for two Formats to have the same name. This is different
              *     from the other Format determinators which can be repeated; the name is the
              *     ultimate arbiter and must be unique.</p>
-             *
              * @default XML
              */
             name: string;
-            /** @description <P>The description of the format.</P>
+            /**
+             * @description <P>The description of the format.</P>
              *     <P>
              *     The description is used in UIs to help users choose which format to use.
              *     </P>
-             *      */
+             */
             description?: string;
             /**
              * @description <p>The extension of the format.</p>
              *     <p>This is used to determine the file extension for output files and
              *     for URL paths.</p>
-             *
              * @default .xml
              */
             extension: string;
@@ -4774,41 +4771,48 @@ export interface components {
              */
             mediaType: string;
         };
-        /** @description <P>
+        /**
+         * @description <P>
          *     Representation of a Pipeline for display in a custom UI.
          *     </P>
-         *      */
+         */
         PipelineDetails: {
-            /** @description <P>
+            /**
+             * @description <P>
              *     The name of the pipeline file, to be displayed in the UI if no title is set.
              *     </P>
-             *      */
+             */
             name?: string;
-            /** @description <P>
+            /**
+             * @description <P>
              *     The path to the pipeline.
              *     </P>
-             *      */
+             */
             path?: string;
-            /** @description <P>
+            /**
+             * @description <P>
              *     The title of the pipeline, to be displayed in the UI.
              *     </P>
-             *      */
+             */
             title?: string;
-            /** @description <P>
+            /**
+             * @description <P>
              *     The description of the pipeline.
              *     </P>
-             *      */
+             */
             description?: string;
-            /** @description <P>Declared argument groups in the Pipeline.</P>
+            /**
+             * @description <P>Declared argument groups in the Pipeline.</P>
              *     <P>
              *     The UI for gathering arguments should group them into titles sets that may also have a comment.
              *     </P>
              *     <P>
              *     Arguments with no group will always be presented first.
              *     </P>
-             *      */
+             */
             argumentGroups?: components["schemas"]["ArgumentGroup"][];
-            /** @description <P>Declared arguments to the Pipeline.</P>
+            /**
+             * @description <P>Declared arguments to the Pipeline.</P>
              *     <P>
              *     Pipelines can receive arguments via the HTTP query string.
              *     Any arguments may be provided and may be processed by the templates of the pipeline, even if they are not
@@ -4822,9 +4826,10 @@ export interface components {
              *     case they will be presented to the query in the order that they appear in the query string, regardless of any other arguments appearing
              *     between them).
              *     </P>
-             *      */
+             */
             arguments?: components["schemas"]["ArgumentDetails"][];
-            /** @description <P>The outputs that this Pipeline supports.</P>
+            /**
+             * @description <P>The outputs that this Pipeline supports.</P>
              *     <P>
              *     The format to use for a pipeline is chosen by according to the following rules:
              *     <ol>
@@ -4854,24 +4859,27 @@ export interface components {
              *     If the request does not use any of these mechanisms then the first Format specified in the Pipeline will be used.
              *     </ol>
              *     <p>
-             *      */
+             */
             formats?: components["schemas"]["FormatDetails"][];
         };
-        /** @description Information about the current user and environment.
+        /**
+         * @description Information about the current user and environment.
          *     <P>
          *     This information is pulled from the access token and is only available if present there.
-         *      */
+         */
         Profile: {
-            /** @description The username from the token.
+            /**
+             * @description The username from the token.
              *     <P>
              *     This is taken from the first of the following claims to have a value:
              *     <UL>
              *     <LI>preferred_username
              *     <LI>sub
              *     </UL>
-             *      */
+             */
             username?: string;
-            /** @description The users full name from the token.
+            /**
+             * @description The users full name from the token.
              *     <P>
              *     This is taken from the first of the following claims to have a value:
              *     <UL>
@@ -4880,15 +4888,13 @@ export interface components {
              *     <LI>preferred_username
              *     <LI>sub
              *     </UL>
-             *      */
+             */
             fullname?: string;
-            /** @description The version of the Query Engine backend.
-             *      */
+            /** @description The version of the Query Engine backend. */
             version?: string;
             /**
              * @description The claims from the JWT representing the user.
              *     The type will be an object with string keys.
-             *
              * @example {
              *       "sub": "user123",
              *       "iss": "http://issuer-endpoint/token",
