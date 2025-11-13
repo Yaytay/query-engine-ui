@@ -11,6 +11,7 @@ import Login from './components/Login';
 import Home from './Home';
 import Demo from './Demo';
 import History from './History';
+import Jwt from './Jwt';
 import Test from './Test';
 import Help from './Help';
 import Api from './Api';
@@ -210,6 +211,8 @@ function App() {
     }
   });
 
+  const loginFn = (authConfigs?.at(0)) ? () => doLogin(authConfigs) : null;
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -223,6 +226,7 @@ function App() {
           apiUrl={apiUrl}
           profile={profile}
           clearProfile={clearProfile}
+          login={loginFn}
         />
       </div>
       {displayServiceUnavailable ?
@@ -230,7 +234,7 @@ function App() {
           <ServiceUnavailable baseUrl={baseUrl} />
         </div>
         :
-        displayAuthSelection && authConfigs ?
+        displayAuthSelection && (authConfigs || designMode) ?
           <div style={{ width: '100%', height: '100%' }}>
             <Login baseUrl={baseUrl} authConfigs={authConfigs} />
           </div>
@@ -238,11 +242,13 @@ function App() {
           <Routes>
             <Route index element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} docs={docs} available={available} profile={profile} />}></Route>
             <Route index path='/ui' element={<Home designMode={designMode} managementEndpoints={managementEndpoints} apiUrl={apiUrl} docs={docs} available={available} profile={profile} />}></Route>
-            <Route path='/ui/design' element={
-              <Suspense>
-                <Design baseUrl={baseUrl} onChange={refresh} />
-              </Suspense>
-            }></Route>
+            {designMode && 
+              <Route path='/ui/design' element={
+                <Suspense>
+                  <Design baseUrl={baseUrl} onChange={refresh} />
+                </Suspense>
+              }></Route>
+            }
             {available &&
               <Route path='/ui/test' element={<Test available={available} baseUrl={baseUrl} window={window} />}></Route>
             }
@@ -261,6 +267,9 @@ function App() {
             }
             {apiUrl &&
               <Route path='/ui/api' element={<Api url={apiUrl} />}></Route>
+            }
+            {designMode && 
+              <Route path='/ui/jwt' element={<Jwt baseUrl={baseUrl} />}></Route>
             }
           </Routes>
       }

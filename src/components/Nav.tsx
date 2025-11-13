@@ -42,7 +42,8 @@ interface NavProps {
   , window: Window
   , profile: components["schemas"]["Profile"] | null
   , docs: components["schemas"]["DocDir"] | null
-  , clearProfile: () => void;
+  , clearProfile: () => void
+  , login: (() => undefined) | null
 }
 
 function Nav(props : NavProps) {
@@ -305,22 +306,32 @@ function Nav(props : NavProps) {
                 }
             </Box>
             {
-              props.profile &&
-              <Box sx={{ alignSelf: 'flex-end', my: 2, color: 'white', p: '6px' }}>
-                <Button key='Profile' sx={{ my: 2, color: 'white' }} onClick={(event) => {
-                  setProfileMenuAnchor(event.currentTarget)
-                }}>
-                  {props.profile.fullname || props.profile.username}
-                </Button>
-                <NestableMenu menuItems={profileMenuItems(props.profile) || []}
-                  anchor={profileMenuAnchor}
-                  onClose={() => {
-                    setProfileMenuAnchor(null)
-                  }}
-                >
-                </NestableMenu>
-
-              </Box>
+              props.profile?.username ? (
+                <Box sx={{ alignSelf: 'flex-end', my: 2, color: 'white', p: '6px' }}>
+                  <Button key='Profile' sx={{ my: 2, color: 'white' }} onClick={(event) => {
+                    setProfileMenuAnchor(event.currentTarget)
+                  }}>
+                    {props.profile.fullname || props.profile.username}
+                  </Button>
+                  <NestableMenu menuItems={profileMenuItems(props.profile) || []}
+                    anchor={profileMenuAnchor}
+                    onClose={() => {
+                      setProfileMenuAnchor(null)
+                    }}
+                  >
+                  </NestableMenu>
+                </Box> 
+              ) : props.login ? (
+                  <Box sx={{ alignSelf: 'flex-end', my: 2, color: 'white', p: '6px' }}>
+                    <Button key='Profile' sx={{ my: 2, color: 'white' }} onClick={() => {
+                      if (props.login) {
+                        props.login()
+                      }
+                    }}>
+                      Login
+                    </Button>
+                  </Box> 
+              ) : null
             }
           </Toolbar>
         </Container>
