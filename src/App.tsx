@@ -268,9 +268,7 @@ function App() {
             {apiUrl &&
               <Route path='/ui/api' element={<Api url={apiUrl} />}></Route>
             }
-            {designMode && 
-              <Route path='/ui/jwt' element={<Jwt baseUrl={baseUrl} />}></Route>
-            }
+            <Route path='/ui/jwt' element={<Jwt baseUrl={baseUrl} />}></Route>
           </Routes>
       }
     </ThemeProvider>
