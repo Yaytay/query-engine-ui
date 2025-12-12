@@ -24,7 +24,7 @@ interface ManagementProps {
   endpoints: ManagementEndpointType[] | null
 }
 
-export function Manage(props : ManagementProps) {
+function Manage(props : ManagementProps) {
 
   const [drawerWidth, setDrawerWidth] = useState(250)
   const [displayDrawer, setDisplayDrawer] = useState(true)

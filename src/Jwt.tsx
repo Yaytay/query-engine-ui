@@ -7,7 +7,7 @@ interface JwtProps {
   baseUrl: string 
 }
 
-export function Jwt(props : JwtProps) {
+function Jwt(props : JwtProps) {
 
   const [jwt, setJwt] = useState('')
 

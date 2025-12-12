@@ -15,7 +15,7 @@ import Jwt from './Jwt';
 import Test from './Test';
 import Help from './Help';
 import Api from './Api';
-import { Manage, ManagementEndpointType } from './Manage';
+import Manage, { ManagementEndpointType } from './Manage';
 import CssBaseline from '@mui/material/CssBaseline';
 import { components } from "./Query-Engine-Schema";
 import ServiceUnavailable from './components/ServiceUnavailable';

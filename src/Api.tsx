@@ -4,7 +4,7 @@ interface ApiUiProps {
   url: string | null
 }
 
-export function Api(props : ApiUiProps) {
+function Api(props : ApiUiProps) {
 
   return (
     <div className="h-full flex">
