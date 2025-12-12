@@ -7,6 +7,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import Tooltip from '@mui/material/Tooltip';
 
 import { ObjectTypeMap, PropertyType } from "../SchemaType";
+import { AutoResizeTextArea } from './AutoResizeTextArea';
 
 interface OASValueEditorProps {
   id : string
@@ -34,14 +35,6 @@ function OASValueEditor(props : OASValueEditorProps) {
 
   function handleChange(newValue : any) {
     props.onChange(newValue);
-  }
-
-  function countLines(value: string) {
-    let count = 1; // Start at 1 to count the last line
-    for (const ch of value) {
-      if (ch === '\n') count++;
-    }
-    return count;
   }
 
   const classes = "grow bg-transobject appearance-none px-1 text-gray-700 leading-tight font-mono overflow-wrap resize";
@@ -159,14 +152,13 @@ function OASValueEditor(props : OASValueEditorProps) {
     } else {
       // Long text field
       return (
-        <textarea className={classes + ' h-6' + bgcol}
+        <AutoResizeTextArea className={classes + ' h-6' + bgcol}
           id={props.id}
+          value={value}
           placeholder={props.propertyType.title ?? props.propertyType.name}
           defaultValue={value}
           onChange={e => handleChange(e.target.value)}
           onFocus={props.onFocus}
-          ref={input}
-          rows={countLines(value)}
         />
       )
     }

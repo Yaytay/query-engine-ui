@@ -552,19 +552,27 @@ export interface components {
              */
             description?: string;
             /**
-             * @description <P>If set to false the pipeline will fail if the argument is not supplied.</P>
+             * @description <P>
+             *     If set to false the pipeline will fail if the argument is not supplied.
+             *     </P>
              *     <P>
              *     Declaring mandatory arguments to not be optional results in a better user experience when
              *     the users fail to provide it.
+             *     </P>
+             *     <P>
+             *     The hidden and optional values should not both be set to true at the same time - optional arguments can be provided, hidden ones cannot.
              *     </P>
              * @default false
              */
             optional: boolean;
             /**
-             * @description <P>If set to true the pipeline UI will not show this argument and the pipeline will fail if the argument is supplied.</P>
-             *     <P>
+             * @description <P>
+             *     If set to true the pipeline UI will not show this argument and the pipeline will fail if the argument is supplied.
+             *     </P><P>
              *     The purpose of hidden arguments is to use the defaultValueExpression to present dynamic data to the query.
              *     Suggested uses include dynamic limits on a query or values extracted from the token.
+             *     </P><P>
+             *     The hidden and optional values should not both be set to true at the same time - optional arguments can be provided, hidden ones cannot.
              *     </P>
              * @default false
              */
@@ -786,16 +794,8 @@ export interface components {
             /** @description The expression that makes up the condition. */
             expression: string;
         };
-        /**
-         * @description Override of the data type for a specific column.
-         *
-         *     This facility is rarely required, but can be useful when a database does not provide adequate information for Query Engine to correctly identify the type of a field.
-         *
-         *     This is known to be useful for boolean fields with MySQL.
-         *
-         *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
-         */
-        ColumnTypeOverride: {
+        /** @description Specify the data type for a column. */
+        ColumnType: {
             /** @description <P>The name of the column that is to have its data type set.</P> */
             column?: string;
             /**
@@ -1521,7 +1521,7 @@ export interface components {
         /** @description A Source is the source of data for a pipeline. */
         Source: {
             /**
-             * @description <P>Get the name of the Source, that will be used in logging.</P>
+             * @description <P>Get the name of the Source, this is now deprecated.</P>
              *     <P>
              *     This is optional, if it is not set a numeric (or delimited numeric) name will be allocated.
              *     </P>
@@ -1531,7 +1531,7 @@ export interface components {
              * @description <P>The type of Source being configured.</P>
              * @enum {string}
              */
-            type: "TEST" | "SQL" | "JDBC" | "HTTP";
+            type: "TEST" | "SQL" | "JDBC" | "STATIC" | "HTTP";
         };
         /**
          * @description Pipeline data source that gets data from a SQL database.
@@ -1543,7 +1543,7 @@ export interface components {
              * @description <P>The type of Source being configured.</P>
              * @enum {string}
              */
-            type: "TEST" | "SQL" | "JDBC" | "HTTP";
+            type: "TEST" | "SQL" | "JDBC" | "STATIC" | "HTTP";
             /**
              * @description <P>The name of the endpoint that provides the data for the Source.</P>
              *     <P>
@@ -1672,7 +1672,7 @@ export interface components {
              *     <P>
              *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
              */
-            columnTypeOverrides?: components["schemas"]["ColumnTypeOverride"][];
+            columnTypeOverrides?: components["schemas"]["ColumnType"][];
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -1709,7 +1709,7 @@ export interface components {
              * @description <P>The type of Source being configured.</P>
              * @enum {string}
              */
-            type: "TEST" | "SQL" | "JDBC" | "HTTP";
+            type: "TEST" | "SQL" | "JDBC" | "STATIC" | "HTTP";
             /**
              * @description <P>The name of the endpoint that provides the data for the Source.</P>
              *     <P>
@@ -1847,13 +1847,41 @@ export interface components {
              *     <P>
              *     Setting a column to use a type that the result does not fit is going to cause problems (loss of data or errors) - so be sure you do this with care.
              */
-            columnTypeOverrides?: components["schemas"]["ColumnTypeOverride"][];
+            columnTypeOverrides?: components["schemas"]["ColumnType"][];
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
              */
             type: "SQL";
+        };
+        /**
+         * @description Source producing a fixed set of data without any need to communicate with a database.
+         *     <P>
+         *     The data stream will contain the defined values only.
+         */
+        SourceStatic: Omit<WithRequired<components["schemas"]["Source"], "type">, "type"> & {
+            /**
+             * @description <P>The type of Source being configured.</P>
+             * @enum {string}
+             */
+            type: "TEST" | "SQL" | "JDBC" | "STATIC" | "HTTP";
+            /** @description <P>The column definitions for the dataset.</P> */
+            types?: components["schemas"]["ColumnType"][];
+            /**
+             * @description <P>The rows of the dataset.</P>
+             *     <P>
+             *     Each row must have the same number of columns as the types definition
+             *     , and each value must be convertible to the matching DataType.
+             *     </P>
+             */
+            rows?: unknown[][];
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "STATIC";
         };
         /**
          * @description Source producing a fixed set of data without any need to communicate with a database.
@@ -1872,7 +1900,7 @@ export interface components {
              * @description <P>The type of Source being configured.</P>
              * @enum {string}
              */
-            type: "TEST" | "SQL" | "JDBC" | "HTTP";
+            type: "TEST" | "SQL" | "JDBC" | "STATIC" | "HTTP";
             /**
              * Format: int32
              * @description The number of rows that the source will return.
@@ -2145,12 +2173,12 @@ export interface components {
              */
             extension?: string;
             /**
-             * @description <P>The description of the format.</P>
+             * @description <P>The filename to specify in the Content-Disposition header.</P>
              *     <P>
-             *     The description is used in UIs to help users choose which format to use.
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
              *     </P>
              */
-            description?: string;
+            filename?: string;
             /**
              * @description <P>The media type of the format.</P>
              *     <P>
@@ -2163,12 +2191,12 @@ export interface components {
              */
             mediaType?: string;
             /**
-             * @description <P>The filename to specify in the Content-Disposition header.</P>
+             * @description <P>The description of the format.</P>
              *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     The description is used in UIs to help users choose which format to use.
              *     </P>
              */
-            filename?: string;
+            description?: string;
         };
         /**
          * @description Configuration for an output format of Atom.
@@ -4034,117 +4062,6 @@ export interface components {
             with: string;
         };
         /**
-         * @description <P>Definition of an endpoint that can be used for querying data.</P>
-         *     <P>
-         *     An Endpoint represents a connection to a data source, where a Source represents an actual data query.
-         *     For EndpointType.HTTP Sources there is often a one-to-one relationship between Source and Endpoint, but for EndpointType.SQL Sources there
-         *     are often multiple Sources for a single Endpoint (for SQL a Source is a query and an Endpoint is a database).
-         *     </P>
-         *     <P>
-         *     The credentials for an Endpoint can be specified in three ways:
-         *     <ul>
-         *     <li>By including them in the URL specified in the Endpoint definition.
-         *     This is the least secure option as the URL value will be written to log entries.
-         *     <li>By explicitly setting username/password on the Endpoint.
-         *     The password will not be logged, but will be in your configuration files and thus in your source repo.
-         *     <li>By using secrets set in the configuration of the query engine.
-         *     This is the most secure option as it puts the responsibility on the deployment to protect the credentials.
-         *     </ul>
-         *     </P>
-         *     <P>
-         *     If the secret field is set it will take precedence over both the username and the password set in the Endpoint
-         *     , as a result it is not valid to set either username or password at the same time as secret.
-         *     The same does not apply to the condition field, that can be set on both the Endpoint and the Secret (and both conditions
-         *     must be met for the Endpoint to work).
-         *     </P>
-         */
-        Endpoint: {
-            /** @description <P>The name of the Endpoint, that will be used to refer to it in Sources. */
-            name: string;
-            /**
-             * @description <P>The type of Endpoint being configured</P>
-             * @enum {string}
-             */
-            type: "SQL" | "JDBC" | "HTTP";
-            /**
-             * Format: uri
-             * @description <P>A URL that defines the Endpoint.</P>
-             *     <P>
-             *     Invalid if the URL template field is provided.
-             *     </P>
-             *     <P>
-             *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
-             *     fields of the Endpoint will not be.
-             *     </P>
-             */
-            url?: string;
-            /**
-             * @description <P>A StringTemplate that will be rendered as the URL that defines the Endpoint.</P>
-             *     <P>
-             *     Invalid if the URL field is provided.
-             *     </P>
-             *     <P>
-             *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
-             *     fields of the Endpoint will not be.
-             *     </P>
-             */
-            urlTemplate?: string;
-            /**
-             * @description <P>The name of the secret that contains the credentials to be used for the connection.</P>
-             *     <P>
-             *     Invalid if the username or password fields are provided.
-             *     </P>
-             *     <P>
-             *     The named secret must be configured in the instance of the query engine.
-             *     The currently running instance is in design mode and thus should not be your live instance,
-             *     which unfortuantely means it is not possible to list the known secrets of your live instance here.
-             *     Please ask your systems administrator for this information.
-             *     </P>
-             */
-            secret?: string;
-            /**
-             * @description <P>The username that should be used when communicating with the endpoint.</P>
-             *     <P>
-             *     Invalid if the secret field  provided.
-             *     </P>
-             *     <P>
-             *     The username will be logged.
-             *     </P>
-             */
-            username?: string;
-            /**
-             * @description <P>The password that should be used when communicating with the endpoint.</P>
-             *     <P>
-             *     Invalid if the secret field  provided.
-             *     </P>
-             *     <P>
-             *     The password will not be logged.
-             *     </P>
-             *     <P>
-             *     Any password entered here will inevitably end up in your pipeline repo.
-             *     This is not a security best practice.
-             *     Please use secrets instead of username/password for live deployments.
-             *     </P>
-             */
-            password?: string;
-            /** @description <P>A condition that must be passed for the endpoint to be used.</P> */
-            condition?: components["schemas"]["Condition"];
-            /**
-             * @description <P>The connection timeout for the endpoint connection in milliseconds.</P>
-             *     <P>
-             *     This controls the maximum time a connection can remain connection before being closed.
-             *     </P>
-             */
-            connectionTimeout?: string;
-            /**
-             * @description <P>The idle timeout for the endpoint connection in milliseconds.</P>
-             *     <P>
-             *     This controls the maximum time a connection can remain idle before being closed.
-             *     </P>
-             */
-            idleTimeout?: string;
-        };
-        /**
          * @description <P>The Pipeline is the fundamental unit of processing in QueryEngine.</P>
          *     <P>
          *      A single Pipeline takes data from a single Source, passes it through any number of Processors and finally delivers it to a Format.
@@ -4270,7 +4187,7 @@ export interface components {
              *     The segregation between Source and Endpoint allows a single Source to work with multiple Endpoints.
              *     </P>
              */
-            sourceEndpoints?: components["schemas"]["Endpoint"][];
+            sourceEndpoints?: string | Record<string, never>;
             /**
              * @description <P>Sub-Pipelines that can be run prior to the main Pipeline in order to generate more SourceEndpoints.</P>
              *     <P>
@@ -4332,28 +4249,13 @@ export interface components {
          *     A directory containing documentation files.
          *     </P>
          */
-        DocDir: WithRequired<components["schemas"]["DocNode"], "children" | "name" | "path"> & {
-            /**
-             * @description The children of the node.
-             *     <P>
-             *     If this is null then the node is a file, otherwise it is a directory.
-             *     </P>
-             */
-            children: components["schemas"]["DocNode"][];
-        };
+        DocDir: WithRequired<components["schemas"]["DocNode"], "children" | "name" | "path">;
         /**
          * @description <P>
          *     A documentation file.
          *     </P>
          */
         DocFile: WithRequired<components["schemas"]["DocNode"], "name" | "path"> & {
-            /**
-             * @description The children of the node.
-             *     <P>
-             *     If this is null then the node is a file, otherwise it is a directory.
-             *     </P>
-             */
-            children?: components["schemas"]["DocNode"][];
             /**
              * @description <P>
              *     The title of the document.
@@ -4463,28 +4365,13 @@ export interface components {
          *     A directory containing pipelines.
          *     </P>
          */
-        PipelineDir: WithRequired<components["schemas"]["PipelineNode"], "children" | "name" | "path"> & {
-            /**
-             * @description The children of the node.
-             *     <P>
-             *     If this is null then the node is a file, otherwise it is a directory.
-             *     </P>
-             */
-            children: components["schemas"]["PipelineNode"][];
-        };
+        PipelineDir: WithRequired<components["schemas"]["PipelineNode"], "children" | "name" | "path">;
         /**
          * @description <P>
          *     A pipeline.
          *     </P>
          */
         PipelineFile: WithRequired<components["schemas"]["PipelineNode"], "name" | "path"> & {
-            /**
-             * @description The children of the node.
-             *     <P>
-             *     If this is null then the node is a file, otherwise it is a directory.
-             *     </P>
-             */
-            children?: components["schemas"]["PipelineNode"][];
             /**
              * @description <P>
              *     The title of the pipeline, to be displayed in the UI.
