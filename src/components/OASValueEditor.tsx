@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import Textarea from 'react-expanding-textarea'
 import OASObjectEditor from './OASObjectEditor';
 import IconButton from '@mui/material/IconButton';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -35,6 +34,14 @@ function OASValueEditor(props : OASValueEditorProps) {
 
   function handleChange(newValue : any) {
     props.onChange(newValue);
+  }
+
+  function countLines(value: string) {
+    let count = 1; // Start at 1 to count the last line
+    for (const ch of value) {
+      if (ch === '\n') count++;
+    }
+    return count;
   }
 
   const classes = "grow bg-transobject appearance-none px-1 text-gray-700 leading-tight font-mono overflow-wrap resize";
@@ -152,13 +159,14 @@ function OASValueEditor(props : OASValueEditorProps) {
     } else {
       // Long text field
       return (
-        <Textarea className={classes + ' h-6' + bgcol}
+        <textarea className={classes + ' h-6' + bgcol}
           id={props.id}
           placeholder={props.propertyType.title ?? props.propertyType.name}
           defaultValue={value}
           onChange={e => handleChange(e.target.value)}
           onFocus={props.onFocus}
           ref={input}
+          rows={countLines(value)}
         />
       )
     }

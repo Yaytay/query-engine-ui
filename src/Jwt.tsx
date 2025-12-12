@@ -15,9 +15,10 @@ export function Jwt(props : JwtProps) {
 
 
   function submit() : void {
-    console.log(jwt)
+    const strippedJwt = jwt.replace(/\s+/g, "");
+    console.log(strippedJwt)
     const url = props.baseUrl + "login/forcejwt";
-    fetch(url, { method: 'PUT', body: jwt, credentials: 'include', headers: {'Content-Type': 'application/octet-stream'} })
+    fetch(url, { method: 'PUT', body: strippedJwt, credentials: 'include', headers: {'Content-Type': 'application/octet-stream'} })
       .then(r => {
         if (!r.ok) {
           return r.text().then(t => {
