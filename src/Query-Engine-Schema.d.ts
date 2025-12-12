@@ -794,6 +794,117 @@ export interface components {
             /** @description The expression that makes up the condition. */
             expression: string;
         };
+        /**
+         * @description <P>Definition of an endpoint that can be used for querying data.</P>
+         *     <P>
+         *     An Endpoint represents a connection to a data source, where a Source represents an actual data query.
+         *     For EndpointType.HTTP Sources there is often a one-to-one relationship between Source and Endpoint, but for EndpointType.SQL Sources there
+         *     are often multiple Sources for a single Endpoint (for SQL a Source is a query and an Endpoint is a database).
+         *     </P>
+         *     <P>
+         *     The credentials for an Endpoint can be specified in three ways:
+         *     <ul>
+         *     <li>By including them in the URL specified in the Endpoint definition.
+         *     This is the least secure option as the URL value will be written to log entries.
+         *     <li>By explicitly setting username/password on the Endpoint.
+         *     The password will not be logged, but will be in your configuration files and thus in your source repo.
+         *     <li>By using secrets set in the configuration of the query engine.
+         *     This is the most secure option as it puts the responsibility on the deployment to protect the credentials.
+         *     </ul>
+         *     </P>
+         *     <P>
+         *     If the secret field is set it will take precedence over both the username and the password set in the Endpoint
+         *     , as a result it is not valid to set either username or password at the same time as secret.
+         *     The same does not apply to the condition field, that can be set on both the Endpoint and the Secret (and both conditions
+         *     must be met for the Endpoint to work).
+         *     </P>
+         */
+        Endpoint: {
+            /** @description <P>The name of the Endpoint, that will be used to refer to it in Sources. */
+            name: string;
+            /**
+             * @description <P>The type of Endpoint being configured</P>
+             * @enum {string}
+             */
+            type: "SQL" | "JDBC" | "HTTP";
+            /**
+             * Format: uri
+             * @description <P>A URL that defines the Endpoint.</P>
+             *     <P>
+             *     Invalid if the URL template field is provided.
+             *     </P>
+             *     <P>
+             *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
+             *     fields of the Endpoint will not be.
+             *     </P>
+             */
+            url?: string;
+            /**
+             * @description <P>A StringTemplate that will be rendered as the URL that defines the Endpoint.</P>
+             *     <P>
+             *     Invalid if the URL field is provided.
+             *     </P>
+             *     <P>
+             *     For security reasons the URL should not contain credentials - the URL may be logged but the username and password
+             *     fields of the Endpoint will not be.
+             *     </P>
+             */
+            urlTemplate?: string;
+            /**
+             * @description <P>The name of the secret that contains the credentials to be used for the connection.</P>
+             *     <P>
+             *     Invalid if the username or password fields are provided.
+             *     </P>
+             *     <P>
+             *     The named secret must be configured in the instance of the query engine.
+             *     The currently running instance is in design mode and thus should not be your live instance,
+             *     which unfortuantely means it is not possible to list the known secrets of your live instance here.
+             *     Please ask your systems administrator for this information.
+             *     </P>
+             */
+            secret?: string;
+            /**
+             * @description <P>The username that should be used when communicating with the endpoint.</P>
+             *     <P>
+             *     Invalid if the secret field  provided.
+             *     </P>
+             *     <P>
+             *     The username will be logged.
+             *     </P>
+             */
+            username?: string;
+            /**
+             * @description <P>The password that should be used when communicating with the endpoint.</P>
+             *     <P>
+             *     Invalid if the secret field  provided.
+             *     </P>
+             *     <P>
+             *     The password will not be logged.
+             *     </P>
+             *     <P>
+             *     Any password entered here will inevitably end up in your pipeline repo.
+             *     This is not a security best practice.
+             *     Please use secrets instead of username/password for live deployments.
+             *     </P>
+             */
+            password?: string;
+            /** @description <P>A condition that must be passed for the endpoint to be used.</P> */
+            condition?: components["schemas"]["Condition"];
+            /**
+             * @description <P>The connection timeout for the endpoint connection in milliseconds.</P>
+             *     <P>
+             *     This controls the maximum time a connection can remain connection before being closed.
+             *     </P>
+             */
+            connectionTimeout?: string;
+            /**
+             * @description <P>The idle timeout for the endpoint connection in milliseconds.</P>
+             *     <P>
+             *     This controls the maximum time a connection can remain idle before being closed.
+             *     </P>
+             */
+            idleTimeout?: string;
+        };
         /** @description Specify the data type for a column. */
         ColumnType: {
             /** @description <P>The name of the column that is to have its data type set.</P> */
@@ -2173,12 +2284,12 @@ export interface components {
              */
             extension?: string;
             /**
-             * @description <P>The filename to specify in the Content-Disposition header.</P>
+             * @description <P>The description of the format.</P>
              *     <P>
-             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
+             *     The description is used in UIs to help users choose which format to use.
              *     </P>
              */
-            filename?: string;
+            description?: string;
             /**
              * @description <P>The media type of the format.</P>
              *     <P>
@@ -2191,12 +2302,12 @@ export interface components {
              */
             mediaType?: string;
             /**
-             * @description <P>The description of the format.</P>
+             * @description <P>The filename to specify in the Content-Disposition header.</P>
              *     <P>
-             *     The description is used in UIs to help users choose which format to use.
+             *     If not specified then the leaf name of the pipeline (with extension the value of {@link #getExtension()} appended) will be used.
              *     </P>
              */
-            description?: string;
+            filename?: string;
         };
         /**
          * @description Configuration for an output format of Atom.
@@ -4187,7 +4298,7 @@ export interface components {
              *     The segregation between Source and Endpoint allows a single Source to work with multiple Endpoints.
              *     </P>
              */
-            sourceEndpoints?: string | Record<string, never>;
+            sourceEndpoints?: components["schemas"]["Endpoint"][];
             /**
              * @description <P>Sub-Pipelines that can be run prior to the main Pipeline in order to generate more SourceEndpoints.</P>
              *     <P>
