@@ -18,9 +18,17 @@ import Tooltip from '@mui/material/Tooltip';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+
+import deepEqual from 'fast-deep-equal';
+
 import { components } from "./Query-Engine-Schema";
 import { ObjectTypeMap, buildSchema } from "./SchemaType";
-import deepEqual from 'fast-deep-equal';
 
 let onChange = () => {};
 
@@ -48,8 +56,13 @@ function Design(props : DesignProps) {
   const [fileContents, setFileContents] = useState(null as components["schemas"]["Pipeline"] | null)
   const [fileContentsString, setFileContentsString] = useState(null as string | null)
 
-  const [savedFileContents, setSavedFileContents] = useState(null as components["schemas"]["Pipeline"] | null);
-  const [savedFileContentsString, setSavedFileContentsString] = useState(null as string | null);
+  const [savedFileContents, setSavedFileContents] =
+    useState(null as components["schemas"]["Pipeline"] | null);
+  const [savedFileContentsString, setSavedFileContentsString] =
+    useState(null as string | null);
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingSelection, setPendingSelection] = useState<string | null>(null);
 
   const [helpText, setHelpText] = useState('')
 
@@ -175,9 +188,9 @@ function Design(props : DesignProps) {
   const [currentFile, setCurrentFile] = useState(null as  components["schemas"]["DesignFile"] | null);
 
   const isDirty =
-      (currentFile?.path?.endsWith('.jexl') ?? false)
-          ? ((fileContentsString ?? '') !== (savedFileContentsString ?? ''))
-          : (!deepEqual(fileContents, savedFileContents));
+    (currentFile?.path?.endsWith('.jexl') ?? false)
+      ? ((fileContentsString ?? '') !== (savedFileContentsString ?? ''))
+      : (!deepEqual(fileContents, savedFileContents));
 
   function validateFile() {
     const url = new URL(props.baseUrl + 'api/design/validate');
@@ -204,10 +217,10 @@ function Design(props : DesignProps) {
       })
   }
 
-  function saveFile() {
+  async function saveFile(): Promise<boolean> {
     if (!currentFile) {
-      return
-    }    
+      return false
+    }
     const url = new URL(props.baseUrl + 'api/design/file/' + currentFile.path)
     let contents : string;
     if (currentFile.path.endsWith('.jexl')) {
@@ -215,32 +228,38 @@ function Design(props : DesignProps) {
     } else {
       contents = JSON.stringify(fileContents, (_, value) => value === '' ? undefined : value)
     }
-    fetch(url, { method: 'PUT', body: contents, credentials: 'include', headers: {'Content-Type': 'application/json'} })
-      .then(r => {
-        if (!r.ok) {
-          return r.text().then(t => {
-            throw Error(t)
-          })
-        } else {
-          onChange()
-          return r.text()
-        }
-      })
-      .then(() => {
-        // mark "clean" after a successful save
-        if (currentFile.path.endsWith('.jexl')) {
-          setSavedFileContents(null);
-          setSavedFileContentsString(fileContentsString ?? '');
-        } else {
-          setSavedFileContents(fileContents);
-          setSavedFileContentsString(null);
-        }
-      })
-      .catch(e => {
-        console.log(e)
-        setSnackMessage(e.message)
-        setSnackOpen(true)
-      })
+
+    try {
+      const r = await fetch(url, {
+        method: 'PUT',
+        body: contents,
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!r.ok) {
+        const t = await r.text();
+        throw Error(t);
+      }
+
+      onChange();
+
+      // mark "clean" after successful save
+      if (currentFile.path.endsWith('.jexl')) {
+        setSavedFileContents(null);
+        setSavedFileContentsString(fileContentsString ?? '');
+      } else {
+        setSavedFileContents(fileContents);
+        setSavedFileContentsString(null);
+      }
+
+      return true;
+    } catch (e: any) {
+      console.log(e)
+      setSnackMessage(e.message)
+      setSnackOpen(true)
+      return false;
+    }
   }
 
   function fileSelected(nodeId : string) {
@@ -264,6 +283,7 @@ function Design(props : DesignProps) {
             setHelpText(permissionsHtml + (openapi ? openapi.components.schemas.Condition.description : ''))
             setFileContents(null)
             setFileContentsString(j)
+
             // snapshot for dirty tracking
             setSavedFileContents(null)
             setSavedFileContentsString(j)
@@ -274,6 +294,7 @@ function Design(props : DesignProps) {
             }
             setFileContents(p)
             setFileContentsString(null)
+
             // snapshot for dirty tracking
             setSavedFileContents(p)
             setSavedFileContentsString(null)
@@ -288,7 +309,7 @@ function Design(props : DesignProps) {
       setCurrentFile(null)
       setFileContents(null)
       setFileContentsString('')
-      // snapshot for dirty tracking
+
       setSavedFileContents(null)
       setSavedFileContentsString(null)
     }
@@ -348,7 +369,7 @@ function Design(props : DesignProps) {
 
     // Fallback if everything up to NewFolder9 exists (keeps behaviour predictable)
     if (!name) {
-      name = `NewFolder${Date.now()}`;
+      name = `NewPipeline${Date.now()}.yaml`;
     }
 
     const parentPath = node.path === '' ? '' : node.path + '/'
@@ -380,13 +401,47 @@ function Design(props : DesignProps) {
   };
 
   const handleSelect = (_: React.SyntheticEvent | null, itemId: string | null) => {
-    if (itemId) {
-      setSelected(itemId)
-      fileSelected(itemId)
-    } else {
+    if (!itemId) {
       setSelected('')
       fileSelected('')
+      return;
     }
+
+    // Guard navigation: if dirty, confirm before switching files
+    if (isDirty && itemId !== selected) {
+      setPendingSelection(itemId);
+      setConfirmOpen(true);
+      return;
+    }
+
+    setSelected(itemId)
+    fileSelected(itemId)
+  };
+
+  const closeConfirm = () => {
+    setConfirmOpen(false);
+    setPendingSelection(null);
+  };
+
+  const proceedToPendingSelection = (target: string | null) => {
+    if (!target) {
+      closeConfirm();
+      return;
+    }
+    setSelected(target);
+    fileSelected(target);
+    closeConfirm();
+  };
+
+  const onConfirmSave = async () => {
+    const ok = await saveFile();
+    if (ok) {
+      proceedToPendingSelection(pendingSelection);
+    }
+  };
+
+  const onConfirmDiscard = () => {
+    proceedToPendingSelection(pendingSelection);
   };
 
   function fileDrawerWidthChange(w : number) {
@@ -549,7 +604,34 @@ function Design(props : DesignProps) {
           </div>
         </>
       )}
-    </div>);
+
+      <Dialog
+        open={confirmOpen}
+        onClose={closeConfirm}
+        aria-labelledby="unsaved-changes-title"
+        aria-describedby="unsaved-changes-description"
+      >
+        <DialogTitle id="unsaved-changes-title">Unsaved changes</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="unsaved-changes-description">
+            You have unsaved changes in <strong>{currentFile?.path ?? 'the current file'}</strong>.<br/>
+            What would you like to do?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeConfirm} variant="outlined">
+            Cancel
+          </Button>
+          <Button onClick={onConfirmDiscard} color="error" variant="outlined">
+            Discard changes
+          </Button>
+          <Button onClick={onConfirmSave} variant="contained">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
 }
 
 const permissionsHtml = `
