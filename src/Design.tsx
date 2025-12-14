@@ -20,6 +20,7 @@ import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { components } from "./Query-Engine-Schema";
 import { ObjectTypeMap, buildSchema } from "./SchemaType";
+import deepEqual from 'fast-deep-equal';
 
 let onChange = () => {};
 
@@ -46,6 +47,9 @@ function Design(props : DesignProps) {
 
   const [fileContents, setFileContents] = useState(null as components["schemas"]["Pipeline"] | null)
   const [fileContentsString, setFileContentsString] = useState(null as string | null)
+
+  const [savedFileContents, setSavedFileContents] = useState(null as components["schemas"]["Pipeline"] | null);
+  const [savedFileContentsString, setSavedFileContentsString] = useState(null as string | null);
 
   const [helpText, setHelpText] = useState('')
 
@@ -170,6 +174,11 @@ function Design(props : DesignProps) {
 
   const [currentFile, setCurrentFile] = useState(null as  components["schemas"]["DesignFile"] | null);
 
+  const isDirty =
+      (currentFile?.path?.endsWith('.jexl') ?? false)
+          ? ((fileContentsString ?? '') !== (savedFileContentsString ?? ''))
+          : (!deepEqual(fileContents, savedFileContents));
+
   function validateFile() {
     const url = new URL(props.baseUrl + 'api/design/validate');
     console.log(fileContents)
@@ -217,6 +226,16 @@ function Design(props : DesignProps) {
           return r.text()
         }
       })
+      .then(() => {
+        // mark "clean" after successful save
+        if (currentFile.path.endsWith('.jexl')) {
+          setSavedFileContents(null);
+          setSavedFileContentsString(fileContentsString ?? '');
+        } else {
+          setSavedFileContents(fileContents);
+          setSavedFileContentsString(null);
+        }
+      })
       .catch(e => {
         console.log(e)
         setSnackMessage(e.message)
@@ -245,6 +264,9 @@ function Design(props : DesignProps) {
             setHelpText(permissionsHtml + (openapi ? openapi.components.schemas.Condition.description : ''))
             setFileContents(null)
             setFileContentsString(j)
+            // snapshot for dirty tracking
+            setSavedFileContents(null)
+            setSavedFileContentsString(j)
           } else {
             let p = JSON.parse(j)
             if (!p) {
@@ -252,6 +274,9 @@ function Design(props : DesignProps) {
             }
             setFileContents(p)
             setFileContentsString(null)
+            // snapshot for dirty tracking
+            setSavedFileContents(p)
+            setSavedFileContentsString(null)
           }
         })
         .catch(e => {
@@ -263,6 +288,9 @@ function Design(props : DesignProps) {
       setCurrentFile(null)
       setFileContents(null)
       setFileContentsString('')
+      // snapshot for dirty tracking
+      setSavedFileContents(null)
+      setSavedFileContentsString(null)
     }
   }
 
@@ -437,7 +465,7 @@ function Design(props : DesignProps) {
         <div className="flex border-b">
           <div style={{ borderColor: 'divider' }} className="flex p-3 grow">
             <div className="grow">
-              {currentFile == null ? 'No file selected' : currentFile.path}
+              {currentFile == null ? 'No file selected' : `${currentFile.path}${isDirty ? ' •' : ''}`}
             </div>
           </div>
           <div>
@@ -446,7 +474,7 @@ function Design(props : DesignProps) {
                 <FactCheckIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Save">
+            <Tooltip title={isDirty ? 'Save (unsaved changes)' : 'Save'}>
               <IconButton sx={{ 'borderRadius': '20%' }} onClick={saveFile}>
                 <SaveIcon />
               </IconButton>
