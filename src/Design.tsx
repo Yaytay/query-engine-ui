@@ -113,7 +113,7 @@ function Design(props : DesignProps) {
       })
   }, [setFiles, setNodeMap, buildNodeMap])
 
-  const [defaulExpanded, _] = useState(() => {
+  const [defaultExpanded, _] = useState(() => {
     const saved = localStorage.getItem("design-dir-state")
     return saved ? JSON.parse(saved) : saved
   })
@@ -143,8 +143,8 @@ function Design(props : DesignProps) {
     handleResponse(fetch(url, {credentials: 'include'}))
       .then(j => {
         const dirs = getAllDirs(j)
-        if (defaulExpanded) {
-          setExpanded(dirs.filter(value => defaulExpanded.includes(value)))
+        if (defaultExpanded) {
+          setExpanded(dirs.filter(value => defaultExpanded.includes(value)))
         } else {
           setExpanded(dirs) 
         }
@@ -227,7 +227,7 @@ function Design(props : DesignProps) {
         }
       })
       .then(() => {
-        // mark "clean" after successful save
+        // mark "clean" after a successful save
         if (currentFile.path.endsWith('.jexl')) {
           setSavedFileContents(null);
           setSavedFileContentsString(fileContentsString ?? '');
@@ -310,13 +310,24 @@ function Design(props : DesignProps) {
   }
 
   function childExists(node : components["schemas"]["DesignDir"], newName : string) {
-    return node.children.find(n => n.name === newName) === undefined ? false : true;
+    return node.children.find(n => n.name === newName) !== undefined;
   }
 
   function onNewFolder(node : components["schemas"]["DesignDir"]) {
-    let name;
-    for (let i = 1; (name = 'NewFolder' + i) && childExists(node, name) && i < 10; ++i)
-      ;
+    let name : string | undefined;
+    for (let i = 1; i < 10; i += 1) {
+      const candidate = `NewFolder${i}`;
+      if (!childExists(node, candidate)) {
+        name = candidate;
+        break;
+      }
+    }
+
+    // Fallback if everything up to NewFolder9 exists (keeps behaviour predictable)
+    if (!name) {
+      name = `NewFolder${Date.now()}`;
+    }
+
     const parentPath = node.path === '' ? '' : node.path + '/'
     const url = new URL(props.baseUrl + 'api/design/file/' + parentPath + name);
     if (expanded.find(n => n === node.path) === undefined) {
@@ -326,9 +337,20 @@ function Design(props : DesignProps) {
   }
 
   function onNewPipeline(node : components["schemas"]["DesignDir"]) {
-    let name;
-    for (let i = 1; (name = 'NewPipeline' + i + '.yaml') && childExists(node, name) && i < 10; ++i)
-      ;
+    let name : string | undefined;
+    for (let i = 1; i < 10; i += 1) {
+      const candidate = `NewPipeline${i}.yaml`;
+      if (!childExists(node, candidate)) {
+        name = candidate;
+        break;
+      }
+    }
+
+    // Fallback if everything up to NewFolder9 exists (keeps behaviour predictable)
+    if (!name) {
+      name = `NewFolder${Date.now()}`;
+    }
+
     const parentPath = node.path === '' ? '' : node.path + '/'
     const url = new URL(props.baseUrl + 'api/design/file/' + parentPath + name);
     if (expanded.find(n => n === node.path) === undefined) {
@@ -534,7 +556,7 @@ const permissionsHtml = `
 <H2>Permissions Files</H2>
 <P>
 You are editing a permissions file.
-At runtime the expression in this file will be evaluated and the operation will only be permitted to access the directory if the expression evaluates to true.
+At runtime the expression in this file will be evaluated, and the operation will only be permitted to access the directory if the expression evaluates to true.
 </P>
 <P>
 Permissions files are evaluated at every level of the directory hierarchy.
