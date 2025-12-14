@@ -263,6 +263,11 @@ function Design(props : DesignProps) {
   }
 
   function fileSelected(nodeId : string) {
+    // Prevent reloading the file that's already open (avoids discarding unsaved changes)
+    if (currentFile?.path && nodeId === currentFile.path) {
+      return;
+    }
+
     const node = nodeMap && nodeMap.get(nodeId)
     if (node && isFile(node)) {
       setCurrentFile(node);
@@ -407,8 +412,14 @@ function Design(props : DesignProps) {
       return;
     }
 
+    // If user clicked the currently selected file again, do nothing.
+    // This prevents reloading from the server and nuking unsaved edits.
+    if (itemId === selected) {
+      return;
+    }
+
     // Guard navigation: if dirty, confirm before switching files
-    if (isDirty && itemId !== selected) {
+    if (isDirty) {
       setPendingSelection(itemId);
       setConfirmOpen(true);
       return;
