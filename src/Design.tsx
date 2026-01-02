@@ -244,7 +244,7 @@ function Design(props : DesignProps) {
 
       onChange();
 
-      // mark "clean" after successful save
+      // mark "clean" after a successful save
       if (currentFile.path.endsWith('.jexl')) {
         setSavedFileContents(null);
         setSavedFileContentsString(fileContentsString ?? '');
@@ -412,7 +412,7 @@ function Design(props : DesignProps) {
       return;
     }
 
-    // If user clicked the currently selected file again, do nothing.
+    // If the user clicked the currently selected file again, do nothing.
     // This prevents reloading from the server and nuking unsaved edits.
     if (itemId === selected) {
       return;
