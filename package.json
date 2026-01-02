@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@formio/js": "^5.2.4",
-    "@formio/react": "^6.1.1",
+    "@formio/react": "^6.1.2",
     "@mui/system": "^7.3.6",
     "@mui/x-tree-view": "^8.23.0",
     "@tailwindcss/vite": "^4.1.18",
