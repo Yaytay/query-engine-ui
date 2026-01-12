@@ -14,7 +14,7 @@
   "dependencies": {
     "@formio/js": "^5.2.5",
     "@formio/react": "^6.1.2",
-    "@mui/system": "^7.3.6",
+    "@mui/system": "^7.3.7",
     "@mui/x-tree-view": "^8.24.0",
     "@tailwindcss/vite": "^4.1.18",
     "bootstrap": "^5.3.8",
