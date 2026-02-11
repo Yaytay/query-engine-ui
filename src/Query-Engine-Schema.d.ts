@@ -12,7 +12,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Return details of the available OAuth providers */
-        get: operations["get"];
+        get: operations["getAuthConfig"];
         put?: never;
         post?: never;
         delete?: never;
@@ -133,7 +133,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Return a tree of available  documentation */
-        get: operations["getAvailable"];
+        get: operations["getAllDocumentation"];
         put?: never;
         post?: never;
         delete?: never;
@@ -150,7 +150,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Return some documentation */
-        get: operations["getDoc"];
+        get: operations["getSingleDocument"];
         put?: never;
         post?: never;
         delete?: never;
@@ -206,7 +206,7 @@ export interface paths {
             cookie?: never;
         };
         /** @description Return a list of available pipelines */
-        get: operations["getAvailable_1"];
+        get: operations["getAvailable"];
         put?: never;
         post?: never;
         delete?: never;
@@ -222,7 +222,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Return a form.io definition for a given document */
+        /** @description Return details of a pipeline that would be needed for a UI to run the pipeline without using formio */
         get: operations["getDetails"];
         put?: never;
         post?: never;
@@ -286,13 +286,6 @@ export interface components {
              */
             name: string;
             /**
-             * @description The children of the node.
-             *     <P>
-             *     If this is null then the node is a file, otherwise it is a directory.
-             *     </P>
-             */
-            children: components["schemas"]["DesignNode"][];
-            /**
              * @description <P>
              *     The relative path to the node from the root.
              *     </P>
@@ -308,20 +301,27 @@ export interface components {
              *     </P>
              */
             modified: string;
-        };
-        /**
-         * @description <P>
-         *     A pipeline definition file.
-         *     </P>
-         */
-        DesignFile: WithRequired<components["schemas"]["DesignNode"], "modified" | "name" | "path"> & {
             /**
              * @description The children of the node.
              *     <P>
              *     If this is null then the node is a file, otherwise it is a directory.
              *     </P>
              */
-            children?: components["schemas"]["DesignNode"][];
+            children: components["schemas"]["DesignNode"][];
+            /**
+             * @description <P>
+             *     The type of this node, whether it is a dir or a file.
+             *     </P>
+             * @enum {string}
+             */
+            type: "file" | "dir";
+        };
+        /**
+         * @description <P>
+         *     A pipeline definition file.
+         *     </P>
+         */
+        DesignFile: WithRequired<components["schemas"]["DesignNode"], "modified" | "name" | "path" | "type"> & {
             /**
              * Format: int64
              * @description <P>
@@ -343,13 +343,6 @@ export interface components {
              */
             name: string;
             /**
-             * @description The children of the node.
-             *     <P>
-             *     If this is null then the node is a file, otherwise it is a directory.
-             *     </P>
-             */
-            children?: components["schemas"]["DesignNode"][];
-            /**
              * @description <P>
              *     The relative path to the node from the root.
              *     </P>
@@ -365,6 +358,13 @@ export interface components {
              *     </P>
              */
             modified: string;
+            /**
+             * @description <P>
+             *     The type of this node, whether it is a dir or a file.
+             *     </P>
+             * @enum {string}
+             */
+            type: "file" | "dir";
         };
         /**
          * @description <p>A definition of a rule that prevents a pipeline from running if previous runs that match the scope and time limit exceed the byte count.</p>
@@ -4360,13 +4360,41 @@ export interface components {
          *     A directory containing documentation files.
          *     </P>
          */
-        DocDir: WithRequired<components["schemas"]["DocNode"], "children" | "name" | "path">;
+        DocDir: {
+            /**
+             * @description <P>
+             *     The leaf name of the node.
+             *     </P>
+             */
+            name: string;
+            /**
+             * @description <P>
+             *     The relative path to the node from the root.
+             *     </P>
+             */
+            path: string;
+            /**
+             * @description The children of the node.
+             *     <P>
+             *     If this is null then the node is a file, otherwise it is a directory.
+             *     </P>
+             */
+            children: components["schemas"]["DocNode"][];
+            /**
+             * @description <P>
+             *     The type of this node, whether it is a dir or a file.
+             *     </P>
+             *      (enum property replaced by openapi-typescript)
+             * @enum {string}
+             */
+            type: "dir";
+        };
         /**
          * @description <P>
          *     A documentation file.
          *     </P>
          */
-        DocFile: WithRequired<components["schemas"]["DocNode"], "name" | "path"> & {
+        DocFile: Omit<WithRequired<components["schemas"]["DocNode"], "name" | "path" | "type">, "type"> & {
             /**
              * @description <P>
              *     The title of the document.
@@ -4376,6 +4404,18 @@ export interface components {
              *     </P>
              */
             title: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "file";
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "file";
         };
         /**
          * @description <P>
@@ -4390,18 +4430,18 @@ export interface components {
              */
             name: string;
             /**
-             * @description The children of the node.
-             *     <P>
-             *     If this is null then the node is a file, otherwise it is a directory.
-             *     </P>
-             */
-            children?: components["schemas"]["DocNode"][];
-            /**
              * @description <P>
              *     The relative path to the node from the root.
              *     </P>
              */
             path: string;
+            /**
+             * @description <P>
+             *     The type of this node, whether it is a dir or a file.
+             *     </P>
+             * @enum {string}
+             */
+            type: "file" | "dir";
         } & (components["schemas"]["DocDir"] | components["schemas"]["DocFile"]);
         /** @description Information about requests made to the query engine by a single user. */
         AuditHistory: {
@@ -4421,6 +4461,26 @@ export interface components {
              *     <P>The number of entries in this array should be no greater than the maxRows argument passed in the request for history.</P>
              */
             rows: components["schemas"]["AuditHistoryRow"][];
+        };
+        /** @description A single log record from a single request. */
+        AuditHistoryLogRow: {
+            /**
+             * Format: date-time
+             * @description The time of the log event.
+             */
+            timestamp: string;
+            /** @description The pipe being run from the pipeline. */
+            pipe: string;
+            /** @description The log level of this log record. */
+            level: string;
+            /** @description The name of the logger (typically the class). */
+            loggerName: string;
+            /** @description The name of the thread recording the message. */
+            threadName: string;
+            /** @description The log message. */
+            message: string;
+            /** @description Any KeyValuePair data associated with the log message. */
+            kvp: components["schemas"]["PrimitiveKeyValuePair"][];
         };
         /** @description Record of a request made against the Query Engine. */
         AuditHistoryRow: {
@@ -4470,19 +4530,93 @@ export interface components {
              * @description The time between the request being made and the final row being returned.
              */
             responseDuration: number;
+            /**
+             * Format: int32
+             * @description The count of warnings and errors that occurred during the pipeline run.
+             */
+            warningCount: number;
+            /**
+             * @description The warnings and errors recorded during the pipeline run.
+             *     <P>
+             *     This value will only be set for requests made by global operators.
+             */
+            warnings?: components["schemas"]["AuditHistoryLogRow"][];
+            /**
+             * @description Details of the queries actually used during the pipeline run.
+             *     <P>
+             *     This value will only be set for requests made by global operators.
+             */
+            sources: components["schemas"]["AuditHistorySourceRow"][];
+        };
+        /** @description Details of a source referenced by a query. */
+        AuditHistorySourceRow: {
+            /** @description The name of the SourcePipeline being executed to reference this source. */
+            pipe: string;
+            /**
+             * Format: date-time
+             * @description The time of the source being referenced.
+             */
+            timestamp: string;
+            /** @description The name of the SourcePipeline being executed to reference this source. */
+            sourceHash: string;
+            /** @description The name of the endpoint being accessed. */
+            endpoint: string;
+            /** @description The URL of the endpoint. */
+            url: string;
+            /** @description The username used to connect to the endpoint. */
+            username: string;
+            /** @description The query being executed against the endpoint. */
+            query: string;
+            /** @description All arguments being passed to the query. */
+            arguments: (number | boolean | string)[];
+        };
+        /** @description A Key/Value pair recorded at the time of the log message. */
+        PrimitiveKeyValuePair: {
+            /** @description The Key for this Key/Value pair recorded at the time of the log message. */
+            key?: string;
+            /** @description The Value for this Key/Value pair recorded at the time of the log message. */
+            value?: string | number | boolean;
         };
         /**
          * @description <P>
          *     A directory containing pipelines.
          *     </P>
          */
-        PipelineDir: WithRequired<components["schemas"]["PipelineNode"], "children" | "name" | "path">;
+        PipelineDir: {
+            /**
+             * @description <P>
+             *     The leaf name of the node.
+             *     </P>
+             */
+            name: string;
+            /**
+             * @description <P>
+             *     The relative path to the node from the root.
+             *     </P>
+             */
+            path: string;
+            /**
+             * @description The children of the node.
+             *     <P>
+             *     If this is null then the node is a file, otherwise it is a directory.
+             *     </P>
+             */
+            children: components["schemas"]["PipelineNode"][];
+            /**
+             * @description <P>
+             *     The type of this node, whether it is a dir or a file.
+             *     </P>
+             *      (enum property replaced by openapi-typescript)
+             * @enum {string}
+             */
+            type: "dir";
+        };
         /**
          * @description <P>
          *     A pipeline.
          *     </P>
          */
-        PipelineFile: WithRequired<components["schemas"]["PipelineNode"], "name" | "path"> & {
+        PipelineFile: Omit<WithRequired<components["schemas"]["PipelineNode"], "name" | "path" | "type">, "type"> & {
             /**
              * @description <P>
              *     The title of the pipeline, to be displayed in the UI.
@@ -4495,6 +4629,18 @@ export interface components {
              *     </P>
              */
             description?: string;
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "file";
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "file";
         };
         /** @description Base class for pipelines and the directories that contain them. */
         PipelineNode: {
@@ -4505,18 +4651,18 @@ export interface components {
              */
             name: string;
             /**
-             * @description The children of the node.
-             *     <P>
-             *     If this is null then the node is a file, otherwise it is a directory.
-             *     </P>
-             */
-            children?: components["schemas"]["PipelineNode"][];
-            /**
              * @description <P>
              *     The relative path to the node from the root.
              *     </P>
              */
             path: string;
+            /**
+             * @description <P>
+             *     The type of this node, whether it is a dir or a file.
+             *     </P>
+             * @enum {string}
+             */
+            type: "file" | "dir";
         } & (components["schemas"]["PipelineDir"] | components["schemas"]["PipelineFile"]);
         /**
          * @description <P>
@@ -4917,7 +5063,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    get: {
+    getAuthConfig: {
         parameters: {
             query?: never;
             header?: never;
@@ -5119,7 +5265,7 @@ export interface operations {
             };
         };
     };
-    getAvailable: {
+    getAllDocumentation: {
         parameters: {
             query?: never;
             header?: never;
@@ -5134,12 +5280,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DocNode"][];
+                    "application/json": components["schemas"]["DocDir"];
                 };
             };
         };
     };
-    getDoc: {
+    getSingleDocument: {
         parameters: {
             query?: never;
             header?: never;
@@ -5192,6 +5338,12 @@ export interface operations {
                 maxRows?: number;
                 sort?: "timestamp" | "id" | "path" | "host" | "issuer" | "subject" | "username" | "name" | "responseCode" | "responseRows" | "responseSize" | "responseStreamStart" | "responseDuration";
                 desc?: boolean;
+                filterTimestampStart?: string;
+                filterTimestampEnd?: string;
+                filterIssuer?: string;
+                filterName?: string;
+                filterPath?: string;
+                filterResponseCode?: number;
             };
             header?: never;
             path?: never;
@@ -5210,7 +5362,7 @@ export interface operations {
             };
         };
     };
-    getAvailable_1: {
+    getAvailable: {
         parameters: {
             query?: never;
             header?: never;
@@ -5225,7 +5377,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PipelineNode"][];
+                    "application/json": components["schemas"]["PipelineDir"];
                 };
             };
         };
@@ -5241,7 +5393,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description A form.io definition for a given document. */
+            /** @description Details of a pipeline as required by a custom UI. */
             200: {
                 headers: {
                     [name: string]: unknown;
