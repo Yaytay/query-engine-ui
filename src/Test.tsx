@@ -124,7 +124,7 @@ function Test(props : TestProps) {
 
   const [nodeMap, setNodeMap] = useState({} as any)
 
-  const [defaulExpanded, _] = useState(() => {
+  const [defaultExpanded, _] = useState(() => {
     const saved = localStorage.getItem("test-dir-state")
     return saved ? JSON.parse(saved) : saved
   })
@@ -150,12 +150,12 @@ function Test(props : TestProps) {
     AddToNodeMap(nm, dirs, props.available);
     setNodeMap(nm)
 
-    if (defaulExpanded) {
-      setExpanded(dirs.filter(value => defaulExpanded.includes(value)))
+    if (defaultExpanded) {
+      setExpanded(dirs.filter(value => defaultExpanded.includes(value)))
     } else {
       setExpanded(dirs) 
     }
-  }, [props.available])
+  }, [props.available, defaultExpanded])
 
   const handleToggle = (_: React.SyntheticEvent | null, itemIds: string[]) => {
     setExpanded(itemIds)

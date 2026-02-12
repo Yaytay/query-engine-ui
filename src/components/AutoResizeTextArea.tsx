@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useCallback, useLayoutEffect, useRef } from "react";
 
 type AutoResizeTextAreaProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "rows"> & {
   value: string;
@@ -15,11 +15,10 @@ export function AutoResizeTextArea({
 }: AutoResizeTextAreaProps) {
   const ref = useRef<HTMLTextAreaElement | null>(null);
 
-  const resize = () => {
+  const resize = useCallback(() => {
     const el = ref.current;
     if (!el) return;
 
-    // Reset height so scrollHeight is computed from natural content height
     el.style.height = "0px";
 
     const cs = window.getComputedStyle(el);
@@ -42,7 +41,7 @@ export function AutoResizeTextArea({
 
     el.style.height = `${next}px`;
     el.style.overflowY = next >= maxHeight ? "auto" : "hidden";
-  };
+  }, [minRows, maxRows]);
 
   useLayoutEffect(() => {
     resize();
@@ -54,7 +53,7 @@ export function AutoResizeTextArea({
     ro.observe(el);
 
     return () => ro.disconnect();
-  }, [value, minRows, maxRows]);
+  }, [value, minRows, maxRows, resize]);
 
   return (
     <textarea

@@ -76,6 +76,11 @@ function Help(props : HelpProps) {
     );
   }
 
+  const [defaultExpanded, _] = useState(() => {
+    const saved = localStorage.getItem("help-dir-state")
+    return saved ? JSON.parse(saved) : saved
+  })
+
   useEffect(() => {
     function AddToNodeMap(nm: any, dirs: string[], node : components["schemas"]["DocNode"]) {
       if (Array.isArray(node.children)) {
@@ -88,17 +93,12 @@ function Help(props : HelpProps) {
     const dirs = [] as string[]
     AddToNodeMap({}, dirs, props.docs);
 
-    if (defaulExpanded) {
-      setExpanded(dirs.filter(value => defaulExpanded.includes(value)))
+    if (defaultExpanded) {
+      setExpanded(dirs.filter(value => defaultExpanded.includes(value)))
     } else {
       setExpanded(dirs) 
     }
-  }, [props.docs])
-
-  const [defaulExpanded, _] = useState(() => {
-    const saved = localStorage.getItem("help-dir-state")
-    return saved ? JSON.parse(saved) : saved
-  })
+  }, [props.docs, defaultExpanded])
 
   const [expanded, setExpanded] = useState([] as string[])
   const [selected, setSelected] = useState('')

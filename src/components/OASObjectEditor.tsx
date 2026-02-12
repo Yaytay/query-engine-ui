@@ -27,11 +27,6 @@ function OASObjectEditor(props: OASObjectEditorProps) {
   const [object, setObject] = useState<any>()
   const [objectSchema, setObjectSchema] = useState<ObjectType>(props.objectSchema)
 
-  if (!props.objectSchema) {
-    console.log("No schema", props.field, object)
-    return;
-  }
-
   useEffect(() => {
     setObject(props.object)
   }, [props.object])
@@ -54,7 +49,12 @@ function OASObjectEditor(props: OASObjectEditorProps) {
     if (!schemaSet) {
       setObjectSchema(props.objectSchema)
     }
-  }, [props.objectSchema])
+  }, [props.objectSchema, object, props.schema])
+
+  if (!props.objectSchema) {
+    console.log("No schema", props.field, object)
+    return;
+  }
 
   function handleInputChange(changedField: string, value: any) {
     const rep = { ...object }

@@ -35,7 +35,7 @@ function App() {
     , "authConfigs": [] as components["schemas"]["AuthConfig"][] 
   };
 
-  const [baseUrl, _] = useState(buildApiBaseUrl())
+  const [baseUrl] = useState(buildApiBaseUrl())
   const [available, setAvailable] = useState(defaultState.available)
   const [designMode, setDesignMode] = useState(defaultState.designMode)
   const [docs, setDocs] = useState(defaultState.docs)
@@ -72,7 +72,7 @@ function App() {
   }
 
   useEffect(() => {
-    function performProfileFetch(profurl: URL, resolve: (value: unknown) => void) {
+    function performProfileFetch(profurl: URL, resolve: (_value: unknown) => void) {
       fetch(profurl, fetchConfig)
         .then(r => {
           console.log('Profile fetch result: ', r);

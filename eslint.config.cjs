@@ -38,6 +38,11 @@ module.exports = [
     },
 
     rules: {
+      // Turn off the core rule in favour of the TS-aware one
+      "no-unused-vars": "off",
+      // Ignore undefined because Typescript will already find them and eslint doesn't know Typescript built-in types
+      "no-undef": "off",
+
       // React Refresh
       "react-refresh/only-export-components": "warn",
 

@@ -183,7 +183,7 @@ function Design(props : DesignProps) {
         setSnackOpen(true)
       })
 
-  }, [props.baseUrl, handleResponse])
+  }, [props.baseUrl, handleResponse, defaultExpanded])
 
   const [currentFile, setCurrentFile] = useState(null as  components["schemas"]["DesignFile"] | null);
 

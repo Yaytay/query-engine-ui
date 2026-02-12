@@ -39,32 +39,34 @@ function OASValueEditor(props : OASValueEditorProps) {
 
   const classes = "grow bg-transobject appearance-none px-1 text-gray-700 leading-tight font-mono overflow-wrap resize";
 
-  function updateHelpText() {
-    let text
-    if (props.propertyType.description) {
-      text = '<h3>' + props.field + '</h3>' + props.propertyType.description
-    }
-    if (props.propertyType.ref) {
-      const s = props.schema[props.propertyType.ref]
-      if (s) {
-        text = '<h3>' + s.name + '</h3>' + s.description
+  useEffect(() => {
+    function updateHelpText() {
+      let text
+      if (props.propertyType.description) {
+        text = '<h3>' + props.field + '</h3>' + props.propertyType.description
+      }
+      if (props.propertyType.ref) {
+        const s = props.schema[props.propertyType.ref]
+        if (s) {
+          text = '<h3>' + s.name + '</h3>' + s.description
+        }
+      }
+      if (props.propertyType.discriminatorDocs && props.propertyType.discriminatorDocs.has(value)) {
+        text = text + '<br><h2>' + value + '</h2>' + props.propertyType.discriminatorDocs.get(value)
+      }
+
+      if (text) {
+        if (props.onHelpChange) {
+          props.onHelpChange(text)
+        }
       }
     }
-    if (props.propertyType.discriminatorDocs && props.propertyType.discriminatorDocs.has(value)) {
-      text = text + '<br><h2>' + value + '</h2>' + props.propertyType.discriminatorDocs.get(value)
-    }
 
-    if (text) {
-      help(text)
-    }
-  }
-
-  useEffect(() => {
     if (props.propertyType.discriminatorDocs) {
       updateHelpText()
     }
     setValue(props.value)
-  }, [props.value])
+  }, [props, value])
 
   if (props.propertyType.enum) {
     // Enum/select field
