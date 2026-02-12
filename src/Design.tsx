@@ -73,18 +73,18 @@ function Design(props : DesignProps) {
   }
 
   const isDirectory = (n : components["schemas"]["DesignNode"]) : n is components["schemas"]["DesignDir"] => {
-    return Array.isArray(n.children);
+    return n.type == 'dir';
   }
 
   const isFile = (n : components["schemas"]["DesignNode"]) : n is components["schemas"]["DesignFile"] => {
-    return ! Array.isArray(n.children);
+    return n.type == 'file';
   }
 
   const buildNodeMap = useCallback((root : components["schemas"]["DesignDir"]) => {
     const nm = new Map<string, components["schemas"]["DesignNode"]>();
     function addToNodeMap(node : components["schemas"]["DesignNode"] ) {
       nm.set(node.path, node)
-      if (Array.isArray(node.children)) {
+      if (isDirectory(node)) {
         node.children.forEach(n => addToNodeMap(n))
       }
     }
@@ -495,7 +495,7 @@ function Design(props : DesignProps) {
         onDelete={onDelete}
       />
     )
-    const children = Array.isArray(node.children) ? node.children.map((child) => renderTree(child)) : null
+    const children = isDirectory(node) ? node.children.map((child) => renderTree(child)) : null
     return (
       <TreeItem key={node.name} itemId={node.path} label={label}>
         {children}

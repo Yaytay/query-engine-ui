@@ -85,7 +85,7 @@ function TreeViewFileItemLabel(props : TreeViewFileItemLabelProps) {
   }
 
   const isDirectory = (n : components["schemas"]["DesignNode"]) : n is components["schemas"]["DesignDir"] => {
-    return Array.isArray(n.children);
+    return n.type == 'dir';
   }
 
   useEffect(() => {
@@ -93,7 +93,7 @@ function TreeViewFileItemLabel(props : TreeViewFileItemLabelProps) {
   }, [disabled])
 
   const menuItems = []
-  if (Array.isArray(props.node.children)) {
+  if (isDirectory(props.node)) {
     menuItems.push(
       <MenuItem key="newfolder" onClick={e => { e.stopPropagation(); props.onNewFolder && isDirectory(props.node) && props.onNewFolder(props.node) }}>
         <CreateNewFolderIcon fontSize="small" className="mr-2" /> New folder
@@ -118,7 +118,7 @@ function TreeViewFileItemLabel(props : TreeViewFileItemLabelProps) {
         <DriveFileRenameOutlineIcon fontSize="small" className="mr-2" /> Rename
       </MenuItem>
     )
-    if (!props.node.children || props.node.children.length === 0) {
+    if (!isDirectory(props.node) || props.node.children.length === 0) {
       menuItems.push(
         <MenuItem key="delete" onClick={handleDelete}>
           <DeleteIcon fontSize="small" className="mr-2" /> Delete
@@ -143,7 +143,7 @@ function TreeViewFileItemLabel(props : TreeViewFileItemLabelProps) {
         />
       </Box>
       <Box className='flex-none'>
-        <Tooltip title={Array.isArray(props.node.children) ? 'Folder operations' : 'File operations'}>
+        <Tooltip title={isDirectory(props.node) ? 'Folder operations' : 'File operations'}>
           <IconButton
             className="flex-right"
             sx={{ 'borderRadius': '20%' }}
