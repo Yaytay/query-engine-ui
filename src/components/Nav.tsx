@@ -1,6 +1,6 @@
 import './Nav.css';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import Parameters from './Parameters';
 import Modal from 'react-modal';
 import QeIcon from './QeIcon';
@@ -12,13 +12,11 @@ import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import { components } from "../Query-Engine-Schema";
+import {components} from "../Query-Engine-Schema";
 
-import { ManagementEndpointType } from '../Manage';
-import { ArgsToArgs } from '../Test';
-import NestableMenu, { NestableMenuItemData } from './nested-menu/NestableMenu';
-
-let pipeline : components["schemas"]["PipelineFile"]
+import {ManagementEndpointType} from '../Manage';
+import {ArgsToArgs} from '../Test';
+import NestableMenu, {NestableMenuItemData} from './nested-menu/NestableMenu';
 
 const customStyles = {
   content: {
@@ -70,11 +68,11 @@ function Nav(props : NavProps) {
 
   function submitModal(values : any): Promise<void> {
     console.log("Submitted: ", values);
-    if (!pipeline) {
+    if (!pipelineDetails) {
       return Promise.resolve()
     }
-    const query = ArgsToArgs(pipeline, values);
-    const url = props.baseUrl + 'query/' + pipeline.path + (query == null ? '' : ('?' + query))
+    const query = ArgsToArgs(pipelineDetails, values);
+    const url = props.baseUrl + 'query/' + pipelineDetails.path + (query == null ? '' : ('?' + query))
     console.log(url)
   
     if (!values) {
@@ -82,7 +80,7 @@ function Nav(props : NavProps) {
     }
     console.log('submit', values)
     setArgs(values)
-    const w = props.window.open(url, pipeline.path)
+    const w = props.window.open(url, pipelineDetails.path)
     if (window.location.href.startsWith(props.baseUrl)) {
       return new Promise(function(resolve, _) {
         if (w) {
@@ -165,13 +163,14 @@ function Nav(props : NavProps) {
   }
 
   function profileMenuItems(_ : components["schemas"]["Profile"]) : NestableMenuItemData[] {
-    const items : NestableMenuItemData[] = [
-      { key: 'logout', caption: 'Logout', callback: () => {
-        props.clearProfile()
-        window.location.replace('/logout')
-      }}
-    ]
-    return items;
+    return [
+      {
+        key: 'logout', caption: 'Logout', callback: () => {
+          props.clearProfile()
+          window.location.replace('/logout')
+        }
+      }
+    ];
   }
 
   let columns = 1

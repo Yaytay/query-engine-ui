@@ -47,7 +47,7 @@ function App() {
   const [displayServiceUnavailable, setDisplayServiceUnavailable] = useState(false)
 
   function buildApiBaseUrl(): string {
-    let url = ''
+    let url;
     if (import.meta.env.VITE_API_URL) {
       url = import.meta.env.VITE_API_URL
     } else if (import.meta.env.MODE == 'development') {
