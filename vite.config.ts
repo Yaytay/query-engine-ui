@@ -12,9 +12,6 @@ export default defineConfig({
   ],
   base: "",
   appType: "spa",
-  esbuild: {
-    loader: "tsx"  
-  },
   server: {
     open: true,
     port: 5173,
