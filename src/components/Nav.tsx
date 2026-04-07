@@ -99,7 +99,7 @@ function Nav(props : NavProps) {
     }
   }
 
-  if (process.env.NODE_ENV !== 'test') {
+  if (import.meta.env.MODE !== 'test') {
     Modal.setAppElement('#root');
   }
   
