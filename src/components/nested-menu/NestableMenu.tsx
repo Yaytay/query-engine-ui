@@ -74,7 +74,7 @@ function NestableMenu(props: NestableMenuProps) {
     return (
       <div>
         <MenuItem onClick={handleClick}>
-          <Box display="flex" justifyContent="space-between" width="100%">
+          <Box sx={{ display:"flex", justifyContent: "space-between", width: "100%" }} >
             {props.caption}
             <ArrowRightIcon />
           </Box>

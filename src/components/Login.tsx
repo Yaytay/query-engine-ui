@@ -30,7 +30,7 @@ function Login(props: LoginProps) {
 
   return (
     <Modal isOpen={true} style={customStyles}>
-      <Box bgcolor={theme.palette.primary.main} sx={{ padding: '8px', height: 'fit-content', width: '100%' }}>
+      <Box sx={{ padding: '8px', height: 'fit-content', width: '100%', backgroundColor: theme.palette.primary.main }}>
         <Box sx={{width: 'fit-content', padding: 'audo'}}>
           <QeIcon sx={{ mr: 1, float: 'left' }} />
           <Typography
