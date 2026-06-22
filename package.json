@@ -12,7 +12,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@formio/js": "^5.3.5",
+    "@formio/js": "^5.3.6",
     "@formio/react": "^6.2.0",
     "@mui/system": "^9.0.1",
     "@mui/x-tree-view": "^9.1.0",
