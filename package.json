@@ -27,7 +27,7 @@
     "@emotion/styled": "^11.14.1",
     "@eslint/js": "^10.0.1",
     "@fontsource/roboto": "^5.2.10",
-    "@mui/icons-material": "9.0.1",
+    "@mui/icons-material": "9.1.1",
     "@mui/material": "^9.0.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^25.9.3",
