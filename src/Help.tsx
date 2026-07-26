@@ -14,7 +14,7 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
 import { components } from "./Query-Engine-Schema"
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router'
 
 interface HelpProps {
   docs: components["schemas"]["DocDir"]

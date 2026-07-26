@@ -13,7 +13,7 @@ import Tab from '@mui/material/Tab';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem } from '@mui/x-tree-view/TreeItem'
 
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router'
 
 export interface ManagementEndpointType {
   name: string

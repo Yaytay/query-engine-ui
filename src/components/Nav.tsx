@@ -1,6 +1,6 @@
 import './Nav.css';
 import {useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router';
 import Parameters from './Parameters';
 import Modal from 'react-modal';
 import QeIcon from './QeIcon';

@@ -1,7 +1,7 @@
 import Button from "@mui/material/Button";
 import Box from "@mui/system/Box";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 interface JwtProps {
   baseUrl: string 
