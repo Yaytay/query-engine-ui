@@ -39,7 +39,7 @@
     "@typescript-eslint/parser": "^8.64.0",
     "@vitejs/plugin-react": "^6.0.4",
     "autoprefixer": "^10.5.4",
-    "dompurify": "^3.4.12",
+    "dompurify": "^3.4.13",
     "eslint": "^10.7.0",
     "react-modal": "^3.16.3",
     "tailwindcss": "^4.3.3",
