@@ -40,7 +40,7 @@
     "@vitejs/plugin-react": "^6.0.4",
     "autoprefixer": "^10.5.4",
     "dompurify": "^3.4.13",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.1",
     "react-modal": "^3.16.3",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
